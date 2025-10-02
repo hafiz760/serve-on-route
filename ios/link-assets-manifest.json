@@ -1,0 +1,85 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/DMSans-Bold.ttf",
+      "sha1": "ba828d9137dac8d986a3ea97ca56e390897a0b14"
+    },
+    {
+      "path": "assets/fonts/DMSans-BoldItalic.ttf",
+      "sha1": "af5915d120d1f8253c18cb05128777e0fa5682fa"
+    },
+    {
+      "path": "assets/fonts/DMSans-Italic.ttf",
+      "sha1": "d3719e603afd398b4307d3f742dad87d1bc7eb64"
+    },
+    {
+      "path": "assets/fonts/DMSans-Medium.ttf",
+      "sha1": "28f97dacc140468ccd62c24da33b6c597c3c0767"
+    },
+    {
+      "path": "assets/fonts/DMSans-MediumItalic.ttf",
+      "sha1": "86e59dafb24123738647c212c84b762f4e8da672"
+    },
+    {
+      "path": "assets/fonts/DMSans-Regular.ttf",
+      "sha1": "8180c148b1ddb13f1501e6cfff62335c01e682f5"
+    },
+    {
+      "path": "assets/fonts/Poppins-Bold.ttf",
+      "sha1": "45dc28c425c3ee2237440bf9cb926753c5aa3b5c"
+    },
+    {
+      "path": "assets/fonts/Poppins-Light.ttf",
+      "sha1": "3463374351473d252d82eb34761298426fa0e113"
+    },
+    {
+      "path": "assets/fonts/Poppins-Medium.ttf",
+      "sha1": "01be8feaed323d19eeccf16fd79ea3b74206cfdb"
+    },
+    {
+      "path": "assets/fonts/Poppins-Regular.ttf",
+      "sha1": "58ca484f2ec5b8817a63136af362e1db1d29d49e"
+    },
+    {
+      "path": "assets/fonts/Poppins-SemiBold.ttf",
+      "sha1": "c58d147b4cab73fa650aa9ac47044772c794ae42"
+    },
+    {
+      "path": "assets/fonts/Product Sans Bold Italic.ttf",
+      "sha1": "dbc80cda84b300870f0e2c9251a07f0f7ae2a118"
+    },
+    {
+      "path": "assets/fonts/Product Sans Bold.ttf",
+      "sha1": "e07e7ff0ec27cb309c74e5a8df2fb9ad16288f72"
+    },
+    {
+      "path": "assets/fonts/Product Sans Italic.ttf",
+      "sha1": "302e08fb112dd10a524f6fc4987b44b80ee6747f"
+    },
+    {
+      "path": "assets/fonts/Product Sans Regular.ttf",
+      "sha1": "49bdf6c2dc3ca0c772da5bc3d10ff5da23badee3"
+    },
+    {
+      "path": "assets/fonts/Unkempt-Bold.ttf",
+      "sha1": "0dc5b63a1731979c801b7a2bb2347628022cd5f0"
+    },
+    {
+      "path": "assets/fonts/Unkempt-Regular.ttf",
+      "sha1": "194ddd7119f842ef1a9ddf219f7182158cb183f2"
+    },
+    {
+      "path": "assets/fonts/Unna-Bold.ttf",
+      "sha1": "08014f366e6b58b0bd1ef4fb67e092da69b91756"
+    },
+    {
+      "path": "assets/fonts/Unna-Regular.ttf",
+      "sha1": "b6265dc796896b4aea7f194f08b9180352af6f03"
+    },
+    {
+      "path": "assets/fonts/index.js",
+      "sha1": "fb15b8e40a13d29ee9d58fae7ff4887183e43058"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "586663035062",
+    "project_id": "trucke-4c153",
+    "storage_bucket": "trucke-4c153.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586663035062:android:5705ec4072cba8753ca617",
+        "android_client_info": {
+          "package_name": "com.truckie"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDB4gzP7Gp8xcrmYggQSkqkayVd23GpKDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
