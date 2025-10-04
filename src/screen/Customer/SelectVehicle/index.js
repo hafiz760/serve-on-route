@@ -185,7 +185,7 @@ function SelectVehicle(params) {
   };
 
   useEffect(() => {
-    // if (!isFocused) {
+    if (socket) {
     socket.on("bidding", (incomingBid) => {
       const incomingBidId = incomingBid.bidder._id;
       setBids((prevBids) => {
@@ -224,7 +224,7 @@ function SelectVehicle(params) {
         setUntil(0);
       }
     });
-    // }
+     }
   }, []);
 
   const MainModel = ({ value }) => {

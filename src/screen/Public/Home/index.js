@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
 import {DarkStatusBar} from '../../../component/StatusBar';
 import {Button} from '../../../component/Form';
@@ -23,7 +24,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {BASE_URL, GOOGLE_MAPS_KEY, URL_V} from '../../../utilities/helper';
 import {navigate} from '../../../navigations';
 import axios from 'axios';
-import { updateUser } from '../../../store/reducers/session';
+import {updateUser} from '../../../store/reducers/session';
 // const GOOGLE_MAPS_APIKEY = "AIzaSyATpSrcISxeRrwW8iTnB2j_C8UNR7Dv4f8";
 const GOOGLE_MAPS_APIKEY = GOOGLE_MAPS_KEY;
 // console.log('GOOGLE_MAPS_APIKEY>>>>>>', GOOGLE_MAPS_APIKEY);
@@ -37,8 +38,8 @@ const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 export default function Home(params) {
-  const user = useSelector((state) => state.session.user);
-  console.log("user on home",JSON.stringify(user,null,2));
+  const user = useSelector(state => state.session.user);
+  console.log('user on home', JSON.stringify(user, null, 2));
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const {socket} = useSelector(state => state.socket);
@@ -190,7 +191,6 @@ export default function Home(params) {
     }
   }, [isFocused]);
 
-
   return (
     <Container>
       <DarkStatusBar />
@@ -200,30 +200,28 @@ export default function Home(params) {
           <View style={styles.formRow}>
             <Icon name="dot-circle-o" type="FontAwesome" />
             <GooglePlacesAutocomplete
-
               nearbyPlacesAPI="None"
               ref={pickupRef}
-              onFail={(error) => console.log(error)}
+              onFail={error => console.log(error)}
               placeholder="Pickup location"
               textInputProps={{
-                placeholderTextColor: "#59499E",
-                returnKeyType: "search",
+                placeholderTextColor: '#59499E',
+                returnKeyType: 'search',
                 // value: pickupCords.locationName || "",
               }}
               styles={{
                 textInput: {
-                  color: "black",
+                  color: 'black',
                 },
                 listView: {
-                  color: "black",
+                  color: 'black',
                 },
                 description: {
-                  color: "black",
+                  color: 'black',
                 },
                 predefinedPlacesDescription: {
-                  color: "black",
+                  color: 'black',
                 },
-
               }}
               currentLocation
               currentLocationLabel="Current location"
@@ -237,7 +235,7 @@ export default function Home(params) {
                 if (!coords?.locationName) {
                   const returnedAddress = await handleReverseGeocoding(
                     coords?.latitude,
-                    coords?.longitude
+                    coords?.longitude,
                   );
 
                   coords.locationName = returnedAddress;
@@ -251,12 +249,12 @@ export default function Home(params) {
               }}
               query={{
                 key: GOOGLE_MAPS_APIKEY,
-                language: "en",
+                language: 'en',
               }}
               minLength={2}
-              GooglePlacesDetailsQuery={{ fields: "geometry" }}
+              GooglePlacesDetailsQuery={{fields: 'geometry'}}
               autoFocus={false}
-              returnKeyType={"default"}
+              returnKeyType={'default'}
               fetchDetails={true}
               enablePoweredByContainer={false}
               renderRightButton={() => {
@@ -437,6 +435,53 @@ export default function Home(params) {
                 />
               )}
             </MapView>
+            <TouchableOpacity
+  style={{
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 12,
+    elevation: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+  onPress={() => {
+    Geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Reverse geocode to get address (optional)
+        const address = await handleReverseGeocoding(latitude, longitude);
+
+        // Update state with new pickup cords
+        setState((prev) => ({
+          ...prev,
+          pickupCords: { latitude, longitude, locationName: address },
+        }));
+
+        pickupRef.current?.setAddressText(address);
+
+        // Animate camera to user location
+        mapRef.current?.animateToRegion({
+          latitude,
+          longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        });
+      },
+      (error) => {
+        console.log('Error getting current location:', error);
+        alert('Unable to fetch your location. Please enable GPS.');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+    );
+  }}
+>
+  <Text style={{ fontSize: 22 }}>📍</Text>
+</TouchableOpacity>
+
 
             {!state?.pickupCords?.latitude && (
               <View
