@@ -14,7 +14,6 @@ import {
   TextInput,
   Button,
   ToggleSwitch,
-  Checkbox,
 } from '../../../component/Form';
 import DatePicker from 'react-native-date-picker';
 
@@ -27,7 +26,6 @@ import {DarkStatusBar} from '../../../component/StatusBar';
 import {useEffect} from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Hyperlink from 'react-native-hyperlink';
 import DocumentPicker from 'react-native-document-picker';
 import {showMessage} from '../../../helper/showAlert';
 import AppSpinner from '../../../component/AppSpinner';
@@ -119,7 +117,7 @@ const [backLicenseImage, setBackLicenseImage] = useState(null);
   //     }
   //   }
   // };
-  const removeFrontIdImage = () => setFrontIdImage(null);
+const removeFrontIdImage = () => setFrontIdImage(null);
 const removeBackIdImage = () => setBackIdImage(null);
 const getPhotoForFront = () => {
   ImagePicker.openCamera({
@@ -142,8 +140,6 @@ const getPhotoForFront = () => {
     // setUploadedFrontIdPath(uploadedPath); // <-- Save this for final submit
   }).catch(e => console.log(e));
 };
-
-
 const getPhotoForBack = () => {
   ImagePicker.openCamera({
     width: 300,
@@ -187,8 +183,6 @@ const getPhotoForFrontLicense = () => {
     // setUploadedFrontLicensePath(uploadedPath);
   }).catch(e => console.log(e));
 };
-
-
 const getPhotoForBackLicense = () => {
   ImagePicker.openCamera({
     width: 300,
@@ -212,10 +206,7 @@ const getPhotoForBackLicense = () => {
   }).catch(e => console.log(e));
 };
 
-
-
-
-  const UploadData = async setPath => {
+const UploadData = async setPath => {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
@@ -253,55 +244,58 @@ const getPhotoForBackLicense = () => {
     setImageForShowSelfi(updatedImageData);
   };
 
-  const getData = async () => {
-    var data = await AsyncStorage.getItem('response');
-    var datas = JSON.parse(data);
-    // console.log(datas);
+  const sanitizeValue = (val) => {
+  if (!val || typeof val !== 'string') return '';
+  const cleaned = val.trim().toLowerCase();
+  const invalids = ['string', 'undefined', 'null', 'n/a', 'na', 'none'];
+  return invalids.includes(cleaned) ? '' : val;
+};
 
-    const res = axios
-      .get(
-        `  https://api.serveonroute.com/v1/users/user-by-id/${datas._id}`,
+const getData = async () => {
+  try {
+    const data = await AsyncStorage.getItem('response');
+    const datas = JSON.parse(data);
 
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
+    const res = await axios.get(
+      `https://api.serveonroute.com/v1/users/user-by-id/${datas._id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${datas.access_token}`,
         },
-      )
-      .then(data => {
-        console.log(
-          'res account no>>>>>>',
-          JSON.stringify(data.data.data, null, 2),
-        );
-        dispatch(updateUser(data.data.data));
-        setName(data.data.data.first_name);
-        setProfile(data.data.data.cover_image);
-        setVehicalNumber(data.data.data.vehicle_no);
-        // setDrivingLiscence(data.data.data.driving_license);
-          setFrontIdImage(data?.data.data?.driving_license[0] || null)
-          setBackIdImage(data?.data.data?.driving_license[1] || null)
-          setFrontLicenseImage(data?.data.data?.ID_file[0] || null);
-          setBackLicenseImage(data?.data.data?.ID_file[1] || null);
-          SetCarName(data?.data.data?.car_name)
-      
-        setLicense(data?.data.data?.driving_license[0]);
-        setDisplayDate(data?.data?.data?.driving_license_expiry);
-        if (data?.data?.data?.driving_license_expiry) {
-          setIsDateExist(true);
-        }
-        setPhoneNumber(data?.data?.data?.phone);
-        setProfileHttp(data.data.data.avatar);
-        setEmail(data.data.data.email);
+      }
+    );
 
-        setLoading(false);
-        setNationalCard(data.data?.data?.ID);
-      })
-      .catch(err => {
-        console.log('Get data account error');
-        console.log('error', err);
-        setLoading(false);
-      });
-  };
+    const userData = res.data.data;
+    console.log('res account no>>>>>>', JSON.stringify(userData, null, 2));
+    dispatch(updateUser(userData));
+    setName(sanitizeValue(userData.first_name));
+    SetCarNumber(userData?.vehicle_no || '');
+    setDrivingLiscence(userData.license_id || '');
+    setProfile(sanitizeValue(userData.cover_image));
+    setVehicalNumber(sanitizeValue(userData.vehicle_no));
+    setFrontIdImage(userData?.driving_license?.[0] || null);
+    setBackIdImage(userData?.driving_license?.[1] || null);
+    setFrontLicenseImage(userData?.ID_file?.[0] || null);
+    setBackLicenseImage(userData?.ID_file?.[1] || null);
+    SetCarName(sanitizeValue(userData.car_name));
+    setLicense(userData?.driving_license?.[0] || null);
+    setDisplayDate(sanitizeValue(userData.driving_license_expiry));
+
+    if (userData?.driving_license_expiry && sanitizeValue(userData.driving_license_expiry)) {
+      setIsDateExist(true);
+    }
+
+    setPhoneNumber(sanitizeValue(userData.phone));
+    setProfileHttp(sanitizeValue(userData.avatar));
+    setEmail(sanitizeValue(userData.email));
+    setNationalCard(sanitizeValue(userData.ID));
+
+    setLoading(false);
+  } catch (err) {
+    console.log('Get data account error', err);
+    setLoading(false);
+  }
+};
 
   const fetchData = async () => {
     try {
@@ -442,7 +436,7 @@ const getPhotoForBackLicense = () => {
       return null;
     }
   };
-  
+
   async function onSubmit() {
     await Support.showSuccess({
       title: 'Success!',
@@ -454,65 +448,8 @@ const getPhotoForBackLicense = () => {
     });
   }
 
-  // const submit = async () => {
-  //   console.log(
-  //     name,
-  //     email,
-  //     drivingLiscence,
-  //     phoneNumber,
-  //     profile,
-  //     nationalCard,
-  //   );
-  //   var data = await AsyncStorage.getItem('response');
-  //   var datas = JSON.parse(data);
-  //   const formData = new FormData();
-  //   formData.append('first_name', name);
-  //   // formData.append("lastame", second);
-  //   formData.append('cover_image_file', profile);
-  //   // formData.append('cover_image',JSON.stringify(profile));
-  //   formData.append('avatar_file', profile);
-  //   formData.append('national_ID_file', idCardCheck);
-  //   // formData.append("national_ID_file", idCardCheck);
-  //   formData.append('phone', phoneNumber);
-  //   formData.append('vehicle_no', vehicalNumber);
-  //   formData.append('driving_license', drivingLiscence);
-  //   formData.append('driving_license_file', licenseProofCheck);
-  //   formData.append('driving_license_expiry', displayDate);
-  //   formData.append('email', email);
-
-  //   console.log('FormData', formData);
-
-  //   const requestOptions = {
-  //     method: 'PUT',
-  //     headers: {
-  //       Authorization: `Bearer ${datas.access_token}`,
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //     body: formData,
-  //   };
-  //   try {
-  //     const res = await fetch(
-  //       'https://api.serveonroute.com/v1/users/update-user',
-  //       requestOptions,
-  //     );
-  //     console.log('update res', JSON.stringify(res.status, null, 2));
-  //     const result = await res.json();
-  //     if (res.status == 200) {
-  //       getData();
-  //     }
-  //     showMessage('success', 'Profile Updated Successfully');
-  //     // dispatch(updateUser(result.result));
-  //     AsyncStorage.setItem('userName', name);
-  //     // AsyncStorage.setItem('coverImage',profile)
-
-  //     // AsyncStorage.JSON.stringify().setItem('avatar_file',profile)
-  //     AsyncStorage.setItem('coverImage', JSON.stringify(profile));
-  //   } catch (err) {
-  //     console.log('ERROR', err);
-  //   }
-  // };
   const submit = async () => {
-    setLoading(true)
+    setLoading(true);
     console.log(
       name,
       email,
@@ -525,11 +462,53 @@ const getPhotoForBackLicense = () => {
       frontLicenseImage,
       backLicenseImage,
     );
-  
     try {
+       const sanitize = (v) =>
+      v && typeof v === 'string'
+        ? v.trim()
+        : v || ''; // handle null/undefined
+
+    const requiredFields = {
+      name: sanitize(name),
+      phoneNumber: sanitize(phoneNumber),
+      gender: sanitize(itemsType),
+      nationalCard: sanitize(nationalCard),
+      carNumber: sanitize(carnumber),
+      carName: sanitize(carname),
+      drivingLiscence: sanitize(drivingLiscence),
+      displayDate: sanitize(displayDate),
+    };
+    for (const [key, value] of Object.entries(requiredFields)) {
+      if (!value) {
+        showMessage(
+          'error',
+          `Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`
+        );
+        setLoading(false);
+        return; // stop execution
+      }
+    }
+    if (!frontIdImage || !backIdImage) {
+      showMessage('error', 'Please upload both front and back ID card images');
+      setLoading(false);
+      return;
+    }
+
+    if (!frontLicenseImage || !backLicenseImage) {
+      showMessage(
+        'error',
+        'Please upload both front and back driving license images'
+      );
+      setLoading(false);
+      return;
+    }
+    if (!profile) {
+      showMessage('error', 'Please upload your profile image');
+      setLoading(false);
+      return;
+    }
       const data = await AsyncStorage.getItem('response');
       const datas = JSON.parse(data);
-  
       const formData = new FormData();
       formData.append('first_name', name);
       // formData.append('last_name', lastName); // if you have
@@ -538,12 +517,10 @@ const getPhotoForBackLicense = () => {
       formData.append('vehicle_no', carnumber);
       formData.append('car_name', carname);
       formData.append('gender', itemsType);
-      formData.append('driving_license', drivingLiscence);
+      formData.append('license_id', drivingLiscence);
       formData.append('driving_license_expiry', displayDate);
-      formData.append('ID', nationalCard); // your ID number field
-  
-      // avatar_file & cover_image_file (single file)
-      if (profile?.uri) {
+      formData.append('ID', nationalCard); 
+        if (profile?.uri) {
         formData.append('avatar_file', {
           uri: profile.uri,
           type: profile.type || 'image/jpeg',
@@ -559,14 +536,14 @@ const getPhotoForBackLicense = () => {
       // national_ID_file (array of front & back)
       if (frontIdImage) {
         formData.append('national_ID_file', {
-          uri: frontIdImage.uri||frontIdImage,
+          uri: frontIdImage.uri || frontIdImage,
           type: frontIdImage.type || 'image/jpeg',
           name: frontIdImage.name || 'front_id.jpg',
         });
       }
       if (backIdImage) {
         formData.append('national_ID_file', {
-          uri: backIdImage.uri||backIdImage,
+          uri: backIdImage.uri || backIdImage,
           type: backIdImage.type || 'image/jpeg',
           name: backIdImage.name || 'back_id.jpg',
         });
@@ -575,14 +552,14 @@ const getPhotoForBackLicense = () => {
       // driving_license_file (array of front & back)
       if (frontLicenseImage) {
         formData.append('driving_license_file', {
-          uri: frontLicenseImage.uri||frontLicenseImage,
+          uri: frontLicenseImage.uri || frontLicenseImage,
           type: frontLicenseImage.type || 'image/jpeg',
           name: frontLicenseImage.name || 'front_license.jpg',
         });
       }
       if (backLicenseImage) {
         formData.append('driving_license_file', {
-          uri: backLicenseImage.uri||backLicenseImage,
+          uri: backLicenseImage.uri || backLicenseImage,
           type: backLicenseImage.type || 'image/jpeg',
           name: backLicenseImage.name || 'back_license.jpg',
         });
@@ -642,7 +619,7 @@ const getPhotoForBackLicense = () => {
       console.log('ERROR', err);
       showMessage('error', 'Something went wrong');
     }finally{
-      setLoading(false)
+      setLoading(false);
     }
   };
   
@@ -941,7 +918,7 @@ const getPhotoForBackLicense = () => {
   {frontIdImage ? (
     <>
       <Image
-        source={{uri: frontIdImage.uri||frontIdImage}}
+        source={{uri: frontIdImage.uri || frontIdImage}}
         style={{width: '100%', height: '100%'}}
         resizeMode="cover"
       />
@@ -987,7 +964,7 @@ const getPhotoForBackLicense = () => {
   {backIdImage ? (
     <>
       <Image
-        source={{uri: backIdImage.uri||backIdImage}}
+        source={{uri: backIdImage.uri || backIdImage}}
         style={{width: '100%', height: '100%'}}
         resizeMode="cover"
       />
@@ -1169,7 +1146,7 @@ const getPhotoForBackLicense = () => {
       {frontLicenseImage ? (
         <>
           <Image
-            source={{uri: frontLicenseImage.uri||frontLicenseImage}}
+            source={{uri: frontLicenseImage.uri || frontLicenseImage}}
             style={{width: '100%', height: '100%'}}
             resizeMode="cover"
           />
@@ -1214,7 +1191,7 @@ const getPhotoForBackLicense = () => {
       {backLicenseImage ? (
         <>
           <Image
-            source={{uri: backLicenseImage.uri||backLicenseImage}}
+            source={{uri: backLicenseImage.uri || backLicenseImage}}
             style={{width: '100%', height: '100%'}}
             resizeMode="cover"
           />

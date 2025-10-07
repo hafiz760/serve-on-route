@@ -1,90 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { View, ScrollView, Text, Image, AppRegistry } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
-import { Container, Content, Icon } from "../../../component/Basic";
-import { TextInput, Button, ToggleSwitch, Checkbox } from "../../../component/Form";
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text, Image, AppRegistry } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { Container, Content, Icon } from '../../../component/Basic';
+import { TextInput, Button, ToggleSwitch, Checkbox } from '../../../component/Form';
 // import ImagePicker from "react-native-image-crop-picker";
-import Modal from "react-native-modalbox";
-import { CreditCardInput } from "react-native-credit-card-input";
-import styles from "./styles";
-import theme from "../../../theme/styles";
-import axios from "axios";
-import Header from "../../../component/Header";
-import Support from "../../../component/Support";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import DocumentPicker from "react-native-document-picker";
+import Modal from 'react-native-modalbox';
+import { CreditCardInput } from 'react-native-credit-card-input';
+import styles from './styles';
+import theme from '../../../theme/styles';
+import axios from 'axios';
+import Header from '../../../component/Header';
+import Support from '../../../component/Support';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DocumentPicker from 'react-native-document-picker';
 
 
-import { DarkStatusBar } from "../../../component/StatusBar";
-import { showMessage } from "../../../helper/showAlert";
-import { useDispatch, useSelector } from "react-redux";
+import { DarkStatusBar } from '../../../component/StatusBar';
+import { showMessage } from '../../../helper/showAlert';
+import { useDispatch, useSelector } from 'react-redux';
 // import {BASE_URL,URL_V} from "@env"
-import { BASE_URL, URL_V } from "../../../utilities/helper";
-import { navigate, navigateReset } from "../../../navigations";
-import { updateUser } from "../../../store/reducers/session";
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate, navigateReset } from '../../../navigations';
+import { updateUser } from '../../../store/reducers/session';
 
 export default function ManageProfile() {
   const dispatch = useDispatch();
   const [information, setInformation] = useState({});
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState();
   const [values, setValues] = useState();
-  console.log("values",values);
+  console.log('values',values);
   const [valuesHttp, setValuesHttp] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [CardInput, setCardInput] = useState({});
-  const [tabSelected, setTabSelected] = useState("profile");
-  const [PaymentTabSelected, setPaymentTabSelected] = useState("card");
+  const [tabSelected, setTabSelected] = useState('profile');
+  const [PaymentTabSelected, setPaymentTabSelected] = useState('card');
   const { token1 } = useSelector((state) => state.session);
-  const [itemsType, setItemsType] = useState("Male");
+  const [itemsType, setItemsType] = useState('Male');
   const [openModel, setOpenModel] = useState(false);
   const [avatar, setAvatar] = useState();
   const [items, setItems] = useState([
-    { label: "Male", value: "Male" },
-    { label: "Female", value: "Female" },
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
   ]);
   useEffect(() => {
     fetchData();
   }, []);
 
-  const postData = async () => {
-    var data = await AsyncStorage.getItem("response");
-    var datas = JSON.parse(data);
+const postData = async () => {
+  // Check mandatory fields
+  if (!firstName?.trim()) {
+    showMessage('error', 'First name is required');
+    return;
+  }
+  if (!lastName?.trim()) {
+    showMessage('error', 'Last name is required');
+    return;
+  }
+  if (!itemsType) {
+    showMessage('error', 'Please select gender');
+    return;
+  }
+  // if (!values) {
+  //   showMessage('error', 'Please upload a profile image');
+  //   return;
+  // }
+
+  try {
+    const data = await AsyncStorage.getItem('response');
+    const datas = JSON.parse(data);
+
     const formData = new FormData();
-    formData.append("first_name", firstName);
-    formData.append("last_name", lastName);
-    formData.append("avatar_file", values);
-    formData.append("gender", gender);
-    formData.append('cover_image',values);
-    console.log("EditedFrofileFormData", formData);
+    formData.append('first_name', firstName);
+    formData.append('last_name', lastName);
+    formData.append('avatar_file', values);
+    formData.append('gender', itemsType);
+    formData.append('cover_image', values);
+
+    console.log('EditedProfileFormData', formData);
 
     const requestOptions = {
-      method: "PUT",
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${datas.access_token}`,
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
       body: formData,
     };
-    try {
-      const res = await fetch(
-        `${BASE_URL}${URL_V}users/update-user`,
-        requestOptions
-      );
-      const result = await res.json();
-      console.log("RESULT", result);
-      fetchData()
-      showMessage("success", "Profile is Updated SuccessFully");
-    } catch (err) {
-      showMessage("error", "Error While Updating Profile");
-      console.log("ERROR");
-    }
-  };
-  
+
+    const res = await fetch(`${BASE_URL}${URL_V}users/update-user`, requestOptions);
+    const result = await res.json();
+
+    console.log('RESULT', result);
+    fetchData();
+    showMessage('success', 'Profile updated successfully');
+  } catch (err) {
+    console.log('ERROR', err);
+    showMessage('error', 'Error while updating profile');
+  }
+};
+
 
   const fetchData = async () => {
-    var data = await AsyncStorage.getItem("response");
+    var data = await AsyncStorage.getItem('response');
     var datas = JSON.parse(data);
 
     const res = await axios
@@ -100,10 +119,10 @@ export default function ManageProfile() {
         setLastName(data.data.data.last_name);
         setGender(data.data.data.gender);
         setValuesHttp(data.data.data.avatar);
-        console.log("DATA API:", JSON.stringify(data.data.data,null,2));
+        console.log('DATA API:', JSON.stringify(data.data.data,null,2));
       })
       .catch((err) => {
-        console.log(("errors", err.response.data));
+        console.log(('errors', err.response.data));
       });
   };
 
@@ -163,15 +182,15 @@ export default function ManageProfile() {
   // }
 
   async function onSubmit() {
-    if (CardInput.valid == false || typeof CardInput.valid == "undefined") {
-      alert("Invalid Credit Card");
+    if (CardInput.valid == false || typeof CardInput.valid === 'undefined') {
+      alert('Invalid Credit Card');
       return false;
     } else {
       await Support.showSuccess({
-        title: "Success!",
-        message: "Transaction success",
+        title: 'Success!',
+        message: 'Transaction success',
         onHide: () => {
-          navigateReset("");
+          navigateReset('');
         },
         hideDelay: 2500,
       });
@@ -196,7 +215,6 @@ export default function ManageProfile() {
 
   function renderProfile() {
     return (
-     
       <View style={styles.profileContainer}>
         <View style={styles.profileContent}>
         <ScrollView>
@@ -207,7 +225,7 @@ export default function ManageProfile() {
                   uri:
                     values?.uri ||
                     valuesHttp ||
-                    "https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg",
+                    'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
                   // uri: values,
                   // uri: "file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg" ,
                 }}
@@ -285,7 +303,7 @@ export default function ManageProfile() {
           </ScrollView>
         </View>
       </View>
-      
+
     );
   }
   function renderPermission() {
@@ -320,7 +338,7 @@ export default function ManageProfile() {
           <Button
             style={styles.saveBtn}
             onPress={() => {
-              navigate("CustomerSelectVehicle");
+              navigate('CustomerSelectVehicle');
             }}
           >
             <Text style={styles.saveBtnText}>SAVE</Text>
@@ -336,16 +354,16 @@ export default function ManageProfile() {
           <View style={styles.tabInfo}>
             <Button
               style={
-                PaymentTabSelected === "card"
+                PaymentTabSelected === 'card'
                   ? styles.tabActive1
                   : styles.tabInactive
               }
-              onPress={() => setPaymentTabSelected("card")}
+              onPress={() => setPaymentTabSelected('card')}
             >
               <Image
-                source={require("../../../assets/images/payment-card.png")}
+                source={require('../../../assets/images/payment-card.png')}
                 style={
-                  PaymentTabSelected === "card"
+                  PaymentTabSelected === 'card'
                     ? styles.tabImgActive
                     : styles.tabImgInactive
                 }
@@ -354,16 +372,16 @@ export default function ManageProfile() {
             </Button>
             <Button
               style={
-                PaymentTabSelected === "paypal"
+                PaymentTabSelected === 'paypal'
                   ? styles.tabActive1
                   : styles.tabInactive
               }
-              onPress={() => setPaymentTabSelected("paypal")}
+              onPress={() => setPaymentTabSelected('paypal')}
             >
               <Image
-                source={require("../../../assets/images/download.png")}
+                source={require('../../../assets/images/download.png')}
                 style={
-                  PaymentTabSelected === "paypal"
+                  PaymentTabSelected === 'paypal'
                     ? styles.tabImgActive
                     : styles.tabImgInactive
                 }
@@ -406,7 +424,7 @@ export default function ManageProfile() {
   return (
     <Container>
       <DarkStatusBar />
-      <Header default leftType="back" title={""} />
+      <Header default leftType="back" title={''} />
       <Content contentContainerStyle={theme.layoutDf}>
         <View>
           <View style={styles.profileHeader}>
@@ -417,15 +435,15 @@ export default function ManageProfile() {
             <View style={styles.tabInfo}>
               <Button
                 style={
-                  tabSelected === "profile"
+                  tabSelected === 'profile'
                     ? styles.tabActive
                     : styles.tabInactive
                 }
-                onPress={() => setTabSelected("profile")}
+                onPress={() => setTabSelected('profile')}
               >
                 <Text
                   style={
-                    tabSelected === "profile"
+                    tabSelected === 'profile'
                       ? styles.tabTextActive
                       : styles.tabTextInactive
                   }
@@ -435,15 +453,15 @@ export default function ManageProfile() {
               </Button>
               <Button
                 style={
-                  tabSelected === "permission"
+                  tabSelected === 'permission'
                     ? styles.tabActive
                     : styles.tabInactive
                 }
-                onPress={() => setTabSelected("permission")}
+                onPress={() => setTabSelected('permission')}
               >
                 <Text
                   style={
-                    tabSelected === "permission"
+                    tabSelected === 'permission'
                       ? styles.tabTextActive
                       : styles.tabTextInactive
                   }
@@ -453,15 +471,15 @@ export default function ManageProfile() {
               </Button>
               <Button
                 style={
-                  tabSelected === "insurance"
+                  tabSelected === 'insurance'
                     ? styles.tabActive
                     : styles.tabInactive
                 }
-                onPress={() => setTabSelected("insurance")}
+                onPress={() => setTabSelected('insurance')}
               >
                 <Text
                   style={
-                    tabSelected === "insurance"
+                    tabSelected === 'insurance'
                       ? styles.tabTextActive
                       : styles.tabTextInactive
                   }
@@ -472,9 +490,9 @@ export default function ManageProfile() {
             </View>
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
-            {tabSelected === "profile"
+            {tabSelected === 'profile'
               ? renderProfile()
-              : tabSelected === "insurance"
+              : tabSelected === 'insurance'
               ? renderInsurance()
               : null}
           </ScrollView>

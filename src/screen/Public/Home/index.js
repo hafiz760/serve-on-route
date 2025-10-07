@@ -246,6 +246,15 @@ export default function Home(params) {
                   ...state,
                   pickupCords: coords,
                 });
+                mapRef.current?.animateToRegion(
+                  {
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    latitudeDelta: 0.04,
+                    longitudeDelta: 0.04,
+                  },
+                  1000, // optional animation duration (ms)
+                );
               }}
               query={{
                 key: GOOGLE_MAPS_APIKEY,
@@ -436,52 +445,53 @@ export default function Home(params) {
               )}
             </MapView>
             <TouchableOpacity
-  style={{
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: 'white',
-    borderRadius: 25,
-    padding: 12,
-    elevation: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}
-  onPress={() => {
-    Geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
+              style={{
+                position: 'absolute',
+                bottom: 20,
+                right: 20,
+                backgroundColor: 'white',
+                borderRadius: 25,
+                padding: 12,
+                elevation: 5,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                Geolocation.getCurrentPosition(
+                  async position => {
+                    const {latitude, longitude} = position.coords;
 
-        // Reverse geocode to get address (optional)
-        const address = await handleReverseGeocoding(latitude, longitude);
+                    // Reverse geocode to get address (optional)
+                    const address = await handleReverseGeocoding(
+                      latitude,
+                      longitude,
+                    );
 
-        // Update state with new pickup cords
-        setState((prev) => ({
-          ...prev,
-          pickupCords: { latitude, longitude, locationName: address },
-        }));
+                    // Update state with new pickup cords
+                    setState(prev => ({
+                      ...prev,
+                      pickupCords: {latitude, longitude, locationName: address},
+                    }));
 
-        pickupRef.current?.setAddressText(address);
+                    pickupRef.current?.setAddressText(address);
 
-        // Animate camera to user location
-        mapRef.current?.animateToRegion({
-          latitude,
-          longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        });
-      },
-      (error) => {
-        console.log('Error getting current location:', error);
-        alert('Unable to fetch your location. Please enable GPS.');
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-    );
-  }}
->
-  <Text style={{ fontSize: 22 }}>📍</Text>
-</TouchableOpacity>
-
+                    // Animate camera to user location
+                    mapRef.current?.animateToRegion({
+                      latitude,
+                      longitude,
+                      latitudeDelta: LATITUDE_DELTA,
+                      longitudeDelta: LONGITUDE_DELTA,
+                    });
+                  },
+                  error => {
+                    console.log('Error getting current location:', error);
+                    alert('Unable to fetch your location. Please enable GPS.');
+                  },
+                  {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+                );
+              }}>
+              <Text style={{fontSize: 22}}>📍</Text>
+            </TouchableOpacity>
 
             {!state?.pickupCords?.latitude && (
               <View

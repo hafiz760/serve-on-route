@@ -92,7 +92,7 @@ console.log("requestPayload",requestPayload);
         setLoading(false);
       })
       .catch((err) => {
-        // console.log(("error", err.response));
+        console.log(("error", err.response));
         setLoading(false);
       });
   };
@@ -182,8 +182,8 @@ console.log("requestPayload",requestPayload);
   // }, []);
   // console.log("INCOMDOMG PARCELS===>", incomingParcelNotifications);
   useEffect(() => {
-    console.log("use effect call on home11111")
-    fetchData()
+    console.log("use effect call on home11111");
+    fetchData();
     if (notiId) {
       const id = notiId.split("Id: ")[1].split(" has")[0];
       getParcelById(id);
@@ -286,7 +286,7 @@ console.log("requestPayload",requestPayload);
         </View>
       </View>
     );
-  }
+  };
   return (
     <Container>
       <Modal
@@ -328,21 +328,20 @@ console.log("requestPayload",requestPayload);
                 flexDirection: "row",
               },
             ]}
-          ></View>
-          <View style={{ width: "90%", alignSelf: "center", paddingTop: 15 }}>
+           />
+          <View style={{ width: "90%", alignSelf: 'center', paddingTop: 15 }}>
           {/* <Text>ahmad</Text> */}
           <FlatList
         data={data}
         showsHorizontalScrollIndicator={false}
         renderItem={renderOpen}
       />
-       
+
           </View>
         </ScrollView>
       </Content>
 
-      <View style={styles.footerBtn}>
-      </View>
+      <View style={styles.footerBtn} />
     </Container>
   );
 }

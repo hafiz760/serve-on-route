@@ -76,7 +76,6 @@ export default function SignUp() {
       `${BASE_URL}${URL_V}auth/login`
     );
     try {
-      console.log("try");
       axios
         .post(`${BASE_URL}${URL_V}auth/login`, qs.stringify(cd))
         .then((response) => {
