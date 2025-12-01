@@ -1,5 +1,5 @@
 import React from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button, Picker } from "../../../component/Form";
 
@@ -44,6 +44,7 @@ export default function WriteUs (){
             MAIL YOUR REQUIREMENTS TO US
           </Text>
         </View>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <Content contentContainerStyle={theme.layoutDf}>
           <View style={styles.writeUsContainer}>
             <View style={styles.writeUsInfo}>
@@ -71,6 +72,7 @@ export default function WriteUs (){
             </Button>
           </View>
         </Content>
+        </KeyboardAvoidingView>
       </Container>
     );
   }

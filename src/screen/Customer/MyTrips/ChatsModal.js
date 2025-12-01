@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, TouchableOpacity, FlatList } from "react-native";
+import { View, Image, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from "react-native";
 import { Text, Icon } from "../../../component/Basic";
 import { Button, TextInput } from "../../../component/Form";
 import Modal from "react-native-modalbox";
@@ -193,6 +193,7 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
       style={styles.modalRating}
     >
       <View style={styles.modalRatingContainer}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <Button
           onPress={() => setSelectedParcel(null)}
           style={styles.closeSortDesc}
@@ -280,6 +281,7 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
             />
           </TouchableOpacity>
         </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );

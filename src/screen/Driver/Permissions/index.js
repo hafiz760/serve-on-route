@@ -1,5 +1,5 @@
 import React from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button ,ToggleSwitch} from "../../../component/Form";
@@ -27,6 +27,7 @@ export default function Permission() {
         </Text>
       </View>
       <Content contentContainerStyle={theme.layoutDf}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.settlementContainer}>
           <View style={styles.profileInputDetail}>
@@ -75,6 +76,7 @@ export default function Permission() {
           </Button>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </Content>
     </Container>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, ScrollView, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button } from "../../../component/Form";
 import Modal from "react-native-modalbox";
@@ -113,6 +113,7 @@ export default function BookingComplete(props) {
         </Text>
       </View>
       <Content contentContainerStyle={theme.layoutDf}>
+  <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
   <ScrollView showsVerticalScrollIndicator={false}>
     <View style={styles.bookingContainer}>
       <View style={styles.bookingContent}>
@@ -199,6 +200,7 @@ export default function BookingComplete(props) {
       </View>
     </View>
   </ScrollView>
+  </KeyboardAvoidingView>
 </Content>
 
       <Modal
@@ -209,6 +211,7 @@ export default function BookingComplete(props) {
         style={styles.modalRating}
       >
         <View style={styles.modalRatingContainer}>
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
           <Button style={styles.closeSortDesc}>
             <Icon
               name="close"
@@ -263,6 +266,7 @@ export default function BookingComplete(props) {
             </View>
           </View>
 
+        </KeyboardAvoidingView>
         </View>
       </Modal>
       <View style={[styles.mailBtnInfo]}>

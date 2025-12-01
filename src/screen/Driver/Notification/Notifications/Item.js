@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View ,TextInput,TouchableOpacity} from "react-native";
+import { View ,TextInput,TouchableOpacity, KeyboardAvoidingView, Platform} from "react-native";
 import { Text, Icon } from "../../../../component/Basic";
 import { Button } from "../../../../component/Form";
 import styles from "../styles";
@@ -158,6 +158,7 @@ export default function Item({ value }) {
           <View
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
           >
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1, justifyContent: 'center'}}>
             <View
               style={{
                 backgroundColor: "#fff",
@@ -267,6 +268,7 @@ export default function Item({ value }) {
         </View>
       )}
             </View>
+            </KeyboardAvoidingView>
           </View>
          
         </Modal>

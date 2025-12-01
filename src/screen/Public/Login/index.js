@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, Image, ScrollView } from "react-native";
+import { View, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button } from "../../../component/Form";
 import styles from "./styles";
@@ -185,6 +185,7 @@ export default function SignUp() {
       <View style={styles.signUpBgCover} />
 
       <View style={styles.signUpBgContainer}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Content contentContainerStyle={theme.layoutDf}>
             <View style={styles.signUpForm}>
@@ -341,6 +342,7 @@ export default function SignUp() {
             </View>
           </Content>
         </ScrollView>
+      </KeyboardAvoidingView>
       </View>
     </Container>
   );

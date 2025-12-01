@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Modal, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 
 const EnterCodeModal = ({
     modalVisible,
@@ -18,6 +18,7 @@ const EnterCodeModal = ({
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Enter Code</Text>
             <TextInput
@@ -36,6 +37,7 @@ const EnterCodeModal = ({
               <Text style={styles.doneButtonText}>Done</Text>
             </Pressable>
           </View>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
     );

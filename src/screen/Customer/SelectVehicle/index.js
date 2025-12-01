@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, ScrollView, Image, TouchableOpacity} from 'react-native';
+import {View, ScrollView, Image, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
 import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
 import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
@@ -552,6 +552,7 @@ function SelectVehicle(params) {
       <DarkStatusBar />
       <Header leftType="back" title={'Book Your Parcel'} />
       <Content contentContainerStyle={theme.layoutDf}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={[styles.selectVehicleContainer, {height: '80%'}]}>
             <View style={styles.selectVehicleContent}>
@@ -978,6 +979,7 @@ function SelectVehicle(params) {
             </View>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </Content>
       <Button
         style={styles.bookingBtn}

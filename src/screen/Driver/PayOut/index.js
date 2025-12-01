@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, Image ,Button} from "react-native";
+import { View, ScrollView, Image ,Button, KeyboardAvoidingView, Platform} from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import {  Picker, TextInput } from "../../../component/Form";
 import { connect } from "react-redux";
@@ -32,6 +32,7 @@ import { DarkStatusBar } from "../../../component/StatusBar";
         <Text style={styles.myTripHeaderText}>
         </Text>
         </View>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <View style={styles.outerView}>
         <Text style={styles.label}>Account Number</Text>
       <TextInput
@@ -63,6 +64,7 @@ import { DarkStatusBar } from "../../../component/StatusBar";
 
       <Button title="Add Account" onPress={handleAddAccount} />
         </View>
+        </KeyboardAvoidingView>
     </Container>
   );
 }

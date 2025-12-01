@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import Modal from 'react-native-modal';
 import { COLOR, FAMILY, SIZE } from "../theme/typography";
 import axios from "axios";
@@ -51,6 +51,7 @@ const RatingModal = ({ isVisible, onClose ,userID,riderID}) => {
 
   return (
     <Modal isVisible={isVisible} onBackdropPress={onClose} style={styles.modal}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <View style={styles.container}>
         <Text style={styles.title}>Rate This User</Text>
         {/* <StarRating
@@ -72,6 +73,7 @@ const RatingModal = ({ isVisible, onClose ,userID,riderID}) => {
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

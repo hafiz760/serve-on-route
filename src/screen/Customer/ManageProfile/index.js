@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Image, AppRegistry } from 'react-native';
+import { View, ScrollView, Text, Image, AppRegistry, KeyboardAvoidingView, Platform } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Container, Content, Icon } from '../../../component/Basic';
 import { TextInput, Button, ToggleSwitch, Checkbox } from '../../../component/Form';
@@ -217,6 +217,7 @@ const postData = async () => {
     return (
       <View style={styles.profileContainer}>
         <View style={styles.profileContent}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView>
           <View style={styles.profileImgInfo}>
             <View style={styles.profileBgImg}>
@@ -301,6 +302,7 @@ const postData = async () => {
             <Text style={styles.saveBtnText}>SAVE</Text>
           </Button>
           </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </View>
 
@@ -350,6 +352,7 @@ const postData = async () => {
   function renderInsurance() {
     return (
       <Container>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.tabInfo}>
             <Button
@@ -397,6 +400,7 @@ const postData = async () => {
               : null}
           </View> */}
               </ScrollView>
+              </KeyboardAvoidingView>
         <View style={styles.payPalInfo}>
           {/* <Image
          style={styles.cardImg}

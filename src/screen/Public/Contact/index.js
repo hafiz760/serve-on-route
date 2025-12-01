@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, ScrollView, Image } from 'react-native'
+import { View, ScrollView, Image, KeyboardAvoidingView, Platform } from 'react-native'
 import { Container, Content, Text, Icon } from '../../../component/Basic'
 import { TextInput, Button, } from '../../../component/Form'
 
@@ -91,6 +91,7 @@ export default class extends React.Component {
         <Text style={styles.contactHeaderText}>Information about your company</Text>
       </View>
       <Content contentContainerStyle={theme.layoutDf}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.contactContainer}>
             <View style={styles.formRow}>
@@ -134,6 +135,7 @@ export default class extends React.Component {
             </Button>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </Content>
     </Container>
   }

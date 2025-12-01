@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Image, TouchableOpacity, Keyboard } from "react-native";
+import { View, Image, TouchableOpacity, Keyboard, KeyboardAvoidingView, Platform } from "react-native";
 import { TextInput, Button } from "../../../component/Form";
 import { Text, Icon } from "../../../component/Basic";
 import theme from "../../../theme/styles";
@@ -144,6 +144,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
         </Button>
       </View>
       {isBidFormShow && (
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <View
           style={{
             flexDirection: "row",
@@ -184,6 +185,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
             />
           </TouchableOpacity>
         </View>
+        </KeyboardAvoidingView>
       )}
     </View>
   );

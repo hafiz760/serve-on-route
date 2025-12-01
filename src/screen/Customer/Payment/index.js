@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Image } from "react-native";
+import { View, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button } from "../../../component/Form";
 // import notifee, { AndroidImportance, EventType } from "@notifee/react-native";
@@ -129,6 +129,7 @@ export default function Payment({ navigation }) {
       CHOOSE YOUR PAYMENT
         </Text>
       </View>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
       <Container>
         <View style={styles.payPalInfo}>
           <CreditCardInput
@@ -143,6 +144,7 @@ export default function Payment({ navigation }) {
           />
         </View>
       </Container>
+      </KeyboardAvoidingView>
       <Button
         style={styles.payBtn}
         onPress={() => {

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ImageBackground,
   Linking,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
@@ -725,6 +727,7 @@ const getData = async () => {
             {name}
           </Text>
         </View>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView>
           <View style={{width: wp(90), alignSelf: 'center'}}>
             <Text
@@ -1301,6 +1304,7 @@ const getData = async () => {
             <Text style={styles.saveBtnText2}>SAVE</Text>
           </Button>
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
@@ -1355,6 +1359,7 @@ const getData = async () => {
   function renderInsurance() {
     return (
       <Container>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.tabInfo}>
             <Button
@@ -1400,6 +1405,7 @@ const getData = async () => {
               : null}
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
         <Button style={styles.payBtn} onPress={onSubmit}>
           <Text style={styles.payBtnText}>MAKE A PAYMENT</Text>
         </Button>

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, ScrollView, Image } from "react-native";
+import { View, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button } from "../../../component/Form";
 import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
@@ -73,6 +73,7 @@ export default function ResetPassword() {
       />
       <View style={styles.signUpBgCover} />
       <View style={styles.signUpBgContainer}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
         <ScrollView>
           <Content contentContainerStyle={theme.layoutDf}>
             <Header leftType="back" />
@@ -183,6 +184,7 @@ export default function ResetPassword() {
             </View>
           </Content>
         </ScrollView>
+        </KeyboardAvoidingView>
       </View>
     </Container>
   );

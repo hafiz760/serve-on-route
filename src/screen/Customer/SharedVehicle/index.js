@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, ScrollView, Image} from 'react-native';
+import {View, ScrollView, Image, KeyboardAvoidingView, Platform} from 'react-native';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
 import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
 
@@ -51,6 +51,7 @@ export default class extends React.Component {
           />
         </View>
         <Content contentContainerStyle={theme.layoutDf}>
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.sharedVehicleContainer}>
               <View style={styles.sharedVehicleContent}>
@@ -199,6 +200,7 @@ export default class extends React.Component {
               </View>
             </View>
           </ScrollView>
+          </KeyboardAvoidingView>
         </Content>
         <Modal
           ref={'modalPackage'}

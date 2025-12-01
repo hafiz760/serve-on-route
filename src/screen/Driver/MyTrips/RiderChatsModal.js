@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, TouchableOpacity, FlatList } from "react-native";
+import { View, Image, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from "react-native";
 import { Text, Icon } from "../../../component/Basic";
 import { Button, TextInput } from "../../../component/Form";
 import Modal from "react-native-modalbox";
@@ -184,6 +184,7 @@ const RiderChatsModal = ({ setSelectedParcel, selectedParcel }) => {
       onClosed={() => setSelectedParcel(null)}
       style={styles.modalRating}
     >
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
       <View style={styles.modalRatingContainer}>
         <Button
           onPress={() => setSelectedParcel(null)}
@@ -273,6 +274,7 @@ const RiderChatsModal = ({ setSelectedParcel, selectedParcel }) => {
           </TouchableOpacity>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

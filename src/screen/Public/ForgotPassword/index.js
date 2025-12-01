@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, Image, ScrollView } from "react-native";
+import { View, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { TextInput, Button } from "../../../component/Form";
 import styles from "./styles";
@@ -152,6 +152,7 @@ export default function ForgotPassword() {
             </View>
 
 
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
             <ScrollView>
               <View>
                 <PhoneInput
@@ -190,6 +191,7 @@ export default function ForgotPassword() {
               </View>
 
             </ScrollView>
+            </KeyboardAvoidingView>
           </View>
         </Content>
       </View>
