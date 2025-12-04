@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Platform,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
@@ -20,15 +21,10 @@ import Header from '../../../component/Header';
 import {locationPermission} from '../../../helper/getCurrentLocation';
 import {useDispatch, useSelector} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
-// import { GOOGLE_MAPS_KEY } from "@env"
 import {BASE_URL, GOOGLE_MAPS_KEY, URL_V} from '../../../utilities/helper';
 import {navigate} from '../../../navigations';
-import axios from 'axios';
-import {updateUser} from '../../../store/reducers/session';
-// const GOOGLE_MAPS_APIKEY = "AIzaSyATpSrcISxeRrwW8iTnB2j_C8UNR7Dv4f8";
+
 const GOOGLE_MAPS_APIKEY = GOOGLE_MAPS_KEY;
-// console.log('GOOGLE_MAPS_APIKEY>>>>>>', GOOGLE_MAPS_APIKEY);
-// navigator.geolocation = require('react-native-geolocation-service');
 navigator.geolocation = require('@react-native-community/geolocation');
 
 Geocoder.init(GOOGLE_MAPS_APIKEY);
@@ -37,159 +33,260 @@ const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+const defaultLocation = {
+  latitude: 31.522592971963892,
+  latitudeDelta: 0.039999248406068943,
+  longitude: 74.35437122359872,
+  longitudeDelta: 0.05085300654172897,
+};
+
 export default function Home(params) {
   const user = useSelector(state => state.session.user);
-  console.log('user on home', JSON.stringify(user, null, 2));
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const {socket} = useSelector(state => state.socket);
+
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const pickupRef = useRef(null);
   const droplocationRef = useRef(null);
-  const [state, setState] = useState({
-    pickupCords: params?.route?.params?.mydata
-      ? params.route?.params?.mydata.pickupCords
-      : {},
-    droplocationCords: params?.route?.params?.mydata
-      ? params?.route?.params?.mydata.droplocationCords
-      : {},
-    isLoading: false,
-    coordinate: new AnimatedRegion({
-      latitude: 31.5204,
-      longitude: 74.3587,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    }),
-    heading: 0,
-  });
+  const debounceTimerRef = useRef(null);
+  const watchIdRef = useRef(null);
+
+  const [pickupCords, setPickupCords] = useState(
+    params?.route?.params?.mydata?.pickupCords || {},
+  );
+  const [droplocationCords, setDroplocationCords] = useState(
+    params?.route?.params?.mydata?.droplocationCords || {},
+  );
   const [temporaryPickUpCords, setTemporaryPickUpCords] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
 
-  const {pickupCords, droplocationCords, coordinate} = state;
-
-  const defaultLocation = {
-    latitude: 31.522592971963892,
-    latitudeDelta: 0.039999248406068943,
-    longitude: 74.35437122359872,
-    longitudeDelta: 0.05085300654172897,
-  };
-  useEffect;
-  const handleNavigation = () => {
-    if (
-      Object.values(state.pickupCords).length > 0 &&
-      Object.values(state.droplocationCords).length > 0
-    ) {
-      navigate('CustomerSelectVehicle', {
-        to: state.droplocationCords,
-        form: state.pickupCords,
-      });
-    } else {
-      alert('Please Fill the Start and Destination Location');
-    }
-  };
-
-  const handleReverseGeocoding = async (lat, lng) => {
+  // Memoized reverse geocoding with error handling
+  const handleReverseGeocoding = useCallback(async (lat, lng) => {
     try {
       const result = await Geocoder.from(lat, lng);
-      const address = result?.results[0]?.formatted_address;
-
-      return address;
+      return result?.results[0]?.formatted_address || 'Unknown location';
     } catch (err) {
-      throw err;
+      console.error('Reverse geocoding error:', err);
+      return 'Unknown location';
     }
-  };
+  }, []);
 
-  const askForLocationPermission = async () => {
+  // Ask for location permission once
+  const askForLocationPermission = useCallback(async () => {
     try {
       const resp = await locationPermission();
-    } catch (err) {}
-  };
+      setPermissionGranted(true);
+      return true;
+    } catch (err) {
+      console.error('Permission error:', err);
+      setPermissionGranted(false);
+      return false;
+    }
+  }, []);
 
-  const showClearInputButton = clearInput => {
-    return (
+  // Debounced region change handler
+  const handleRegionChangeComplete = useCallback(
+    async coords => {
+      // Clear previous timeout
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // Debounce for 1 second
+      debounceTimerRef.current = setTimeout(async () => {
+        try {
+          const coordsToUse = temporaryPickUpCords?.latitude
+            ? temporaryPickUpCords
+            : defaultLocation;
+
+          const returnedAddress = await handleReverseGeocoding(
+            coordsToUse.latitude,
+            coordsToUse.longitude,
+          );
+
+          const newPickupCords = {
+            ...coordsToUse,
+            locationName: returnedAddress,
+          };
+
+          pickupRef.current?.setAddressText(newPickupCords.locationName);
+          pickupRef.current?.blur();
+          setPickupCords(newPickupCords);
+        } catch (err) {
+          Alert.alert('Error', 'Failed to set location');
+          console.error(err);
+        }
+      }, 1000); // 1 second debounce
+    },
+    [temporaryPickUpCords, handleReverseGeocoding],
+  );
+
+  // Clear input handler
+  const handleClearPickupInput = useCallback(() => {
+    pickupRef?.current?.setAddressText('');
+    droplocationRef?.current?.setAddressText('');
+    setPickupCords({});
+    setDroplocationCords({});
+    setTemporaryPickUpCords({});
+  }, []);
+
+  // Show clear button
+  const showClearInputButton = useCallback(
+    clearInput => (
       <Icon
         name="ios-close-circle-outline"
         type="Ionicons"
         style={styles.closeIconStyles}
         onPress={clearInput}
       />
-    );
-  };
+    ),
+    [],
+  );
 
-  const handleClearPickupInput = () => {
-    pickupRef?.current?.setAddressText('');
-    droplocationRef?.current?.setAddressText('');
-    setState({
-      ...state,
-      pickupCords: {},
-      droplocationCords: {},
-    });
-  };
-
-  const handleRegionChangeComplete = async () => {
-    try {
-      if (!temporaryPickUpCords?.latitude) {
-        const temporaryPickUpCords = {
-          ...defaultLocation,
-        };
-        const returnedAddress = await handleReverseGeocoding(
-          temporaryPickUpCords?.latitude,
-          temporaryPickUpCords?.longitude,
-        );
-        temporaryPickUpCords.locationName = returnedAddress;
-
-        pickupRef.current?.setAddressText(temporaryPickUpCords.locationName);
-        pickupRef.current?.blur();
-        setState({
-          ...state,
-          pickupCords: temporaryPickUpCords,
-        });
-      } else {
-        const temporaryPickUpCordsObj = {
-          ...temporaryPickUpCords,
-        };
-        const returnedAddress = await handleReverseGeocoding(
-          temporaryPickUpCordsObj?.latitude,
-          temporaryPickUpCordsObj?.longitude,
-        );
-        temporaryPickUpCordsObj.locationName = returnedAddress;
-
-        pickupRef.current?.setAddressText(temporaryPickUpCordsObj.locationName);
-        pickupRef.current?.blur();
-        setState({
-          ...state,
-          pickupCords: temporaryPickUpCordsObj,
-        });
-      }
-    } catch (err) {
-      alert(
-        'Something went wrong while setting location through on region complete!',
+  // Navigation handler
+  const handleNavigation = useCallback(() => {
+    if (
+      Object.values(pickupCords).length > 0 &&
+      Object.values(droplocationCords).length > 0
+    ) {
+      navigate('CustomerSelectVehicle', {
+        to: droplocationCords,
+        form: pickupCords,
+      });
+    } else {
+      Alert.alert(
+        'Missing Information',
+        'Please fill start and destination location',
       );
     }
-  };
+  }, [pickupCords, droplocationCords]);
 
+  // Get current location handler
+  const handleGetCurrentLocation = useCallback(() => {
+    setIsLoading(true);
+    Geolocation.getCurrentPosition(
+      async position => {
+        const {latitude, longitude} = position.coords;
+
+        const address = await handleReverseGeocoding(latitude, longitude);
+
+        const newPickupCords = {
+          latitude,
+          longitude,
+          locationName: address,
+        };
+
+        setPickupCords(newPickupCords);
+        pickupRef.current?.setAddressText(address);
+
+        mapRef.current?.animateToRegion(
+          {
+            latitude,
+            longitude,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          },
+          1000,
+        );
+        setIsLoading(false);
+      },
+      error => {
+        console.error('Error getting current location:', error);
+        Alert.alert(
+          'Location Error',
+          'Unable to fetch your location. Please enable GPS.',
+        );
+        setIsLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      },
+    );
+  }, [handleReverseGeocoding]);
+
+  // Marker drag end handler for pickup
+  const handlePickupMarkerDragEnd = useCallback(
+    async e => {
+      const newCoordinate = e.nativeEvent.coordinate;
+      const newLocationName = await handleReverseGeocoding(
+        newCoordinate.latitude,
+        newCoordinate.longitude,
+      );
+
+      const newPickupCords = {
+        latitude: newCoordinate.latitude,
+        longitude: newCoordinate.longitude,
+        locationName: newLocationName,
+      };
+
+      setPickupCords(newPickupCords);
+      pickupRef.current?.setAddressText(newLocationName);
+      mapRef.current?.setNativeProps({scrollEnabled: true});
+    },
+    [handleReverseGeocoding],
+  );
+
+  // Marker drag end handler for droplocation
+  const handleDropMarkerDragEnd = useCallback(
+    async e => {
+      const newCoordinate = e.nativeEvent.coordinate;
+      const newLocationName = await handleReverseGeocoding(
+        newCoordinate.latitude,
+        newCoordinate.longitude,
+      );
+
+      const newDropCords = {
+        latitude: newCoordinate.latitude,
+        longitude: newCoordinate.longitude,
+        locationName: newLocationName,
+      };
+
+      setDroplocationCords(newDropCords);
+      droplocationRef.current?.setAddressText(newLocationName);
+      mapRef.current?.setNativeProps({scrollEnabled: true});
+    },
+    [handleReverseGeocoding],
+  );
+
+  // Initialize on mount
   useEffect(() => {
     askForLocationPermission();
-    if (
-      params?.route?.params?.mydata &&
-      params?.route?.params?.mydata.pickupCords &&
-      params &&
-      params?.route?.params?.mydata.droplocationCords
-    ) {
-      pickupRef.current?.setAddressText(
-        params.route?.params?.mydata.pickupCords?.locationName,
-      );
-      droplocationRef?.current?.setAddressText(
-        params.route?.params?.mydata.droplocationCords?.locationName,
-      );
+
+    // Set initial addresses if coming from navigation params
+    if (params?.route?.params?.mydata) {
+      const {pickupCords: pickup, droplocationCords: drop} =
+        params.route.params.mydata;
+
+      if (pickup?.locationName) {
+        pickupRef.current?.setAddressText(pickup.locationName);
+      }
+      if (drop?.locationName) {
+        droplocationRef.current?.setAddressText(drop.locationName);
+      }
     }
+
+    // Cleanup on unmount
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      if (watchIdRef.current) {
+        Geolocation.clearWatch(watchIdRef.current);
+      }
+    };
   }, []);
 
+  // Clear inputs when screen loses focus
   useEffect(() => {
-    handleClearPickupInput();
-    if (isFocused) {
+    if (!isFocused) {
+      handleClearPickupInput();
     }
-  }, [isFocused]);
+  }, [isFocused, handleClearPickupInput]);
 
   return (
     <Container>
@@ -202,26 +299,19 @@ export default function Home(params) {
             <GooglePlacesAutocomplete
               nearbyPlacesAPI="None"
               ref={pickupRef}
-              onFail={error => console.log(error)}
+              onFail={error =>
+                console.error('Pickup autocomplete error:', error)
+              }
               placeholder="Pickup location"
               textInputProps={{
                 placeholderTextColor: '#59499E',
                 returnKeyType: 'search',
-                // value: pickupCords.locationName || "",
               }}
               styles={{
-                textInput: {
-                  color: 'black',
-                },
-                listView: {
-                  color: 'black',
-                },
-                description: {
-                  color: 'black',
-                },
-                predefinedPlacesDescription: {
-                  color: 'black',
-                },
+                textInput: {color: 'black'},
+                listView: {color: 'black'},
+                description: {color: 'black'},
+                predefinedPlacesDescription: {color: 'black'},
               }}
               currentLocation
               currentLocationLabel="Current location"
@@ -237,23 +327,20 @@ export default function Home(params) {
                     coords?.latitude,
                     coords?.longitude,
                   );
-
                   coords.locationName = returnedAddress;
                   pickupRef.current?.setAddressText(coords.locationName);
                   pickupRef.current?.blur();
                 }
-                setState({
-                  ...state,
-                  pickupCords: coords,
-                });
+
+                setPickupCords(coords);
                 mapRef.current?.animateToRegion(
                   {
                     latitude: coords.latitude,
                     longitude: coords.longitude,
-                    latitudeDelta: 0.04,
-                    longitudeDelta: 0.04,
+                    latitudeDelta: LATITUDE_DELTA,
+                    longitudeDelta: LONGITUDE_DELTA,
                   },
-                  1000, // optional animation duration (ms)
+                  1000,
                 );
               }}
               query={{
@@ -268,7 +355,7 @@ export default function Home(params) {
               enablePoweredByContainer={false}
               renderRightButton={() => {
                 return pickupRef?.current?.getAddressText() &&
-                  state.pickupCords?.latitude
+                  pickupCords?.latitude
                   ? showClearInputButton(handleClearPickupInput)
                   : null;
               }}
@@ -284,21 +371,12 @@ export default function Home(params) {
               textInputProps={{
                 placeholderTextColor: '#59499E',
                 returnKeyType: 'search',
-                // value: droplocationCords.locationName || "",
               }}
               styles={{
-                textInput: {
-                  color: 'black',
-                },
-                listView: {
-                  color: 'black',
-                },
-                description: {
-                  color: 'black',
-                },
-                predefinedPlacesDescription: {
-                  color: 'black',
-                },
+                textInput: {color: 'black'},
+                listView: {color: 'black'},
+                description: {color: 'black'},
+                predefinedPlacesDescription: {color: 'black'},
               }}
               currentLocation
               currentLocationLabel="Current location"
@@ -314,17 +392,12 @@ export default function Home(params) {
                     coords?.latitude,
                     coords?.longitude,
                   );
-
                   coords.locationName = returnedAddress;
                   droplocationRef.current?.setAddressText(coords.locationName);
                   droplocationRef.current?.blur();
                 }
 
-                setState({
-                  ...state,
-                  droplocationCords: coords,
-                });
-                // moveTo(test)
+                setDroplocationCords(coords);
               }}
               query={{
                 key: GOOGLE_MAPS_APIKEY,
@@ -342,7 +415,6 @@ export default function Home(params) {
           <View style={styles.mMap}>
             <MapView
               ref={mapRef}
-              // style={[StyleSheet.absoluteFill, { elevation: -1 }]}
               style={{flex: 1}}
               initialRegion={defaultLocation}
               region={
@@ -357,6 +429,7 @@ export default function Home(params) {
               onRegionChangeComplete={async (coords, {isGesture}) => {
                 if (isGesture && !pickupCords?.latitude) {
                   setTemporaryPickUpCords(coords);
+                  handleRegionChangeComplete(coords);
                 }
               }}
               scrollEnabled={
@@ -366,33 +439,15 @@ export default function Home(params) {
                 <Marker
                   coordinate={pickupCords}
                   draggable
+                  tracksViewChanges={false}
                   onDragStart={() => {
-                    mapRef.current.setNativeProps({scrollEnabled: false});
+                    mapRef.current?.setNativeProps({scrollEnabled: false});
                   }}
-                  onDragEnd={async e => {
-                    const newCoordinate = e.nativeEvent.coordinate;
-                    const newLocationName = await handleReverseGeocoding(
-                      newCoordinate.latitude,
-                      newCoordinate.longitude,
-                    );
-
-                    setState({
-                      ...state,
-                      pickupCords: {
-                        latitude: newCoordinate.latitude,
-                        longitude: newCoordinate.longitude,
-                        locationName: newLocationName,
-                      },
-                    });
-
-                    // Update the autocomplete input with the new address
-                    pickupRef.current?.setAddressText(newLocationName);
-
-                    mapRef.current.setNativeProps({scrollEnabled: true});
-                  }}>
+                  onDragEnd={handlePickupMarkerDragEnd}>
                   <Image
                     source={require('../../../assets/images/Oval2x.png')}
                     style={{width: 44, height: 44}}
+                    resizeMode="contain"
                   />
                 </Marker>
               )}
@@ -400,33 +455,15 @@ export default function Home(params) {
                 <Marker
                   coordinate={droplocationCords}
                   draggable
+                  tracksViewChanges={false}
                   onDragStart={() => {
-                    mapRef.current.setNativeProps({scrollEnabled: false});
+                    mapRef.current?.setNativeProps({scrollEnabled: false});
                   }}
-                  onDragEnd={async e => {
-                    const newCoordinate = e.nativeEvent.coordinate;
-                    const newLocationName = await handleReverseGeocoding(
-                      newCoordinate.latitude,
-                      newCoordinate.longitude,
-                    );
-
-                    setState({
-                      ...state,
-                      droplocationCords: {
-                        latitude: newCoordinate.latitude,
-                        longitude: newCoordinate.longitude,
-                        locationName: newLocationName,
-                      },
-                    });
-
-                    // Update the autocomplete input with the new address
-                    droplocationRef.current?.setAddressText(newLocationName);
-
-                    mapRef.current.setNativeProps({scrollEnabled: true});
-                  }}>
+                  onDragEnd={handleDropMarkerDragEnd}>
                   <Image
                     source={require('../../../assets/images/greenMarker2x.png')}
                     style={{width: 30, height: 30}}
+                    resizeMode="contain"
                   />
                 </Marker>
               )}
@@ -439,61 +476,46 @@ export default function Home(params) {
                   strokeColor="hotpink"
                   optimizeWaypoints={true}
                   onReady={result => {
-                    mapRef.current.fitToCoordinates(result.coordinates);
+                    mapRef.current?.fitToCoordinates(result.coordinates, {
+                      edgePadding: {
+                        top: 50,
+                        right: 50,
+                        bottom: 50,
+                        left: 50,
+                      },
+                      animated: true,
+                    });
                   }}
                 />
               )}
             </MapView>
+
+            {/* Current Location Button */}
             <TouchableOpacity
-              style={{
-                position: 'absolute',
-                bottom: 20,
-                right: 20,
-                backgroundColor: 'white',
-                borderRadius: 25,
-                padding: 12,
-                elevation: 5,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={() => {
-                Geolocation.getCurrentPosition(
-                  async position => {
-                    const {latitude, longitude} = position.coords;
-
-                    // Reverse geocode to get address (optional)
-                    const address = await handleReverseGeocoding(
-                      latitude,
-                      longitude,
-                    );
-
-                    // Update state with new pickup cords
-                    setState(prev => ({
-                      ...prev,
-                      pickupCords: {latitude, longitude, locationName: address},
-                    }));
-
-                    pickupRef.current?.setAddressText(address);
-
-                    // Animate camera to user location
-                    mapRef.current?.animateToRegion({
-                      latitude,
-                      longitude,
-                      latitudeDelta: LATITUDE_DELTA,
-                      longitudeDelta: LONGITUDE_DELTA,
-                    });
-                  },
-                  error => {
-                    console.log('Error getting current location:', error);
-                    alert('Unable to fetch your location. Please enable GPS.');
-                  },
-                  {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-                );
-              }}>
-              <Text style={{fontSize: 22}}>📍</Text>
+              style={
+                styles.currentLocationButton || {
+                  position: 'absolute',
+                  bottom: 20,
+                  right: 20,
+                  backgroundColor: 'white',
+                  borderRadius: 25,
+                  padding: 12,
+                  elevation: 5,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 0, height: 2},
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }
+              }
+              onPress={handleGetCurrentLocation}
+              disabled={isLoading}>
+              <Text style={{fontSize: 22}}>{isLoading ? '⏳' : '📍'}</Text>
             </TouchableOpacity>
 
-            {!state?.pickupCords?.latitude && (
+            {/* Center Marker when no pickup selected */}
+            {!pickupCords?.latitude && (
               <View
                 style={{
                   position: 'absolute',
@@ -503,6 +525,7 @@ export default function Home(params) {
                   bottom: 0,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  pointerEvents: 'none',
                 }}>
                 <Image
                   style={styles.marker}
@@ -515,15 +538,7 @@ export default function Home(params) {
       </Content>
       <View style={styles.footerBtn}>
         <View style={styles.footerBtnInfo}>
-          <Button
-            style={styles.selectBtn}
-            onPress={() => {
-              handleNavigation();
-              // navigate('CustomerSelectVehicle', {
-              //   to: state.droplocationCords,
-              //   form: state.pickupCords,
-              // });
-            }}>
+          <Button style={styles.selectBtn} onPress={handleNavigation}>
             <Text style={styles.shareBtnText}>Next</Text>
           </Button>
         </View>

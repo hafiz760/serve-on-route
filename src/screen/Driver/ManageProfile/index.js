@@ -12,11 +12,7 @@ import {
 } from 'react-native';
 import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {
-  TextInput,
-  Button,
-  ToggleSwitch,
-} from '../../../component/Form';
+import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
 import DatePicker from 'react-native-date-picker';
 
 import styles from './styles';
@@ -58,7 +54,7 @@ export default function ManageProfile({navigation, route}) {
   console.log('isEnabled', isEnabled);
   const [idCardCheck, setIdCardCheck] = useState();
   const [profile, setProfile] = useState();
- 
+
   const [profileHttp, setProfileHttp] = useState('');
   // console.log('whatprofile',profileHttp)
   console.log('profileHttp', profileHttp);
@@ -99,10 +95,10 @@ export default function ManageProfile({navigation, route}) {
   // acct_1MwmIbPu2iasesq5
   const [PaymentTabSelected, setPaymentTabSelected] = useState('card');
   const [frontIdImage, setFrontIdImage] = useState(null);
-const [backIdImage, setBackIdImage] = useState(null);
-const [frontLicenseImage, setFrontLicenseImage] = useState(null);
-console.log("frontLicenseImage",frontLicenseImage);
-const [backLicenseImage, setBackLicenseImage] = useState(null);
+  const [backIdImage, setBackIdImage] = useState(null);
+  const [frontLicenseImage, setFrontLicenseImage] = useState(null);
+  console.log('frontLicenseImage', frontLicenseImage);
+  const [backLicenseImage, setBackLicenseImage] = useState(null);
   const dispatch = useDispatch();
   // const UploadData = async (setPath) => {
   //   try {
@@ -119,96 +115,103 @@ const [backLicenseImage, setBackLicenseImage] = useState(null);
   //     }
   //   }
   // };
-const removeFrontIdImage = () => setFrontIdImage(null);
-const removeBackIdImage = () => setBackIdImage(null);
-const getPhotoForFront = () => {
-  ImagePicker.openCamera({
-    width: 300,
-    height: 400,
-    cropping: true,
-  }).then(async image => {
-    const format = {
-      name: image.path.split('/').pop(),
-      height: image.height,
-      width: image.width,
-      size: 400,
-      type: image.mime,
-      uri: image.path,
-    };
-    setFrontIdImage(format);
+  const removeFrontIdImage = () => setFrontIdImage(null);
+  const removeBackIdImage = () => setBackIdImage(null);
+  const getPhotoForFront = () => {
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    })
+      .then(async image => {
+        const format = {
+          name: image.path.split('/').pop(),
+          height: image.height,
+          width: image.width,
+          size: 400,
+          type: image.mime,
+          uri: image.path,
+        };
+        setFrontIdImage(format);
 
-    // const uploadedPath = await uploadSingleImage(format, 'national_ID_file');
-    // console.log("uploadedPath",uploadedPath);
-    // setUploadedFrontIdPath(uploadedPath); // <-- Save this for final submit
-  }).catch(e => console.log(e));
-};
-const getPhotoForBack = () => {
-  ImagePicker.openCamera({
-    width: 300,
-    height: 400,
-    cropping: true,
-  }).then(async image => {
-    const format = {
-      name: image.path.split('/').pop(),
-      height: image.height,
-      width: image.width,
-      size: 400,
-      type: image.mime,
-      uri: image.path,
-    };
-    setBackIdImage(format);
+        // const uploadedPath = await uploadSingleImage(format, 'national_ID_file');
+        // console.log("uploadedPath",uploadedPath);
+        // setUploadedFrontIdPath(uploadedPath); // <-- Save this for final submit
+      })
+      .catch(e => console.log(e));
+  };
+  const getPhotoForBack = () => {
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    })
+      .then(async image => {
+        const format = {
+          name: image.path.split('/').pop(),
+          height: image.height,
+          width: image.width,
+          size: 400,
+          type: image.mime,
+          uri: image.path,
+        };
+        setBackIdImage(format);
 
-    // const uploadedPath = await uploadSingleImage(format, 'national_ID_file');
-    // setUploadedBackIdPath(uploadedPath);
-  }).catch(e => console.log(e));
-};
+        // const uploadedPath = await uploadSingleImage(format, 'national_ID_file');
+        // setUploadedBackIdPath(uploadedPath);
+      })
+      .catch(e => console.log(e));
+  };
 
-const removeFrontLicenseImage = () => setFrontLicenseImage(null);
-const removeBackLicenseImage = () => setBackLicenseImage(null);
-const getPhotoForFrontLicense = () => {
-  ImagePicker.openCamera({
-    width: 300,
-    height: 400,
-    cropping: true,
-  }).then(async image => {
-    const format = {
-      name: image.path.split('/').pop(),
-      height: image.height,
-      width: image.width,
-      size: 400,
-      type: image.mime,
-      uri: image.path,
-    };
-    setFrontLicenseImage(format);
+  const removeFrontLicenseImage = () => setFrontLicenseImage(null);
+  const removeBackLicenseImage = () => setBackLicenseImage(null);
+  const getPhotoForFrontLicense = () => {
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    })
+      .then(async image => {
+        const format = {
+          name: image.path.split('/').pop(),
+          height: image.height,
+          width: image.width,
+          size: 400,
+          type: image.mime,
+          uri: image.path,
+        };
+        setFrontLicenseImage(format);
 
-    // const uploadedPath = await uploadSingleImage(format, 'driving_license_file');
-    // setUploadedFrontLicensePath(uploadedPath);
-  }).catch(e => console.log(e));
-};
-const getPhotoForBackLicense = () => {
-  ImagePicker.openCamera({
-    width: 300,
-    height: 400,
-    cropping: true,
-  }).then(async image => {
-    const format = {
-      name: image.path.split('/').pop(),
-      height: image.height,
-      width: image.width,
-      size: 400,
-      type: image.mime,
-      uri: image.path,
-    };
-    setBackLicenseImage(format);
+        // const uploadedPath = await uploadSingleImage(format, 'driving_license_file');
+        // setUploadedFrontLicensePath(uploadedPath);
+      })
+      .catch(e => console.log(e));
+  };
+  const getPhotoForBackLicense = () => {
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    })
+      .then(async image => {
+        const format = {
+          name: image.path.split('/').pop(),
+          height: image.height,
+          width: image.width,
+          size: 400,
+          type: image.mime,
+          uri: image.path,
+        };
+        setBackLicenseImage(format);
 
-    // const uploadedPath = await uploadSingleImage(format, 'driving_license_file');
-    // console.log("uploadedPath",uploadedPath);
-    // setUploadedBackLicensePath(uploadedPath);
+        // const uploadedPath = await uploadSingleImage(format, 'driving_license_file');
+        // console.log("uploadedPath",uploadedPath);
+        // setUploadedBackLicensePath(uploadedPath);
+      })
+      .catch(e => console.log(e));
+  };
 
-  }).catch(e => console.log(e));
-};
-
-const UploadData = async setPath => {
+  const UploadData = async setPath => {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
@@ -246,58 +249,61 @@ const UploadData = async setPath => {
     setImageForShowSelfi(updatedImageData);
   };
 
-  const sanitizeValue = (val) => {
-  if (!val || typeof val !== 'string') return '';
-  const cleaned = val.trim().toLowerCase();
-  const invalids = ['string', 'undefined', 'null', 'n/a', 'na', 'none'];
-  return invalids.includes(cleaned) ? '' : val;
-};
+  const sanitizeValue = val => {
+    if (!val || typeof val !== 'string') return '';
+    const cleaned = val.trim().toLowerCase();
+    const invalids = ['string', 'undefined', 'null', 'n/a', 'na', 'none'];
+    return invalids.includes(cleaned) ? '' : val;
+  };
 
-const getData = async () => {
-  try {
-    const data = await AsyncStorage.getItem('response');
-    const datas = JSON.parse(data);
+  const getData = async () => {
+    try {
+      const data = await AsyncStorage.getItem('response');
+      const datas = JSON.parse(data);
 
-    const res = await axios.get(
-      `https://api.serveonroute.com/v1/users/user-by-id/${datas._id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${datas.access_token}`,
+      const res = await axios.get(
+        `https://api.serveonroute.com/v1/users/user-by-id/${datas._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${datas.access_token}`,
+          },
         },
+      );
+
+      const userData = res.data.data;
+      console.log('res account no>>>>>>', JSON.stringify(userData, null, 2));
+      dispatch(updateUser(userData));
+      setName(sanitizeValue(userData.first_name));
+      SetCarNumber(userData?.vehicle_no || '');
+      setDrivingLiscence(userData.license_id || '');
+      setProfile(sanitizeValue(userData.cover_image));
+      setVehicalNumber(sanitizeValue(userData.vehicle_no));
+      setFrontIdImage(userData?.driving_license?.[0] || null);
+      setBackIdImage(userData?.driving_license?.[1] || null);
+      setFrontLicenseImage(userData?.ID_file?.[0] || null);
+      setBackLicenseImage(userData?.ID_file?.[1] || null);
+      SetCarName(sanitizeValue(userData.car_name));
+      setLicense(userData?.driving_license?.[0] || null);
+      setDisplayDate(sanitizeValue(userData.driving_license_expiry));
+
+      if (
+        userData?.driving_license_expiry &&
+        sanitizeValue(userData.driving_license_expiry)
+      ) {
+        setIsDateExist(true);
       }
-    );
 
-    const userData = res.data.data;
-    console.log('res account no>>>>>>', JSON.stringify(userData, null, 2));
-    dispatch(updateUser(userData));
-    setName(sanitizeValue(userData.first_name));
-    SetCarNumber(userData?.vehicle_no || '');
-    setDrivingLiscence(userData.license_id || '');
-    setProfile(sanitizeValue(userData.cover_image));
-    setVehicalNumber(sanitizeValue(userData.vehicle_no));
-    setFrontIdImage(userData?.driving_license?.[0] || null);
-    setBackIdImage(userData?.driving_license?.[1] || null);
-    setFrontLicenseImage(userData?.ID_file?.[0] || null);
-    setBackLicenseImage(userData?.ID_file?.[1] || null);
-    SetCarName(sanitizeValue(userData.car_name));
-    setLicense(userData?.driving_license?.[0] || null);
-    setDisplayDate(sanitizeValue(userData.driving_license_expiry));
+      setPhoneNumber(sanitizeValue(userData.phone));
+      setProfileHttp(sanitizeValue(userData.avatar));
+      setEmail(sanitizeValue(userData.email));
+      setNationalCard(sanitizeValue(userData.ID));
 
-    if (userData?.driving_license_expiry && sanitizeValue(userData.driving_license_expiry)) {
-      setIsDateExist(true);
+      setLoading(false);
+    } catch (err) {
+      console.log('Get data account error', err);
+      setLoading(false);
     }
-
-    setPhoneNumber(sanitizeValue(userData.phone));
-    setProfileHttp(sanitizeValue(userData.avatar));
-    setEmail(sanitizeValue(userData.email));
-    setNationalCard(sanitizeValue(userData.ID));
-
-    setLoading(false);
-  } catch (err) {
-    console.log('Get data account error', err);
-    setLoading(false);
-  }
-};
+  };
 
   const fetchData = async () => {
     try {
@@ -408,23 +414,26 @@ const getData = async () => {
     try {
       const data = await AsyncStorage.getItem('response');
       const datas = JSON.parse(data);
-  
+
       const formData = new FormData();
       formData.append(field, {
         uri: image.uri,
         type: image.type || 'image/jpeg',
         name: image.name || 'upload.jpg',
       });
-  
-      const res = await fetch('https://api.serveonroute.com/v1/users/upload-image', {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${datas.access_token}`,
-          'Content-Type': 'multipart/form-data',
+
+      const res = await fetch(
+        'https://api.serveonroute.com/v1/users/upload-image',
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${datas.access_token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
         },
-        body: formData,
-      });
-  
+      );
+
       const result = await res.json();
       if (res.ok) {
         console.log(`${field} uploaded`, result);
@@ -465,50 +474,50 @@ const getData = async () => {
       backLicenseImage,
     );
     try {
-       const sanitize = (v) =>
-      v && typeof v === 'string'
-        ? v.trim()
-        : v || ''; // handle null/undefined
+      const sanitize = v => (v && typeof v === 'string' ? v.trim() : v || ''); // handle null/undefined
 
-    const requiredFields = {
-      name: sanitize(name),
-      phoneNumber: sanitize(phoneNumber),
-      gender: sanitize(itemsType),
-      nationalCard: sanitize(nationalCard),
-      carNumber: sanitize(carnumber),
-      carName: sanitize(carname),
-      drivingLiscence: sanitize(drivingLiscence),
-      displayDate: sanitize(displayDate),
-    };
-    for (const [key, value] of Object.entries(requiredFields)) {
-      if (!value) {
+      const requiredFields = {
+        name: sanitize(name),
+        phoneNumber: sanitize(phoneNumber),
+        gender: sanitize(itemsType),
+        nationalCard: sanitize(nationalCard),
+        carNumber: sanitize(carnumber),
+        carName: sanitize(carname),
+        drivingLiscence: sanitize(drivingLiscence),
+        displayDate: sanitize(displayDate),
+      };
+      for (const [key, value] of Object.entries(requiredFields)) {
+        if (!value) {
+          showMessage(
+            'error',
+            `Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
+          );
+          setLoading(false);
+          return; // stop execution
+        }
+      }
+      if (!frontIdImage || !backIdImage) {
         showMessage(
           'error',
-          `Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`
+          'Please upload both front and back ID card images',
         );
         setLoading(false);
-        return; // stop execution
+        return;
       }
-    }
-    if (!frontIdImage || !backIdImage) {
-      showMessage('error', 'Please upload both front and back ID card images');
-      setLoading(false);
-      return;
-    }
 
-    if (!frontLicenseImage || !backLicenseImage) {
-      showMessage(
-        'error',
-        'Please upload both front and back driving license images'
-      );
-      setLoading(false);
-      return;
-    }
-    if (!profile) {
-      showMessage('error', 'Please upload your profile image');
-      setLoading(false);
-      return;
-    }
+      if (!frontLicenseImage || !backLicenseImage) {
+        showMessage(
+          'error',
+          'Please upload both front and back driving license images',
+        );
+        setLoading(false);
+        return;
+      }
+      if (!profile) {
+        showMessage('error', 'Please upload your profile image');
+        setLoading(false);
+        return;
+      }
       const data = await AsyncStorage.getItem('response');
       const datas = JSON.parse(data);
       const formData = new FormData();
@@ -521,8 +530,8 @@ const getData = async () => {
       formData.append('gender', itemsType);
       formData.append('license_id', drivingLiscence);
       formData.append('driving_license_expiry', displayDate);
-      formData.append('ID', nationalCard); 
-        if (profile?.uri) {
+      formData.append('ID', nationalCard);
+      if (profile?.uri) {
         formData.append('avatar_file', {
           uri: profile.uri,
           type: profile.type || 'image/jpeg',
@@ -534,7 +543,7 @@ const getData = async () => {
           name: profile.name || 'cover.jpg',
         });
       }
-  
+
       // national_ID_file (array of front & back)
       if (frontIdImage) {
         formData.append('national_ID_file', {
@@ -550,7 +559,7 @@ const getData = async () => {
           name: backIdImage.name || 'back_id.jpg',
         });
       }
-  
+
       // driving_license_file (array of front & back)
       if (frontLicenseImage) {
         formData.append('driving_license_file', {
@@ -566,7 +575,7 @@ const getData = async () => {
           name: backLicenseImage.name || 'back_license.jpg',
         });
       }
-  
+
       // car_picture_file (if you have)
       // if (imageForShow?.length > 0) {
       //   imageForShow.forEach((img, index) => {
@@ -577,9 +586,9 @@ const getData = async () => {
       //     });
       //   });
       // }
-  
+
       console.log('FormData:', formData);
-  
+
       const requestOptions = {
         // method: 'PUT',
         method: 'PATCH',
@@ -589,7 +598,7 @@ const getData = async () => {
         },
         body: formData,
       };
-  
+
       const res = await fetch(
         'https://api.serveonroute.com/v1/users/update-user',
         requestOptions,
@@ -598,8 +607,8 @@ const getData = async () => {
       // const result = await res.json();
       // console.log('update result', result);
       const resText = await res; // Get raw text response first
-      console.log('update raw response', JSON.stringify(resText,null,2));
-      
+      console.log('update raw response', JSON.stringify(resText, null, 2));
+
       let result;
       try {
         result = JSON.parse(resText); // Try parsing it safely
@@ -607,7 +616,7 @@ const getData = async () => {
       } catch (err) {
         console.log('❌ Failed to parse JSON:', err);
       }
-      
+
       if (res.status === 200) {
         getData();
         showMessage('success', 'Profile Updated Successfully');
@@ -616,15 +625,13 @@ const getData = async () => {
       } else {
         showMessage('error', result?.message || 'Update failed');
       }
-  
     } catch (err) {
       console.log('ERROR', err);
       showMessage('error', 'Something went wrong');
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
-  
 
   function renderCard() {
     return (
@@ -727,144 +734,146 @@ const getData = async () => {
             {name}
           </Text>
         </View>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-        <ScrollView>
-          <View style={{width: wp(90), alignSelf: 'center'}}>
-            <Text
-              style={{
-                color: '#59499E',
-                fontFamily: FAMILY.BOLD,
-                fontSize: SIZE.SIZE_18,
-                marginTop: hp(2),
-                marginBottom: hp(2),
-              }}>
-              Personal informations
-            </Text>
-          </View>
-          <View
-            style={{
-              padding: 15,
-              borderRadius: 15,
-              backgroundColor: '#fff',
-              width: wp(90),
-              alignSelf: 'center',
-            }}>
-            <View style>
-              <TextInputComp
-                placeholder="Enter your name"
-                value={name}
-                onChangeText={text => setName(text)}
-                title="Name"
-              />
-            </View>
-            <View style>
-              <TextInputComp
-                editable={false}
-                placeholder="Enter your name"
-                value={phoneNumber}
-                onChangeText={text => setPhoneNumber(text)}
-                title="Phone Number"
-              />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          <ScrollView>
+            <View style={{width: wp(90), alignSelf: 'center'}}>
+              <Text
+                style={{
+                  color: '#59499E',
+                  fontFamily: FAMILY.BOLD,
+                  fontSize: SIZE.SIZE_18,
+                  marginTop: hp(2),
+                  marginBottom: hp(2),
+                }}>
+                Personal informations
+              </Text>
             </View>
             <View
               style={{
-                flexDirection: 'row',
-                width: wp(84),
-                justifyContent: 'space-between',
+                padding: 15,
+                borderRadius: 15,
+                backgroundColor: '#fff',
+                width: wp(90),
+                alignSelf: 'center',
               }}>
-              <View>
-                <Text
-                  style={{
-                    fontWeight: '400',
-                    fontSize: 14,
-                    color: '#59499E',
-                  }}>
-                  Gander
-                </Text>
-                <View
-                  style={{
-                    width: wp(41),
-                  }}>
-                  <DropDownPicker
-                    open={openModel}
-                    items={items}
-                    setOpen={setOpenModel}
-                    value={itemsType}
-                    onSelectItem={e => setItemsType(e.value)}
-                    setItems={setItems}
-                    style={{
-                      paddingVertical: 19,
-                      // marginTop: 10,
-                      marginBottom: 5,
-                      borderWidth: 0,
-                      color: COLOR.PRIMARY,
-                      fontSize: SIZE.SIZE_14,
-                      fontFamily: FAMILY.REGULAR,
-                      backgroundColor: '#E6E6E6',
-                    }}
-                  />
-                </View>
+              <View style>
+                <TextInputComp
+                  placeholder="Enter your name"
+                  value={name}
+                  onChangeText={text => setName(text)}
+                  title="Name"
+                />
               </View>
-              <View style={[styles.profileBtnInfo, styles.profileBtnInfoTwo]}>
-                <View style={styles.formRow2}>
+              <View style>
+                <TextInputComp
+                  editable={false}
+                  placeholder="Enter your name"
+                  value={phoneNumber}
+                  onChangeText={text => setPhoneNumber(text)}
+                  title="Phone Number"
+                />
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: wp(84),
+                  justifyContent: 'space-between',
+                }}>
+                <View>
                   <Text
                     style={{
                       fontWeight: '400',
                       fontSize: 14,
                       color: '#59499E',
                     }}>
-                    DOB
+                    Gander
                   </Text>
-                  <View style={{}}>
-                    <DatePicker
-                      mode="date"
-                      modal
-                      open={open}
-                      date={date}
-                      onConfirm={date => {
-                        setOpen(false);
-                        setDate(date);
-                        setDisplayDate(date.toISOString());
-                      }}
-                      onCancel={() => {
-                        setOpen(false);
+                  <View
+                    style={{
+                      width: wp(41),
+                    }}>
+                    <DropDownPicker
+                      open={openModel}
+                      items={items}
+                      setOpen={setOpenModel}
+                      value={itemsType}
+                      onSelectItem={e => setItemsType(e.value)}
+                      setItems={setItems}
+                      style={{
+                        paddingVertical: 19,
+                        // marginTop: 10,
+                        marginBottom: 5,
+                        borderWidth: 0,
+                        color: COLOR.PRIMARY,
+                        fontSize: SIZE.SIZE_14,
+                        fontFamily: FAMILY.REGULAR,
+                        backgroundColor: '#E6E6E6',
                       }}
                     />
                   </View>
-                  <View
-                    style={{
-                      height: hp(7),
-                      borderRadius: 10,
-                      justifyContent: 'space-between',
-                      // marginTop: hp(1),
-                      backgroundColor: '#E6E6E6',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingHorizontal: wp(2),
-                    }}>
-                    <Text>
-                      {displayDate ? displayDate.substr(0, 10) : 'NO DATE'}
+                </View>
+                <View style={[styles.profileBtnInfo, styles.profileBtnInfoTwo]}>
+                  <View style={styles.formRow2}>
+                    <Text
+                      style={{
+                        fontWeight: '400',
+                        fontSize: 14,
+                        color: '#59499E',
+                      }}>
+                      DOB
                     </Text>
-                    <TouchableOpacity onPress={() => setOpen(true)}>
-                      <Image
-                        source={require('../../../assets/images/blackdrop.png')}
-                        style={{backgroundColor: '#E6E6E6'}}
-                        resizeMode="contain"
+                    <View style={{}}>
+                      <DatePicker
+                        mode="date"
+                        modal
+                        open={open}
+                        date={date}
+                        onConfirm={date => {
+                          setOpen(false);
+                          setDate(date);
+                          setDisplayDate(date.toISOString());
+                        }}
+                        onCancel={() => {
+                          setOpen(false);
+                        }}
                       />
-                    </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        height: hp(7),
+                        borderRadius: 10,
+                        justifyContent: 'space-between',
+                        // marginTop: hp(1),
+                        backgroundColor: '#E6E6E6',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingHorizontal: wp(2),
+                      }}>
+                      <Text>
+                        {displayDate ? displayDate.substr(0, 10) : 'NO DATE'}
+                      </Text>
+                      <TouchableOpacity onPress={() => setOpen(true)}>
+                        <Image
+                          source={require('../../../assets/images/blackdrop.png')}
+                          style={{backgroundColor: '#E6E6E6'}}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
-            <View style>
-              <TextInputComp
-                placeholder="Enter id card number"
-                value={nationalCard}
-                onChangeText={e => setNationalCard(e)}
-                title="ID card"
-              />
-            </View>
-            {/* <View>
+              <View style>
+                <TextInputComp
+                  placeholder="Enter id card number"
+                  value={nationalCard}
+                  onChangeText={e => setNationalCard(e)}
+                  title="ID card"
+                />
+              </View>
+              {/* <View>
               <Text
                 style={{
                   fontWeight: '400',
@@ -893,207 +902,226 @@ const getData = async () => {
                 />
               </TouchableOpacity>
             </View> */}
-            <View style={{marginVertical: hp(2)}}>
-  <Text style={{
-    fontWeight: '400',
-    fontSize: 14,
-    color: '#59499E',
-    marginBottom: 7,
-  }}>
-    ID Card Pictures
-  </Text>
+              <View style={{marginVertical: hp(2)}}>
+                <Text
+                  style={{
+                    fontWeight: '400',
+                    fontSize: 14,
+                    color: '#59499E',
+                    marginBottom: 7,
+                  }}>
+                  ID Card Pictures
+                </Text>
 
-  <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-    {/* Front */}
-    <TouchableOpacity
-  style={{
-    borderWidth: 1,
-    borderColor: '#A3A3A3',
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    width: wp(40),
-    height: hp(12),
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden', // so image corners stay rounded
-  }}
-  onPress={getPhotoForFront}>
-  {frontIdImage ? (
-    <>
-      <Image
-        source={{uri: frontIdImage.uri || frontIdImage}}
-        style={{width: '100%', height: '100%'}}
-        resizeMode="cover"
-      />
-      <TouchableOpacity
-        onPress={removeFrontIdImage}
-        style={{
-          position: 'absolute',
-          top: 5,
-          right: 5,
-          backgroundColor: '#fff',
-          borderRadius: 12,
-          width: 24,
-          height: 24,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Icon name="x" type="Feather" style={{fontSize: 16, color: 'red'}} />
-      </TouchableOpacity>
-    </>
-  ) : (
-    <>
-      <Icon name="camera" type="Feather" style={{fontSize: 20, color: '#59499E'}} />
-      <Text style={{color: '#59499E99', marginTop: 5}}>Front</Text>
-    </>
-  )}
-</TouchableOpacity>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  {/* Front */}
+                  <TouchableOpacity
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#A3A3A3',
+                      borderStyle: 'dashed',
+                      borderRadius: 10,
+                      width: wp(40),
+                      height: hp(12),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      overflow: 'hidden', // so image corners stay rounded
+                    }}
+                    onPress={getPhotoForFront}>
+                    {frontIdImage ? (
+                      <>
+                        <Image
+                          source={{uri: frontIdImage.uri || frontIdImage}}
+                          style={{width: '100%', height: '100%'}}
+                          resizeMode="cover"
+                        />
+                        <TouchableOpacity
+                          onPress={removeFrontIdImage}
+                          style={{
+                            position: 'absolute',
+                            top: 5,
+                            right: 5,
+                            backgroundColor: '#fff',
+                            borderRadius: 12,
+                            width: 24,
+                            height: 24,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Icon
+                            name="x"
+                            type="Feather"
+                            style={{fontSize: 16, color: 'red'}}
+                          />
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <Icon
+                          name="camera"
+                          type="Feather"
+                          style={{fontSize: 20, color: '#59499E'}}
+                        />
+                        <Text style={{color: '#59499E99', marginTop: 5}}>
+                          Front
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
 
+                  {/* Back */}
+                  <TouchableOpacity
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#A3A3A3',
+                      borderStyle: 'dashed',
+                      borderRadius: 10,
+                      width: wp(40),
+                      height: hp(12),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      overflow: 'hidden',
+                    }}
+                    onPress={getPhotoForBack}>
+                    {backIdImage ? (
+                      <>
+                        <Image
+                          source={{uri: backIdImage.uri || backIdImage}}
+                          style={{width: '100%', height: '100%'}}
+                          resizeMode="cover"
+                        />
+                        <TouchableOpacity
+                          onPress={removeBackIdImage}
+                          style={{
+                            position: 'absolute',
+                            top: 5,
+                            right: 5,
+                            backgroundColor: '#fff',
+                            borderRadius: 12,
+                            width: 24,
+                            height: 24,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Icon
+                            name={'x'}
+                            type="Feather"
+                            style={styles.icon}
+                            COLOR={'red'}
+                          />
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <Icon
+                          name="camera"
+                          type="Feather"
+                          style={{fontSize: 20, color: '#59499E'}}
+                        />
+                        <Text style={{color: '#59499E99', marginTop: 5}}>
+                          Back
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-    {/* Back */}
-    <TouchableOpacity
-  style={{
-    borderWidth: 1,
-    borderColor: '#A3A3A3',
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    width: wp(40),
-    height: hp(12),
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  }}
-  onPress={getPhotoForBack}>
-  {backIdImage ? (
-    <>
-      <Image
-        source={{uri: backIdImage.uri || backIdImage}}
-        style={{width: '100%', height: '100%'}}
-        resizeMode="cover"
-      />
-      <TouchableOpacity
-        onPress={removeBackIdImage}
-        style={{
-          position: 'absolute',
-          top: 5,
-          right: 5,
-          backgroundColor: '#fff',
-          borderRadius: 12,
-          width: 24,
-          height: 24,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Icon
-                        name={'x'}
-                        type="Feather"
-                        style={styles.icon}
-                        COLOR={'red'}
-                      />
-      </TouchableOpacity>
-    </>
-  ) : (
-    <>
-      <Icon name="camera" type="Feather" style={{fontSize: 20, color: '#59499E'}} />
-      <Text style={{color: '#59499E99', marginTop: 5}}>Back</Text>
-    </>
-  )}
-</TouchableOpacity>
-  </View>
-</View>
-
-
-            <View>
+              <View>
+                <Text
+                  style={{
+                    fontWeight: '400',
+                    fontSize: 14,
+                    color: '#59499E',
+                    marginTop: 7,
+                  }}>
+                  Take a Selfi
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    height: hp(7),
+                    backgroundColor: '#E6E6E6',
+                    alignItems: 'center',
+                    borderRadius: 10,
+                    paddingHorizontal: wp(5),
+                  }}
+                  onPress={() => {
+                    getPhotoFromGallery1();
+                  }}>
+                  <Text style={{color: '#59499E99'}}>
+                    Upload for verification
+                  </Text>
+                  <Image
+                    source={require('../../../assets/images/upload.png')}
+                    style={{}}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                {imageForShowSelfi.map((item, index) => (
+                  <View>
+                    <ImageBackground
+                      key={item.id}
+                      source={{
+                        uri:
+                          item?.uri ||
+                          'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
+                        i: 'file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg',
+                      }}
+                      style={{width: 100, height: 100, margin: 5}}
+                      imageStyle={{borderRadius: 10}}>
+                      <TouchableOpacity
+                        style={styles.crossView}
+                        onPress={() => removeImage1(item, index)}>
+                        <Icon
+                          name={'x'}
+                          type="Feather"
+                          style={styles.icon}
+                          COLOR={'red'}
+                        />
+                      </TouchableOpacity>
+                    </ImageBackground>
+                  </View>
+                ))}
+              </View>
+            </View>
+            <View style={{width: wp(90), alignSelf: 'center'}}>
               <Text
                 style={{
-                  fontWeight: '400',
-                  fontSize: 14,
                   color: '#59499E',
-                  marginTop: 7,
+                  fontFamily: FAMILY.BOLD,
+                  fontSize: SIZE.SIZE_18,
+                  marginTop: hp(2),
+                  marginBottom: hp(2),
                 }}>
-                Take a Selfi
+                Vehicle information
               </Text>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  height: hp(7),
-                  backgroundColor: '#E6E6E6',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  paddingHorizontal: wp(5),
-                }}
-                onPress={() => {
-                  getPhotoFromGallery1();
-                }}>
-                <Text style={{color: '#59499E99'}}>
-                  Upload for verification
-                </Text>
-                <Image
-                  source={require('../../../assets/images/upload.png')}
-                  style={{}}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
             </View>
-            <View style={{flexDirection: 'row'}}>
-              {imageForShowSelfi.map((item, index) => (
-                <View>
-                  <ImageBackground
-                    key={item.id}
-                    source={{
-                      uri:
-                        item?.uri ||
-                        'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
-                      i: 'file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg',
-                    }}
-                    style={{width: 100, height: 100, margin: 5}}
-                    imageStyle={{borderRadius: 10}}>
-                    <TouchableOpacity
-                      style={styles.crossView}
-                      onPress={() => removeImage1(item, index)}>
-                      <Icon
-                        name={'x'}
-                        type="Feather"
-                        style={styles.icon}
-                        COLOR={'red'}
-                      />
-                    </TouchableOpacity>
-                  </ImageBackground>
-                </View>
-              ))}
-            </View>
-          </View>
-          <View style={{width: wp(90), alignSelf: 'center'}}>
-            <Text
+            <View
               style={{
-                color: '#59499E',
-                fontFamily: FAMILY.BOLD,
-                fontSize: SIZE.SIZE_18,
-                marginTop: hp(2),
-                marginBottom: hp(2),
+                padding: 15,
+                borderRadius: 15,
+                backgroundColor: '#fff',
+                width: wp(90),
+                alignSelf: 'center',
+                // marginBottom:hp(5)
               }}>
-              Vehicle information
-            </Text>
-          </View>
-          <View
-            style={{
-              padding: 15,
-              borderRadius: 15,
-              backgroundColor: '#fff',
-              width: wp(90),
-              alignSelf: 'center',
-              // marginBottom:hp(5)
-            }}>
-            <View style>
-              <TextInputComp
-                placeholder="Enter license number"
-                value={drivingLiscence}
-                onChangeText={e => setDrivingLiscence(e)}
-                title="License"
-              />
-            </View>
-            {/* <View>
+              <View style>
+                <TextInputComp
+                  placeholder="Enter license number"
+                  value={drivingLiscence}
+                  onChangeText={e => setDrivingLiscence(e)}
+                  title="License"
+                />
+              </View>
+              {/* <View>
               <Text
                 style={{
                   fontWeight: '400',
@@ -1121,189 +1149,218 @@ const getData = async () => {
                 />
               </TouchableOpacity>
             </View> */}
-            <View style={{marginVertical: hp(2)}}>
-  <Text style={{
-    fontWeight: '400',
-    fontSize: 14,
-    color: '#59499E',
-    marginBottom: 7,
-  }}>
-    License Pictures
-  </Text>
+              <View style={{marginVertical: hp(2)}}>
+                <Text
+                  style={{
+                    fontWeight: '400',
+                    fontSize: 14,
+                    color: '#59499E',
+                    marginBottom: 7,
+                  }}>
+                  License Pictures
+                </Text>
 
-  <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-    {/* Front license */}
-    <TouchableOpacity
-      style={{
-        borderWidth: 1,
-        borderColor: '#A3A3A3',
-        borderStyle: 'dashed',
-        borderRadius: 10,
-        width: wp(40),
-        height: hp(12),
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-      }}
-      onPress={getPhotoForFrontLicense}>
-      {frontLicenseImage ? (
-        <>
-          <Image
-            source={{uri: frontLicenseImage.uri || frontLicenseImage}}
-            style={{width: '100%', height: '100%'}}
-            resizeMode="cover"
-          />
-          <TouchableOpacity
-            onPress={removeFrontLicenseImage}
-            style={{
-              position: 'absolute',
-              top: 5,
-              right: 5,
-              backgroundColor: '#fff',
-              borderRadius: 12,
-              width: 24,
-              height: 24,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Icon name="x" type="Feather" style={{fontSize: 16, color: 'red'}} />
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Icon name="camera" type="Feather" style={{fontSize: 20, color: '#59499E'}} />
-          <Text style={{color: '#59499E99', marginTop: 5}}>Front</Text>
-        </>
-      )}
-    </TouchableOpacity>
-
-    {/* Back license */}
-    <TouchableOpacity
-      style={{
-        borderWidth: 1,
-        borderColor: '#A3A3A3',
-        borderStyle: 'dashed',
-        borderRadius: 10,
-        width: wp(40),
-        height: hp(12),
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-      }}
-      onPress={getPhotoForBackLicense}>
-      {backLicenseImage ? (
-        <>
-          <Image
-            source={{uri: backLicenseImage.uri || backLicenseImage}}
-            style={{width: '100%', height: '100%'}}
-            resizeMode="cover"
-          />
-          <TouchableOpacity
-            onPress={removeBackLicenseImage}
-            style={{
-              position: 'absolute',
-              top: 5,
-              right: 5,
-              backgroundColor: '#fff',
-              borderRadius: 12,
-              width: 24,
-              height: 24,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Icon name="x" type="Feather" style={{fontSize: 16, color: 'red'}} />
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Icon name="camera" type="Feather" style={{fontSize: 20, color: '#59499E'}} />
-          <Text style={{color: '#59499E99', marginTop: 5}}>Back</Text>
-        </>
-      )}
-    </TouchableOpacity>
-  </View>
-</View>
-
-            <View style>
-              <TextInputComp
-                placeholder="Enter car name"
-                value={carname}
-                onChangeText={e => SetCarName(e, 'name')}
-                title="Car Name"
-              />
-            </View>
-            <View style>
-              <TextInputComp
-                placeholder="Enter car number"
-                value={carnumber}
-                onChangeText={e => SetCarNumber(e)}
-                title="Car Number"
-              />
-            </View>
-            <View>
-              <Text
-                style={{
-                  fontWeight: '400',
-                  fontSize: 14,
-                  color: '#59499E',
-                }}>
-                Car Pictures
-              </Text>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  height: hp(7),
-                  backgroundColor: '#E6E6E6',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  paddingHorizontal: wp(5),
-                }}
-                onPress={() => {
-                  getPhotoFromGallery();
-                }}>
-                <Text style={{color: '#59499E99'}}>Upload car Pictures</Text>
-                <Image
-                  source={require('../../../assets/images/upload.png')}
-                  style={{}}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              {imageForShow.map((item, index) => (
-                <View>
-                  <ImageBackground
-                    key={item.id}
-                    source={{
-                      uri:
-                        item?.uri ||
-                        'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
-                      i: 'file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg',
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  {/* Front license */}
+                  <TouchableOpacity
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#A3A3A3',
+                      borderStyle: 'dashed',
+                      borderRadius: 10,
+                      width: wp(40),
+                      height: hp(12),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      overflow: 'hidden',
                     }}
-                    style={{width: 100, height: 100, margin: 5}}
-                    imageStyle={{borderRadius: 10}}>
-                    <TouchableOpacity
-                      style={styles.crossView}
-                      onPress={() => removeImage(item, index)}>
-                      <Icon
-                        name={'x'}
-                        type="Feather"
-                        style={styles.icon}
-                        COLOR={'red'}
-                      />
-                    </TouchableOpacity>
-                  </ImageBackground>
+                    onPress={getPhotoForFrontLicense}>
+                    {frontLicenseImage ? (
+                      <>
+                        <Image
+                          source={{
+                            uri: frontLicenseImage.uri || frontLicenseImage,
+                          }}
+                          style={{width: '100%', height: '100%'}}
+                          resizeMode="cover"
+                        />
+                        <TouchableOpacity
+                          onPress={removeFrontLicenseImage}
+                          style={{
+                            position: 'absolute',
+                            top: 5,
+                            right: 5,
+                            backgroundColor: '#fff',
+                            borderRadius: 12,
+                            width: 24,
+                            height: 24,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Icon
+                            name="x"
+                            type="Feather"
+                            style={{fontSize: 16, color: 'red'}}
+                          />
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <Icon
+                          name="camera"
+                          type="Feather"
+                          style={{fontSize: 20, color: '#59499E'}}
+                        />
+                        <Text style={{color: '#59499E99', marginTop: 5}}>
+                          Front
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+
+                  {/* Back license */}
+                  <TouchableOpacity
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#A3A3A3',
+                      borderStyle: 'dashed',
+                      borderRadius: 10,
+                      width: wp(40),
+                      height: hp(12),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      overflow: 'hidden',
+                    }}
+                    onPress={getPhotoForBackLicense}>
+                    {backLicenseImage ? (
+                      <>
+                        <Image
+                          source={{
+                            uri: backLicenseImage.uri || backLicenseImage,
+                          }}
+                          style={{width: '100%', height: '100%'}}
+                          resizeMode="cover"
+                        />
+                        <TouchableOpacity
+                          onPress={removeBackLicenseImage}
+                          style={{
+                            position: 'absolute',
+                            top: 5,
+                            right: 5,
+                            backgroundColor: '#fff',
+                            borderRadius: 12,
+                            width: 24,
+                            height: 24,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Icon
+                            name="x"
+                            type="Feather"
+                            style={{fontSize: 16, color: 'red'}}
+                          />
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <Icon
+                          name="camera"
+                          type="Feather"
+                          style={{fontSize: 20, color: '#59499E'}}
+                        />
+                        <Text style={{color: '#59499E99', marginTop: 5}}>
+                          Back
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
                 </View>
-              ))}
+              </View>
+
+              <View style>
+                <TextInputComp
+                  placeholder="Enter car name"
+                  value={carname}
+                  onChangeText={e => SetCarName(e, 'name')}
+                  title="Car Name"
+                />
+              </View>
+              <View style>
+                <TextInputComp
+                  placeholder="Enter car number"
+                  value={carnumber}
+                  onChangeText={e => SetCarNumber(e)}
+                  title="Car Number"
+                />
+              </View>
+              <View>
+                <Text
+                  style={{
+                    fontWeight: '400',
+                    fontSize: 14,
+                    color: '#59499E',
+                  }}>
+                  Car Pictures
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    height: hp(7),
+                    backgroundColor: '#E6E6E6',
+                    alignItems: 'center',
+                    borderRadius: 10,
+                    paddingHorizontal: wp(5),
+                  }}
+                  onPress={() => {
+                    getPhotoFromGallery();
+                  }}>
+                  <Text style={{color: '#59499E99'}}>Upload car Pictures</Text>
+                  <Image
+                    source={require('../../../assets/images/upload.png')}
+                    style={{}}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                {imageForShow.map((item, index) => (
+                  <View>
+                    <ImageBackground
+                      key={item.id}
+                      source={{
+                        uri:
+                          item?.uri ||
+                          'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
+                        i: 'file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg',
+                      }}
+                      style={{width: 100, height: 100, margin: 5}}
+                      imageStyle={{borderRadius: 10}}>
+                      <TouchableOpacity
+                        style={styles.crossView}
+                        onPress={() => removeImage(item, index)}>
+                        <Icon
+                          name={'x'}
+                          type="Feather"
+                          style={styles.icon}
+                          COLOR={'red'}
+                        />
+                      </TouchableOpacity>
+                    </ImageBackground>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
-          <Button
-            style={[styles.uploadbtn2, {marginBottom: hp(6), bottom: 0}]}
-            onPress={submit}>
-            <Text style={styles.saveBtnText2}>SAVE</Text>
-          </Button>
-        </ScrollView>
+            <Button
+              style={[styles.uploadbtn2, {marginBottom: hp(6), bottom: 0}]}
+              onPress={submit}>
+              <Text style={styles.saveBtnText2}>SAVE</Text>
+            </Button>
+          </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
     );
@@ -1359,52 +1416,54 @@ const getData = async () => {
   function renderInsurance() {
     return (
       <Container>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.tabInfo}>
-            <Button
-              style={
-                PaymentTabSelected === 'card'
-                  ? styles.tabActive1
-                  : styles.tabInactive
-              }
-              onPress={() => setPaymentTabSelected('card')}>
-              <Image
-                source={require('../../../assets/images/payment-card.png')}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.tabInfo}>
+              <Button
                 style={
                   PaymentTabSelected === 'card'
-                    ? styles.tabImgActive
-                    : styles.tabImgInactive
+                    ? styles.tabActive1
+                    : styles.tabInactive
                 }
-                resizeMode="contain"
-              />
-            </Button>
-            <Button
-              style={
-                PaymentTabSelected === 'paypal'
-                  ? styles.tabActive1
-                  : styles.tabInactive
-              }
-              onPress={() => setPaymentTabSelected('paypal')}>
-              <Image
-                source={require('../../../assets/images//download.png')}
+                onPress={() => setPaymentTabSelected('card')}>
+                <Image
+                  source={require('../../../assets/images/payment-card.png')}
+                  style={
+                    PaymentTabSelected === 'card'
+                      ? styles.tabImgActive
+                      : styles.tabImgInactive
+                  }
+                  resizeMode="contain"
+                />
+              </Button>
+              <Button
                 style={
                   PaymentTabSelected === 'paypal'
-                    ? styles.tabImgActive
-                    : styles.tabImgInactive
+                    ? styles.tabActive1
+                    : styles.tabInactive
                 }
-                resizeMode="contain"
-              />
-            </Button>
-          </View>
-          <View style={styles.paymentContainer}>
-            {PaymentTabSelected === 'card'
-              ? renderCard()
-              : PaymentTabSelected === 'paypal'
-              ? renderPayPal()
-              : null}
-          </View>
-        </ScrollView>
+                onPress={() => setPaymentTabSelected('paypal')}>
+                <Image
+                  source={require('../../../assets/images//download.png')}
+                  style={
+                    PaymentTabSelected === 'paypal'
+                      ? styles.tabImgActive
+                      : styles.tabImgInactive
+                  }
+                  resizeMode="contain"
+                />
+              </Button>
+            </View>
+            <View style={styles.paymentContainer}>
+              {PaymentTabSelected === 'card'
+                ? renderCard()
+                : PaymentTabSelected === 'paypal'
+                ? renderPayPal()
+                : null}
+            </View>
+          </ScrollView>
         </KeyboardAvoidingView>
         <Button style={styles.payBtn} onPress={onSubmit}>
           <Text style={styles.payBtnText}>MAKE A PAYMENT</Text>
