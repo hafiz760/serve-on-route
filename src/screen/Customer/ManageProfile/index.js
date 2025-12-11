@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Image, AppRegistry, KeyboardAvoidingView, Platform } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  AppRegistry,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { Container, Content, Icon } from '../../../component/Basic';
-import { TextInput, Button, ToggleSwitch, Checkbox } from '../../../component/Form';
+import {Container, Content, Icon} from '../../../component/Basic';
+import {
+  TextInput,
+  Button,
+  ToggleSwitch,
+  Checkbox,
+} from '../../../component/Form';
 // import ImagePicker from "react-native-image-crop-picker";
 import Modal from 'react-native-modalbox';
-import { CreditCardInput } from 'react-native-credit-card-input';
+import {CreditCardInput} from 'react-native-credit-card-input';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import axios from 'axios';
@@ -14,14 +27,15 @@ import Support from '../../../component/Support';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DocumentPicker from 'react-native-document-picker';
 
-
-import { DarkStatusBar } from '../../../component/StatusBar';
-import { showMessage } from '../../../helper/showAlert';
-import { useDispatch, useSelector } from 'react-redux';
+import {DarkStatusBar} from '../../../component/StatusBar';
+import {showMessage} from '../../../helper/showAlert';
+import {useDispatch, useSelector} from 'react-redux';
 // import {BASE_URL,URL_V} from "@env"
-import { BASE_URL, URL_V } from '../../../utilities/helper';
-import { navigate, navigateReset } from '../../../navigations';
-import { updateUser } from '../../../store/reducers/session';
+import {BASE_URL, URL_V} from '../../../utilities/helper';
+import {navigate, navigateReset} from '../../../navigations';
+import {updateUser} from '../../../store/reducers/session';
+import {ActivityIndicator} from 'react-native';
+import {locationPermission} from '../../../helper/getCurrentLocation';
 
 export default function ManageProfile() {
   const dispatch = useDispatch();
@@ -30,100 +44,130 @@ export default function ManageProfile() {
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState();
   const [values, setValues] = useState();
-  console.log('values',values);
   const [valuesHttp, setValuesHttp] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [CardInput, setCardInput] = useState({});
   const [tabSelected, setTabSelected] = useState('profile');
   const [PaymentTabSelected, setPaymentTabSelected] = useState('card');
-  const { token1 } = useSelector((state) => state.session);
+  const {token1} = useSelector(state => state.session);
   const [itemsType, setItemsType] = useState('Male');
   const [openModel, setOpenModel] = useState(false);
   const [avatar, setAvatar] = useState();
   const [items, setItems] = useState([
-    { label: 'Male', value: 'Male' },
-    { label: 'Female', value: 'Female' },
+    {label: 'Male', value: 'Male'},
+    {label: 'Female', value: 'Female'},
   ]);
+  const [loading, setLoading] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [location, setLocation] = useState(null);
   useEffect(() => {
     fetchData();
+    console.log('Test');
   }, []);
 
-const postData = async () => {
-  // Check mandatory fields
-  if (!firstName?.trim()) {
-    showMessage('error', 'First name is required');
-    return;
-  }
-  if (!lastName?.trim()) {
-    showMessage('error', 'Last name is required');
-    return;
-  }
-  if (!itemsType) {
-    showMessage('error', 'Please select gender');
-    return;
-  }
-  // if (!values) {
-  //   showMessage('error', 'Please upload a profile image');
-  //   return;
-  // }
+  const handleToggle = async () => {
+    if (!isEnabled) {
+      try {
+        setLoading(true);
 
-  try {
-    const data = await AsyncStorage.getItem('response');
-    const datas = JSON.parse(data);
+        const permission = await locationPermission();
 
-    const formData = new FormData();
-    formData.append('first_name', firstName);
-    formData.append('last_name', lastName);
-    formData.append('avatar_file', values);
-    formData.append('gender', itemsType);
-    formData.append('cover_image', values);
+        // if (permission === 'granted') {
+        //   const coords = await getUserCurrentPosition();
+        //   setLocation(coords);
+        //   setIsEnabled(true);
+        // }
+      } catch (error) {
+        console.log('LOCATION ERROR:', error);
+        setIsEnabled(false);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setIsEnabled(false);
+      setLocation(null);
+    }
+  };
 
-    console.log('EditedProfileFormData', formData);
+  const postData = async () => {
+    // Check mandatory fields
+    if (!firstName?.trim()) {
+      showMessage('error', 'First name is required');
+      return;
+    }
+    if (!lastName?.trim()) {
+      showMessage('error', 'Last name is required');
+      return;
+    }
+    if (!itemsType) {
+      showMessage('error', 'Please select gender');
+      return;
+    }
+    // if (!values) {
+    //   showMessage('error', 'Please upload a profile image');
+    //   return;
+    // }
 
-    const requestOptions = {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${datas.access_token}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      body: formData,
-    };
+    try {
+      const data = await AsyncStorage.getItem('response');
+      const datas = JSON.parse(data);
 
-    const res = await fetch(`${BASE_URL}${URL_V}users/update-user`, requestOptions);
-    const result = await res.json();
+      const formData = new FormData();
+      formData.append('first_name', firstName);
+      formData.append('last_name', lastName);
+      formData.append('avatar_file', values);
+      formData.append('gender', itemsType);
+      formData.append('cover_image', values);
 
-    console.log('RESULT', result);
-    fetchData();
-    showMessage('success', 'Profile updated successfully');
-  } catch (err) {
-    console.log('ERROR', err);
-    showMessage('error', 'Error while updating profile');
-  }
-};
-
-
-  const fetchData = async () => {
-    var data = await AsyncStorage.getItem('response');
-    var datas = JSON.parse(data);
-
-    const res = await axios
-      .get(`${BASE_URL}${URL_V}users/user-by-id/${datas._id || datas.userId}`, {
+      const requestOptions = {
+        method: 'PUT',
         headers: {
           Authorization: `Bearer ${datas.access_token}`,
+          'Content-Type': 'multipart/form-data',
         },
-      })
-      .then((data) => {
-        dispatch(updateUser(data.data.data));
-        setInformation(data.data.data);
-        setFirstName(data.data.data.first_name);
-        setLastName(data.data.data.last_name);
-        setGender(data.data.data.gender);
-        setValuesHttp(data.data.data.avatar);
-        console.log('DATA API:', JSON.stringify(data.data.data,null,2));
-      })
-      .catch((err) => {
-        console.log(('errors', err.response.data));
-      });
+        body: formData,
+      };
+
+      const res = await fetch(
+        `${BASE_URL}${URL_V}users/update-user`,
+        requestOptions,
+      );
+      const result = await res.json();
+      fetchData();
+      showMessage('success', 'Profile updated successfully');
+    } catch (err) {
+      console.log('ERROR', err);
+      showMessage('error', 'Error while updating profile');
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const data = await AsyncStorage.getItem('response');
+      const datas = JSON.parse(data);
+
+      const res = await axios.get(
+        `${BASE_URL}${URL_V}users/user-by-id/${datas._id || datas.userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${datas.access_token}`,
+          },
+        },
+      );
+
+      console.log('API RESPONSE:', res.data);
+
+      setInformation(res.data.data);
+      setFirstName(res.data.data.first_name);
+      setLastName(res.data.data.last_name);
+      setGender(res.data.data.gender);
+      setValuesHttp(res.data.data.avatar);
+    } catch (err) {
+      console.log('Error:', err.response?.data || err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // async function onDisplayNotification() {
@@ -197,16 +241,14 @@ const postData = async () => {
     }
   }
 
-  const UploadData = async (setPath) => {
+  const UploadData = async setPath => {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
       });
       setPath(res[0]);
-      console.log(res[0]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker, exit any dialogs or menus and move on
       } else {
         throw err;
       }
@@ -216,96 +258,97 @@ const postData = async () => {
   function renderProfile() {
     return (
       <View style={styles.profileContainer}>
-        <View style={styles.profileContent}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-        <ScrollView>
-          <View style={styles.profileImgInfo}>
-            <View style={styles.profileBgImg}>
-              <Image
-                source={{
-                  uri:
-                    values?.uri ||
-                    valuesHttp ||
-                    'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
-                  // uri: values,
-                  // uri: "file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg" ,
-                }}
-                // source={require(values)}
-                style={styles.profileImg}
-              />
-              <Button
-                style={styles.iconDetail}
-                onPress={() => {
-                  UploadData(setValues);
-                }}
-              >
-                <Icon
-                  name="pencil"
-                  type="EvilIcons"
-                  style={[theme.SIZE_24, theme.GREYDARK]}
-                />
-              </Button>
-            </View>
-          </View>
-          <View style={styles.formRow}>
-            <Text style={styles.formText}>FIRST NAME</Text>
-            <TextInput
-              placeholder="First Name"
-              placeholderTextColor="rgba(42,33,77,1)"
-              value={firstName}
-              onChangeText={(e) => {
-                setFirstName(e);
-              }}
-              style={styles.formInput}
-            />
-          </View>
+        {loading ? (
+          <ActivityIndicator size="large" color="#666" />
+        ) : (
+          <View style={styles.profileContent}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{flex: 1}}>
+              <ScrollView>
+                <View style={styles.profileImgInfo}>
+                  <View style={styles.profileBgImg}>
+                    <Image
+                      source={{
+                        uri:
+                          values?.uri ||
+                          valuesHttp ||
+                          'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
+                      }}
+                      style={styles.profileImg}
+                    />
+                    <Button
+                      style={styles.iconDetail}
+                      onPress={() => {
+                        UploadData(setValues);
+                      }}>
+                      <Icon
+                        name="pencil"
+                        type="EvilIcons"
+                        style={[theme.SIZE_24, theme.GREYDARK]}
+                      />
+                    </Button>
+                  </View>
+                </View>
+                <View style={styles.formRow}>
+                  <Text style={styles.formText}>FIRST NAME</Text>
+                  <TextInput
+                    placeholder="First Name"
+                    placeholderTextColor="rgba(42,33,77,1)"
+                    value={firstName}
+                    onChangeText={e => {
+                      setFirstName(e);
+                    }}
+                    style={styles.formInput}
+                  />
+                </View>
 
-          <View style={styles.formRow}>
-            <Text style={styles.formText}>LAST NAME</Text>
-            <TextInput
-              placeholder="Last Name"
-              placeholderTextColor="rgba(42,33,77,1)"
-              value={lastName}
-              onChangeText={(e) => {
-                setLastName(e);
-              }}
-              style={styles.formInput}
-            />
-          </View>
+                <View style={styles.formRow}>
+                  <Text style={styles.formText}>LAST NAME</Text>
+                  <TextInput
+                    placeholder="Last Name"
+                    placeholderTextColor="rgba(42,33,77,1)"
+                    value={lastName}
+                    onChangeText={e => {
+                      setLastName(e);
+                    }}
+                    style={styles.formInput}
+                  />
+                </View>
 
-          <View style={styles.formRow}>
-            <Text style={styles.formText}>GENDER</Text>
+                <View style={styles.formRow}>
+                  <Text style={styles.formText}>GENDER</Text>
 
-            <DropDownPicker
-              open={openModel}
-              items={items}
-              setOpen={setOpenModel}
-              value={itemsType}
-              onSelectItem={(e) => setItemsType(e.value)}
-              setItems={setItems}
-              style={styles.dropDown}
-            />
-          </View>
+                  <DropDownPicker
+                    open={openModel}
+                    items={items}
+                    setOpen={setOpenModel}
+                    value={itemsType}
+                    onSelectItem={e => setItemsType(e.value)}
+                    setItems={setItems}
+                    style={styles.dropDown}
+                  />
+                </View>
 
-          <View style={styles.formRow}>
-            <Text style={styles.formText}>MOBILE NUMBER</Text>
-            <TextInput
-              placeholder="Enter The Phone Number"
-              value={information?.phone}
-              placeholderTextColor="rgba(42,33,77,1)"
-              keyboardType="numeric"
-              editable={false}
-              style={styles.formInput}
-            />
+                <View style={styles.formRow}>
+                  <Text style={styles.formText}>MOBILE NUMBER</Text>
+                  <TextInput
+                    placeholder="Enter The Phone Number"
+                    value={information?.phone}
+                    placeholderTextColor="rgba(42,33,77,1)"
+                    keyboardType="numeric"
+                    editable={false}
+                    style={styles.formInput}
+                  />
+                </View>
+                <Button style={styles.saveBtn} onPress={postData}>
+                  <Text style={styles.saveBtnText}>SAVE</Text>
+                </Button>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </View>
-          <Button style={styles.saveBtn} onPress={postData}>
-            <Text style={styles.saveBtnText}>SAVE</Text>
-          </Button>
-          </ScrollView>
-          </KeyboardAvoidingView>
-        </View>
+        )}
       </View>
-
     );
   }
   function renderPermission() {
@@ -315,10 +358,8 @@ const postData = async () => {
           <View style={styles.profileInputDetail}>
             <Text style={styles.permissionText}>LOCATION</Text>
             <View style={styles.switchInfo}>
-              <Text style={styles.switchText}>
-                Access your location
-              </Text>
-              <ToggleSwitch />
+              <Text style={styles.switchText}>Access your location</Text>
+              <ToggleSwitch value={isEnabled} setValue={handleToggle} />
             </View>
           </View>
           <View style={styles.profileInputDetail}>
@@ -331,9 +372,7 @@ const postData = async () => {
           <View style={styles.profileInputDetail}>
             <Text style={styles.permissionText}>MEDIA & STORAGE</Text>
             <View style={styles.switchInfo}>
-              <Text style={styles.switchText}>
-                Access your Media & Storage
-              </Text>
+              <Text style={styles.switchText}>Access your Media & Storage</Text>
               <ToggleSwitch />
             </View>
           </View>
@@ -341,101 +380,98 @@ const postData = async () => {
             style={styles.saveBtn}
             onPress={() => {
               navigate('CustomerSelectVehicle');
-            }}
-          >
+            }}>
             <Text style={styles.saveBtnText}>SAVE</Text>
           </Button>
         </View>
       </View>
     );
   }
-  function renderInsurance() {
-    return (
-      <Container>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.tabInfo}>
-            <Button
-              style={
-                PaymentTabSelected === 'card'
-                  ? styles.tabActive1
-                  : styles.tabInactive
-              }
-              onPress={() => setPaymentTabSelected('card')}
-            >
-              <Image
-                source={require('../../../assets/images/payment-card.png')}
-                style={
-                  PaymentTabSelected === 'card'
-                    ? styles.tabImgActive
-                    : styles.tabImgInactive
-                }
-                resizeMode="contain"
-              />
-            </Button>
-            <Button
-              style={
-                PaymentTabSelected === 'paypal'
-                  ? styles.tabActive1
-                  : styles.tabInactive
-              }
-              onPress={() => setPaymentTabSelected('paypal')}
-            >
-              <Image
-                source={require('../../../assets/images/download.png')}
-                style={
-                  PaymentTabSelected === 'paypal'
-                    ? styles.tabImgActive
-                    : styles.tabImgInactive
-                }
-                resizeMode="contain"
-              />
-            </Button>
-          </View>
-          {/* <View style={styles.paymentContainer}>
-            {PaymentTabSelected === "card"
-              ? renderCard()
-              : PaymentTabSelected === "paypal"
-              ? renderPayPal()
-              : null}
-          </View> */}
-              </ScrollView>
-              </KeyboardAvoidingView>
-        <View style={styles.payPalInfo}>
-          {/* <Image
-         style={styles.cardImg}
-         source={require("@asset/images/downloadicon.png")}
-       /> */}
+  // function renderInsurance() {
+  //   return (
+  //     <Container>
+  //       <KeyboardAvoidingView
+  //         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  //         style={{flex: 1}}>
+  //         <ScrollView showsVerticalScrollIndicator={false}>
+  //           <View style={styles.tabInfo}>
+  //             <Button
+  //               style={
+  //                 PaymentTabSelected === 'card'
+  //                   ? styles.tabActive1
+  //                   : styles.tabInactive
+  //               }
+  //               onPress={() => setPaymentTabSelected('card')}>
+  //               <Image
+  //                 source={require('../../../assets/images/payment-card.png')}
+  //                 style={
+  //                   PaymentTabSelected === 'card'
+  //                     ? styles.tabImgActive
+  //                     : styles.tabImgInactive
+  //                 }
+  //                 resizeMode="contain"
+  //               />
+  //             </Button>
+  //             <Button
+  //               style={
+  //                 PaymentTabSelected === 'paypal'
+  //                   ? styles.tabActive1
+  //                   : styles.tabInactive
+  //               }
+  //               onPress={() => setPaymentTabSelected('paypal')}>
+  //               <Image
+  //                 source={require('../../../assets/images/download.png')}
+  //                 style={
+  //                   PaymentTabSelected === 'paypal'
+  //                     ? styles.tabImgActive
+  //                     : styles.tabImgInactive
+  //                 }
+  //                 resizeMode="contain"
+  //               />
+  //             </Button>
+  //           </View>
+  //           {/* <View style={styles.paymentContainer}>
+  //             {PaymentTabSelected === 'card'
+  //               ? renderCard()
+  //               : PaymentTabSelected === 'paypal'
+  //               ? renderPayPal()
+  //               : null}
+  //           </View> */}
+  //         </ScrollView>
+  //       </KeyboardAvoidingView>
+  //       <View style={styles.payPalInfo}>
+  //         {/* <Image
+  //        style={styles.cardImg}
+  //        source={require("@asset/images/downloadicon.png")}
+  //      /> */}
 
-          <CreditCardInput
-            inputContainerStyle={styles.inputContainerStyle}
-            inputStyle={styles.inputStyle}
-            labelStyle={styles.labelStyle}
-            validColor="#fff"
-            placeholderColor="#ccc"
-            onChange={(data) => {
-              setCardInput(data);
-            }}
-          />
-        </View>
-        <Button style={styles.payBtn} onPress={onSubmit}>
-          <Text style={styles.payBtnText}>MAKE A PAYMENT</Text>
-        </Button>
-      </Container>
-    );
-  }
+  //         <CreditCardInput
+  //           inputContainerStyle={styles.inputContainerStyle}
+  //           inputStyle={styles.inputStyle}
+  //           labelStyle={styles.labelStyle}
+  //           validColor="#fff"
+  //           placeholderColor="#ccc"
+  //           onChange={data => {
+  //             setCardInput(data);
+  //           }}
+  //         />
+  //       </View>
+  //       <Button style={styles.payBtn} onPress={onSubmit}>
+  //         <Text style={styles.payBtnText}>MAKE A PAYMENT</Text>
+  //       </Button>
+  //     </Container>
+  //   );
+  // }
 
   return (
     <Container>
       <DarkStatusBar />
       <Header default leftType="back" title={''} />
-      <Content contentContainerStyle={theme.layoutDf}>
+      <Content contentContainerStyle={theme.layout}>
         <View>
           <View style={styles.profileHeader}>
             <Text style={styles.profileHeaderTitle}>PROFILE</Text>
-            <Text style={styles.profileHeaderText}>
-              MANAGE YOUR PROFILE
-            </Text>
+            <Text style={styles.profileHeaderText}>MANAGE YOUR PROFILE</Text>
             <View style={styles.tabInfo}>
               <Button
                 style={
@@ -443,15 +479,13 @@ const postData = async () => {
                     ? styles.tabActive
                     : styles.tabInactive
                 }
-                onPress={() => setTabSelected('profile')}
-              >
+                onPress={() => setTabSelected('profile')}>
                 <Text
                   style={
                     tabSelected === 'profile'
                       ? styles.tabTextActive
                       : styles.tabTextInactive
-                  }
-                >
+                  }>
                   PROFILE
                 </Text>
               </Button>
@@ -461,44 +495,42 @@ const postData = async () => {
                     ? styles.tabActive
                     : styles.tabInactive
                 }
-                onPress={() => setTabSelected('permission')}
-              >
+                onPress={() => setTabSelected('permission')}>
                 <Text
                   style={
                     tabSelected === 'permission'
                       ? styles.tabTextActive
                       : styles.tabTextInactive
-                  }
-                >
-                  ERMISSION
+                  }>
+                  PERMISSION
                 </Text>
               </Button>
-              <Button
+              {/* <Button
                 style={
                   tabSelected === 'insurance'
                     ? styles.tabActive
                     : styles.tabInactive
                 }
-                onPress={() => setTabSelected('insurance')}
-              >
+                onPress={() => setTabSelected('insurance')}>
                 <Text
                   style={
                     tabSelected === 'insurance'
                       ? styles.tabTextActive
                       : styles.tabTextInactive
-                  }
-                >
+                  }>
                   PAYMENT
                 </Text>
-              </Button>
+              </Button> */}
             </View>
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
             {tabSelected === 'profile'
               ? renderProfile()
-              : tabSelected === 'insurance'
-              ? renderInsurance()
-              : null}
+              : tabSelected === 'permission'
+              ? renderPermission()
+              : // : tabSelected === 'insurance'
+                // ? renderInsurance()
+                null}
           </ScrollView>
         </View>
       </Content>

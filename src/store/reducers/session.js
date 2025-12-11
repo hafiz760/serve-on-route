@@ -1,16 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
   token1: null,
   isLoggedIn: false,
   user: null,
   bool: false,
-  notiId:null,
+  notiId: null,
   address: {
     billing: {},
     shipping: {},
   },
-  isVerified:false
+  isVerified: false,
 };
 
 const updateToken_ = (state, action) => {
@@ -24,18 +24,19 @@ const login_ = (state, action) => {
   state.isLoggedIn = true;
   // state.user = action.payload.user
 
-  state.bool = true;
+  const role = action.payload?.role;
+  state.bool = role === 'rider' || role === 'driver';
 };
 
-const verfied_=(state, action)=>{
-  state.isVerified=true
-}
+const verfied_ = (state, action) => {
+  state.isVerified = true;
+};
 
 const logout_ = (state, action) => {
   // return { ...initialState, token: state.token };
   return {
     token1: null,
-    notiId:null,
+    notiId: null,
     isLoggedIn: false,
     user: null,
     bool: false,
@@ -60,8 +61,8 @@ const updateAddress_ = (state, action) => {
 };
 
 const slice = createSlice({
-  name: "session",
-  initialState: { ...initialState },
+  name: 'session',
+  initialState: {...initialState},
   reducers: {
     updateToken: updateToken_,
     updateNotiId: updateNotiId_,
@@ -70,11 +71,11 @@ const slice = createSlice({
     logout1: logout1_,
     updateUser: updateUser_,
     updateAddress: updateAddress_,
-    verfied:verfied_
+    verfied: verfied_,
   },
 });
 
-const { actions, reducer } = slice;
+const {actions, reducer} = slice;
 
 export const {
   updateToken,
@@ -88,4 +89,3 @@ export const {
 } = actions;
 
 export default reducer;
-

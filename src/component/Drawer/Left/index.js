@@ -96,20 +96,17 @@ function MenuLeft() {
       <View style={styles.headerBg}>
         <View style={styles.header}>
           <Image
-         
-         source={
-          user.avatar && !user.avatar.includes('\t')
-            ? { uri: user.avatar }
-            : require("../../../assets/images/dummyProfile.jpg")
-        }
+            source={
+              user.avatar && !user.avatar.includes('\t')
+                ? {uri: user.avatar}
+                : require('../../../assets/images/dummyProfile.jpg')
+            }
             resizeMode="cover"
             style={styles.headerImg}
           />
           <View>
             <View style={theme.row}>
-              <Text style={styles.headerName}>
-                {user?.first_name}
-              </Text>
+              <Text style={styles.headerName}>{user?.first_name}</Text>
             </View>
           </View>
         </View>

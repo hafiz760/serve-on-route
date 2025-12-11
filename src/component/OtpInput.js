@@ -3,8 +3,6 @@ import {
   View,
   TextInput,
   StyleSheet,
-  TouchableOpacity,
-  Text,
 } from "react-native";
 
 const OtpInput = ({ length = 4, onComplete ,iscode }) => {

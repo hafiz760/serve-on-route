@@ -5,7 +5,6 @@ import {Button} from '../../../component/Form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 import theme from '../../../theme/styles';
-
 import Header from '../../../component/Header';
 import {DarkStatusBar} from '../../../component/StatusBar';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
@@ -30,11 +29,11 @@ export default function Verification(props) {
   const [code, setCode] = useState('');
   const dispatch = useDispatch();
   const [isCodeValid, setIsCodeValid] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
+  const [otpCode, setOtpCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(true);
-  const param=props.route.params
-  console.log("param",param);
+  const param = props.route.params;
+  console.log('param', param);
   var isSecond = 60;
   var x;
   const [counter, setCounter] = useState(60);
@@ -73,18 +72,23 @@ export default function Verification(props) {
   }, [props.route.params.values]);
 
   const logins = async () => {
-    if(otpCode==="0000"){
-     if( param.from!="signUP"){
-      navigate("ResetPassword")
-     }else{
-      navigateReset("PublicHome");
-     }
-    
-    }else{
-      console.log("else called");
+    if (otpCode === '0000') {
+      if (param.from != 'signUP') {
+        navigate('ResetPassword');
+      } else {
+        const userRole = await AsyncStorage.getItem('role');
+        console.log('User role from storage:', userRole);
+
+        if (userRole === 'Driver') {
+          navigateReset('PublicHome');
+        } else {
+          navigateReset('PublicHome');
+        }
+      }
+    } else {
+      console.log('else called');
     }
-      
-  }
+  };
 
   const ResendOtp = v => {
     setTimer(true);
@@ -93,7 +97,7 @@ export default function Verification(props) {
   return (
     <Container>
       <DarkStatusBar />
-    
+
       <Image
         source={{
           uri: 'https://cdn.pixabay.com/photo/2018/08/01/21/49/peterbilt-3578297_960_720.jpg',
@@ -105,11 +109,11 @@ export default function Verification(props) {
       <View style={styles.verificationContainer}>
         <ScrollView>
           <Content contentContainerStyle={theme.layoutDf}>
-          <Header leftType="back" />
+            <Header leftType="back" />
             <View style={styles.verificationForm}>
               <Image
                 // source={require('../../../assets/images/unlock.png')}
-                source={require("../../../assets/images/lock.png")}
+                source={require('../../../assets/images/lock.png')}
                 resizeMode="contain"
                 style={styles.verificationImg}
               />
@@ -120,15 +124,15 @@ export default function Verification(props) {
                 {`Enter the 4-digit OTP sent to you at your number 03...`}000
               </Text>
 
-            <View style={{marginTop:hp(5)}}>
-            <OtpInput
-                length={4}
-                iscode={isCodeValid}
-                onComplete={code => {
-                  setOtpCode(code);
-                }}
-              />
-            </View>
+              <View style={{marginTop: hp(5)}}>
+                <OtpInput
+                  length={4}
+                  iscode={isCodeValid}
+                  onComplete={code => {
+                    setOtpCode(code);
+                  }}
+                />
+              </View>
 
               {/* <OTPInputView
                 style={{ height: 100 }}

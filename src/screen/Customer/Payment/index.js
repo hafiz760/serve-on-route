@@ -36,6 +36,7 @@ export default function Payment({navigation}) {
           card_exp_month: CardInput.values.expiry.split('/')[0],
           card_exp_year: CardInput.values.expiry.split('/')[1],
           card_cvc: CardInput.values.cvc,
+          payment_method: 'pm_card_visa',
         },
         {
           headers: {
