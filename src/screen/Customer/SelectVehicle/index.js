@@ -25,7 +25,7 @@ import moment from 'moment';
 import {useIsFocused} from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate} from '../../../navigations';
+import {navigate, navigateReset} from '../../../navigations';
 import DropdownPicker from '../../../component/DropdownPicker';
 import AppSpinner from '../../../component/AppSpinner';
 import {showMessage} from '../../../helper/showAlert';
@@ -91,6 +91,8 @@ function SelectVehicle({route}) {
   const [imagePickerModal, setImagePickerModal] = useState(false);
   const [bids, setBids] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [noPaymentMethodModal, setNoPaymentMethodModal] = useState(false);
+  const [hasPaymentMethod, setHasPaymentMethod] = useState(false);
 
   const fromLocation = route?.params?.form;
   const toLocation = route?.params?.to;
@@ -341,6 +343,11 @@ function SelectVehicle({route}) {
       return;
     }
 
+    if (!hasPaymentMethod) {
+      setNoPaymentMethodModal(true);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -469,6 +476,46 @@ function SelectVehicle({route}) {
     if (!isFocused) {
       setBids([]);
       setMainModel(false);
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    const checkPaymentMethod = async () => {
+      try {
+        const data = await AsyncStorage.getItem('response');
+        const parsedData = JSON.parse(data);
+
+        const response = await axios.get(
+          `${BASE_URL}${URL_V}payment?user=${parsedData._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${parsedData.access_token}`,
+            },
+          },
+        );
+
+        console.log('Payment methods response:', response.data);
+
+        if (
+          response.data &&
+          Array.isArray(response.data) &&
+          response.data.length > 0
+        ) {
+          console.log('User has payment methods:', response.data.length);
+          setHasPaymentMethod(true);
+        } else {
+          console.log('User has no payment methods');
+          setHasPaymentMethod(false);
+        }
+      } catch (err) {
+        console.error('Error checking payment method:', err);
+        // If error occurs, assume no payment method to be safe
+        setHasPaymentMethod(false);
+      }
+    };
+
+    if (isFocused) {
+      checkPaymentMethod();
     }
   }, [isFocused]);
 
@@ -615,6 +662,54 @@ function SelectVehicle({route}) {
             style={[styles.bookingBtn, {backgroundColor: '#grey'}]}
             onPress={() => setImagePickerModal(false)}>
             <Text style={styles.bookingBtnText}>CANCEL</Text>
+          </Button>
+        </View>
+      </Modal>
+
+      <Modal
+        isOpen={noPaymentMethodModal}
+        entry={'center'}
+        position="center"
+        backdropOpacity={0.5}
+        swipeToClose={false}
+        onClosed={() => setNoPaymentMethodModal(false)}
+        style={{
+          height: 220,
+          width: '85%',
+          borderRadius: 15,
+          paddingHorizontal: 25,
+          paddingVertical: 30,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{alignItems: 'center', width: '100%'}}>
+          <Icon
+            name="credit-card-off"
+            type="MaterialCommunityIcons"
+            style={{
+              fontSize: 50,
+              color: COLOR.PRIMARY,
+              marginBottom: 30,
+            }}
+          />
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: 'bold',
+              textAlign: 'center',
+              color: COLOR.DARKVIOLET,
+              marginBottom: 25,
+            }}>
+            You Have No Any Payment Method
+          </Text>
+
+          <Button
+            style={[styles.bookingBtn, {width: '100%', marginVertical: 0}]}
+            onPress={() => {
+              setNoPaymentMethodModal(false);
+              navigateReset('CustomerAllPayments');
+            }}>
+            <Text style={styles.bookingBtnText}>Add Payment Method</Text>
           </Button>
         </View>
       </Modal>

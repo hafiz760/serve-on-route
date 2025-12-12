@@ -4,21 +4,12 @@ import {
   ScrollView,
   Text,
   Image,
-  AppRegistry,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {Container, Content, Icon} from '../../../component/Basic';
-import {
-  TextInput,
-  Button,
-  ToggleSwitch,
-  Checkbox,
-} from '../../../component/Form';
-// import ImagePicker from "react-native-image-crop-picker";
-import Modal from 'react-native-modalbox';
-import {CreditCardInput} from 'react-native-credit-card-input';
+import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import axios from 'axios';
@@ -30,12 +21,13 @@ import DocumentPicker from 'react-native-document-picker';
 import {DarkStatusBar} from '../../../component/StatusBar';
 import {showMessage} from '../../../helper/showAlert';
 import {useDispatch, useSelector} from 'react-redux';
-// import {BASE_URL,URL_V} from "@env"
 import {BASE_URL, URL_V} from '../../../utilities/helper';
 import {navigate, navigateReset} from '../../../navigations';
-import {updateUser} from '../../../store/reducers/session';
-import {ActivityIndicator} from 'react-native';
-import {locationPermission} from '../../../helper/getCurrentLocation';
+import {
+  getUserCurrentPosition,
+  locationPermission,
+} from '../../../helper/getCurrentLocation';
+import AppSpinner from '../../../component/AppSpinner';
 
 export default function ManageProfile() {
   const dispatch = useDispatch();
@@ -48,11 +40,8 @@ export default function ManageProfile() {
   const [isOpen, setIsOpen] = useState(false);
   const [CardInput, setCardInput] = useState({});
   const [tabSelected, setTabSelected] = useState('profile');
-  const [PaymentTabSelected, setPaymentTabSelected] = useState('card');
-  const {token1} = useSelector(state => state.session);
   const [itemsType, setItemsType] = useState('Male');
   const [openModel, setOpenModel] = useState(false);
-  const [avatar, setAvatar] = useState();
   const [items, setItems] = useState([
     {label: 'Male', value: 'Male'},
     {label: 'Female', value: 'Female'},
@@ -65,32 +54,31 @@ export default function ManageProfile() {
     console.log('Test');
   }, []);
 
-  const handleToggle = async () => {
-    if (!isEnabled) {
-      try {
-        setLoading(true);
+  // const handleToggle = async () => {
+  //   if (!isEnabled) {
+  //     try {
+  //       setLoading(true);
 
-        const permission = await locationPermission();
+  //       const permission = await locationPermission();
 
-        // if (permission === 'granted') {
-        //   const coords = await getUserCurrentPosition();
-        //   setLocation(coords);
-        //   setIsEnabled(true);
-        // }
-      } catch (error) {
-        console.log('LOCATION ERROR:', error);
-        setIsEnabled(false);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setIsEnabled(false);
-      setLocation(null);
-    }
-  };
+  //       if (permission === 'granted') {
+  //         const coords = await getUserCurrentPosition();
+  //         setLocation(coords);
+  //         setIsEnabled(true);
+  //       }
+  //     } catch (error) {
+  //       console.log('LOCATION ERROR:', error);
+  //       setIsEnabled(false);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   } else {
+  //     setIsEnabled(false);
+  //     setLocation(null);
+  //   }
+  // };
 
   const postData = async () => {
-    // Check mandatory fields
     if (!firstName?.trim()) {
       showMessage('error', 'First name is required');
       return;
@@ -103,10 +91,6 @@ export default function ManageProfile() {
       showMessage('error', 'Please select gender');
       return;
     }
-    // if (!values) {
-    //   showMessage('error', 'Please upload a profile image');
-    //   return;
-    // }
 
     try {
       const data = await AsyncStorage.getItem('response');
@@ -209,22 +193,6 @@ export default function ManageProfile() {
   //     },
   //   });
 
-  //   notifee.onForegroundEvent(({ type, detail }) => {
-  //     if (type === EventType.ACTION_PRESS && detail.pressAction.id) {
-  //       console.log(
-  //         "User pressed an action with the id: ",
-  //         detail.pressAction.id
-  //       );
-  //       if (detail.pressAction.id == "Accept") {
-  //         // fetchData();
-  //         navigate("CustomerPayment");
-  //       } else {
-  //         alert("you decline");
-  //       }
-  //     }
-  //   });
-  // }
-
   async function onSubmit() {
     if (CardInput.valid == false || typeof CardInput.valid === 'undefined') {
       alert('Invalid Credit Card');
@@ -259,7 +227,7 @@ export default function ManageProfile() {
     return (
       <View style={styles.profileContainer}>
         {loading ? (
-          <ActivityIndicator size="large" color="#666" />
+          <AppSpinner color={COLOR.PRIMARY} size="large" />
         ) : (
           <View style={styles.profileContent}>
             <KeyboardAvoidingView
@@ -359,7 +327,7 @@ export default function ManageProfile() {
             <Text style={styles.permissionText}>LOCATION</Text>
             <View style={styles.switchInfo}>
               <Text style={styles.switchText}>Access your location</Text>
-              <ToggleSwitch value={isEnabled} setValue={handleToggle} />
+              <ToggleSwitch />
             </View>
           </View>
           <View style={styles.profileInputDetail}>
