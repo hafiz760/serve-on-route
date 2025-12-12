@@ -495,9 +495,12 @@ export default function MyTrip() {
   return (
     <Container>
       <DarkStatusBar />
-      <Header leftType="back" />
+      <Header
+        leftType="back"
+        title="MY TRIPS"
+        onPressLeft={() => navigate('PublicHome')}
+      />
       <View style={styles.myTripHeader}>
-        <Text style={styles.myTripHeaderTitle}>MY TRIPS</Text>
         <Text style={styles.myTripHeaderText}>LIST OF TRIPS</Text>
         <View style={styles.myTripTabItems}>
           <Button

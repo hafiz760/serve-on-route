@@ -28,6 +28,7 @@ import {
   locationPermission,
 } from '../../../helper/getCurrentLocation';
 import AppSpinner from '../../../component/AppSpinner';
+import {COLOR} from '../../../theme/typography';
 
 export default function ManageProfile() {
   const dispatch = useDispatch();

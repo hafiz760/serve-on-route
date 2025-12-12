@@ -149,10 +149,7 @@ export default function SignUp() {
     axios
       .post(`${BASE_URL}${URL_V}auth/signup`, qs.stringify(cd))
       .then(response => {
-        // console.log("CURRET LOGI===>1", response);
         if (response.status === 201) {
-          // console.log("CURRET LOGI===>", response);
-
           if (response?.data?.status === 500) {
             return showMessage('error', 'Duplicate account exists');
           }
@@ -163,8 +160,6 @@ export default function SignUp() {
             getInformation(response?.data);
             dispatch(initilizeSocket(response.data.access_token));
             method(response);
-            // showMessage("success", "Signup Successfully");
-            // navigateReset("PublicVerification", { values });
           }
 
           if (tabSelected === 'User' && !isSelected) {
@@ -173,8 +168,6 @@ export default function SignUp() {
             dispatch(initilizeSocket(response.data.access_token));
             temp = 2;
             method(response);
-            // showMessage("success", "Signup Successfully");
-            // navigateReset("PublicVerification", { values });
           }
           if (temp != 2) {
             showMessage('error', 'Something went wrong');
@@ -199,11 +192,8 @@ export default function SignUp() {
             },
           },
         );
-
-        // console.log("CURRENT USER YAY!!! ===>", notificationResponse.data);
       })
       .catch(err => {
-        // console.log("error>>>", err.response.data);
         setLoading(false);
         showMessage('error', err?.response?.data.message);
       });

@@ -1,29 +1,24 @@
 import React, {useState} from 'react';
-import {
-  View,
-  ScrollView,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button} from '../../../component/Form';
-// import notifee, { AndroidImportance, EventType } from "@notifee/react-native";
+import {View, KeyboardAvoidingView, Platform} from 'react-native';
+import {Container, Text} from '../../../component/Basic';
 import styles from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CreditCardInput} from 'react-native-credit-card-input';
 import Header from '../../../component/Header';
-import Support from '../../../component/Support';
 import axios from 'axios';
 import {showMessage} from '../../../helper/showAlert';
 import {DarkStatusBar} from '../../../component/StatusBar';
-// import {BASE_URL,URL_V} from "@env"
 import {BASE_URL, URL_V} from '../../../utilities/helper';
+import {Button} from '../../../component/Form';
 import {navigateReset} from '../../../navigations';
-export default function Payment({navigation}) {
+import AppSpinner from '../../../component/AppSpinner';
+
+const Payment = () => {
   const [CardInput, setCardInput] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const postData = async () => {
+    setLoading(true);
     var data = await AsyncStorage.getItem('response');
     var datas = JSON.parse(data);
     console.log(CardInput.values.expiry.split('/'));
@@ -46,48 +41,50 @@ export default function Payment({navigation}) {
       )
       .then(data => {
         console.log('Card res', data);
+        setLoading(false);
         showMessage('success', 'Payment Method is Added Succefully');
-        // navigation.pop();
-
+        navigateReset('CustomerAllPayments');
         // makePaymentByUser(data.data.payment_method);
       })
       .catch(err => {
+        setLoading(false);
         showMessage('error', 'Error in added payment method');
         console.log('CURRENT ERROR===>', err.response.data);
       });
   };
 
-  const makePaymentByUser = async method => {
-    console.log('Method in paymentByUser ', method);
-    var data = await AsyncStorage.getItem('response');
-    var datas = JSON.parse(data);
-    // console.log(datas);
+  // const makePaymentByUser = async method => {
+  //   console.log('Method in paymentByUser ', method);
+  //   var data = await AsyncStorage.getItem('response');
+  //   var datas = JSON.parse(data);
 
-    axios
-      .post(
-        `${BASE_URL}${URL_V}payment/transfer`,
-        {
-          paymentMethod: method,
-          currency: 'cad',
-          amount: '250',
-          rider_account: 'acct_1MwmIbPu2iasesq5',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
-        },
-      )
-      .then(data => {
-        console.log('result to make payment', data.data);
-      })
-      .catch(err => {
-        console.log('error546', err.response);
-      });
-  };
-  async function onSubmit() {
+  //   axios
+  //     .post(
+  //       `${BASE_URL}${URL_V}payment/transfer`,
+  //       {
+  //         paymentMethod: method,
+  //         currency: 'cad',
+  //         amount: '250',
+  //         rider_account: 'acct_1MwmIbPu2iasesq5',
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${datas.access_token}`,
+  //         },
+  //       },
+  //     )
+  //     .then(data => {
+  //       console.log('result to make payment', data.data);
+  //     })
+  //     .catch(err => {
+  //       console.log('error546', err.response);
+  //     });
+  // };
+
+  const onSubmit = () => {
     if (CardInput.valid == false || typeof CardInput.valid == 'undefined') {
       showMessage('error', 'Invalid Credit Card');
+      navigateReset('CustomerAllPayments');
       return false;
     } else {
       // await Support.showSuccess({
@@ -104,9 +101,9 @@ export default function Payment({navigation}) {
       // });
       postData();
     }
-  }
+  };
 
-  async function onDisplayNotification() {
+  const onDisplayNotification = async () => {
     const channelId = await notifee.createChannel({
       id: 'important',
       name: 'Important Notifications',
@@ -118,21 +115,15 @@ export default function Payment({navigation}) {
       body: 'You can see you order requirment going to in my Trip',
       android: {
         channelId,
-        // largeIcon: require('../../../../assets/images/fb.png'),
         importance: AndroidImportance.HIGH,
-        // ongoing: true,
       },
     });
-  }
+  };
 
   return (
     <Container>
       <DarkStatusBar />
-      <Header leftType="back" />
-      <View style={styles.paymentHeader}>
-        <Text style={styles.paymentHeaderTitle}>PAYMENT</Text>
-        <Text style={styles.paymentHeaderText}>CHOOSE YOUR PAYMENT</Text>
-      </View>
+      <Header leftType="back" title="ADD CARD" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{flex: 1}}>
@@ -153,11 +144,18 @@ export default function Payment({navigation}) {
       </KeyboardAvoidingView>
       <Button
         style={styles.payBtn}
+        disabled={loading}
         onPress={() => {
           onSubmit();
         }}>
-        <Text style={styles.payBtnText}>SAVE CARD</Text>
+        {loading ? (
+          <AppSpinner />
+        ) : (
+          <Text style={styles.payBtnText}>SAVE CARD</Text>
+        )}
       </Button>
     </Container>
   );
-}
+};
+
+export default Payment;

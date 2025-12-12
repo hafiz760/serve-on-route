@@ -1,15 +1,13 @@
-import { COLOR, FAMILY, SIZE } from '../../../theme/typography'
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 
-const React = require('react-native')
-const { Platform } = React
+const React = require('react-native');
+const {Platform} = React;
 
 export default {
-
   notificationHeaderView: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 5
-
+    marginTop: 5,
   },
   notificationHeaderText: {
     fontFamily: FAMILY.REGULAR,
@@ -40,12 +38,12 @@ export default {
   notificationTitle: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
-    color: COLOR.DARK
+    color: COLOR.DARK,
   },
   notificationText: {
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_10,
-    color: COLOR.SMOKEVIOLET
+    color: COLOR.SMOKEVIOLET,
   },
   notificationDetail: {
     flex: 1,
@@ -57,7 +55,7 @@ export default {
   cardImg1: {
     // flex:2,
     alignItems: 'center',
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: '#D9D9D9',
     borderRadius: 50,
     height: 50,
@@ -65,8 +63,9 @@ export default {
     marginEnd: 10,
     marginHorizontal: 15,
   },
+
   bookingText: {
-    flex: 5,
+    flex: 1,
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_18,
     color: COLOR.SMOKEVIOLET,
@@ -74,13 +73,13 @@ export default {
     // alignItems:'center',
     // backgroundColor:'black',
     lineHeight: 28,
-
   },
   deleteBtn: {
-    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'Space',
     paddingHorizontal: 10,
     paddingVertical: 10,
-    // backgroundColor:'red'
   },
   /* --Modal-- */
   mNewBox: {
@@ -88,12 +87,12 @@ export default {
     height: 200,
     borderWidth: 1,
     borderColor: COLOR.smoke,
-    borderRadius: 5
+    borderRadius: 5,
   },
   closeIcon: {
     alignSelf: 'flex-end',
     paddingRight: 20,
-    paddingVertical: 15
+    paddingVertical: 15,
   },
   mNotificationText: {
     fontFamily: FAMILY.REGULAR,
@@ -107,7 +106,7 @@ export default {
     alignItems: 'center',
     marginHorizontal: 20,
     marginTop: 20,
-    marginBottom: 50
+    marginBottom: 50,
   },
   yesBtn: {
     flex: 1,
@@ -123,7 +122,7 @@ export default {
   yesBtnText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_16,
-    color: COLOR.LIGHT
+    color: COLOR.LIGHT,
   },
   noBtn: {
     flex: 1,
@@ -135,6 +134,6 @@ export default {
   noBtnText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_11,
-    color: COLOR.SMOKEVIOLET
-  }
-}
+    color: COLOR.SMOKEVIOLET,
+  },
+};

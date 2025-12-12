@@ -1,28 +1,37 @@
-import React, { useState } from "react";
-import { View, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
-import { Container, Content, Text, Icon } from "../../../component/Basic";
-import { TextInput, Button } from "../../../component/Form";
-import Modal from "react-native-modalbox";
-import styles from "./styles";
-import theme from "../../../theme/styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Header from "../../../component/Header";
-import ImagePicker from "react-native-image-crop-picker";
-import { showMessage } from "../../../helper/showAlert";
-import { DarkStatusBar } from "../../../component/StatusBar";
-import DocumentPicker from "react-native-document-picker";
-import { useSelector } from "react-redux";
-import axios from "axios";
-// import {BASE_URL,URL_V} from "@env"
-import { BASE_URL,URL_V } from "../../../utilities/helper";
+import React, {useState} from 'react';
+import {
+  View,
+  ScrollView,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {Container, Content, Text, Icon} from '../../../component/Basic';
+import {TextInput, Button} from '../../../component/Form';
+import Modal from 'react-native-modalbox';
+import styles from './styles';
+import theme from '../../../theme/styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Header from '../../../component/Header';
+import {showMessage} from '../../../helper/showAlert';
+import {DarkStatusBar} from '../../../component/StatusBar';
+import DocumentPicker from 'react-native-document-picker';
+import axios from 'axios';
+import {BASE_URL, URL_V} from '../../../utilities/helper';
+import {navigateReset} from '../../../navigations';
+import AppSpinner from '../../../component/AppSpinner';
+import {COLOR} from '../../../theme/typography';
+
 export default function BookingComplete(props) {
   const val = props.route.params.data;
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [images, setImages] = useState([]);
-  const { user } = useSelector((state) => state.session);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [description, setDescription] = useState("");
+  console.log(val, 'Values');
+
+  const [description, setDescription] = useState('');
 
   const getPhotoFromGallery = async () => {
     try {
@@ -33,7 +42,6 @@ export default function BookingComplete(props) {
       setImages(res[0]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker, exit any dialogs or menus and move on
       } else {
         throw err;
       }
@@ -41,219 +49,207 @@ export default function BookingComplete(props) {
   };
 
   const postComplain = async () => {
-    var data = await AsyncStorage.getItem("response");
+    var data = await AsyncStorage.getItem('response');
     var datas = JSON.parse(data);
 
     const formData = new FormData();
-    formData.append("files", images);
+    formData.append('files', images);
 
-    formData.append("complain_against", val?.rider_id?._id);
-    formData.append("parcel", val?._id);
-    formData.append("description", description);
+    formData.append('complain_against', val?.rider_id?._id);
+    formData.append('parcel', val?._id);
+    formData.append('description', description);
 
-    console.log("FormData", formData);
+    console.log('FormData', formData);
 
     const requestOptions = {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${datas.access_token}`,
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
       body: formData,
     };
     try {
-      const res = await fetch(
-        `${BASE_URL}${URL_V}complaints`,
-        requestOptions
-      );
+      const res = await fetch(`${BASE_URL}${URL_V}complaints`, requestOptions);
       const result = await res.json();
-      showMessage("success", "Complain Created Successfully!");
-      // alert();
-      console.log("RESULT", result);
+      showMessage('success', 'Complain Created Successfully!');
+      console.log('RESULT', result);
     } catch (err) {
-      showMessage("error", "Error in Posted Complain");
-      console.log("ERROR", err);
+      showMessage('error', 'Error in Posted Complain');
+      console.log('ERROR', err);
     }
   };
 
   const cancelTrip = async () => {
     try {
+      setIsLoading(true);
+      var data = await AsyncStorage.getItem('response');
+      var datas = JSON.parse(data);
+
       const resp = await axios.post(
-        `${BASE_URL}${URL_V}parcel/cancel`, 
+        `${BASE_URL}${URL_V}parcel/cancel`,
         {
           parcel: val?._id,
         },
         {
           headers: {
-            Authorization: `Bearer ${user.access_token}`,
+            Authorization: `Bearer ${datas.access_token}`,
           },
-        }
+        },
       );
 
-      showMessage("success", resp.data);
+      showMessage('success', resp.data);
+      navigateReset('CustomerMyTrips');
     } catch (err) {
-      console.log(err);
-      showMessage("error", "Something went wrong while cancelling the trip");
+      console.log('Cancel Trip Error:', err?.response?.data || err);
+      showMessage('error', 'Something went wrong while cancelling the trip');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Container>
       <DarkStatusBar />
-      <Header leftType="back" />
+      <Header leftType="back" title="BOOKING" />
       <View style={styles.bookingHeader}>
-        <Text style={styles.bookingHeaderTitle}>BOOKING</Text>
-        <Text style={styles.bookingHeaderText}>
-          CHECKOUT YOUR BOOKING00000
-        </Text>
+        <Text style={styles.bookingHeaderText}>CHECKOUT YOUR BOOKING</Text>
       </View>
       <Content contentContainerStyle={theme.layoutDf}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.bookingContainer}>
-            <View style={styles.bookingContent}>
-              <View style={styles.bookingDetail}>
-                <Text style={styles.bookingIdText}>
-                BOOKING ID : ${(val?._id).substr(0, 15)}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.bookingContainer}>
+              <View style={styles.bookingContent}>
+                <View style={styles.bookingDetail}>
+                  <Text style={styles.bookingIdText}>
+                    BOOKING ID : ${(val?._id).substr(0, 15)}
+                  </Text>
+                  <Button>
+                    <Text style={styles.completeBtn}>{val?.status}</Text>
+                  </Button>
+                </View>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTitle}>PAID</Text>
+                  <Text style={styles.bookingText}>
+                    {val?.pay_amount
+                      ? `${val?.pay_amount} USD`
+                      : `${val?.fare} USD`}
+                  </Text>
+                </View>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTitle}>PICKUP TIME</Text>
+                  <Text style={styles.bookingText}>
+                    {val?.time
+                      ? `${new Date(val.time).getFullYear()}-${(
+                          new Date(val.time).getMonth() + 1
+                        )
+                          .toString()
+                          .padStart(2, '0')}-${new Date(val.time)
+                          .getDate()
+                          .toString()
+                          .padStart(2, '0')} ${new Date(val.time)
+                          .getHours()
+                          .toString()
+                          .padStart(2, '0')}:${new Date(val.time)
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, '0')}`
+                      : ''}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.documentInfo}>
+                <Text style={styles.documentText}>PACKAGES</Text>
+                <Text style={styles.checkoutText}>
+                  Checkout your package informations
                 </Text>
-                <Button>
-                  <Text style={styles.completeBtn}>{val?.status}</Text>
-                </Button>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTitle}>DIMENSION</Text>
+                  <Text style={styles.bookingTitle}>QUANTITY</Text>
+                </View>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTextDark}>Width</Text>
+                  <Text style={styles.bookingTextDark}>{val?.width}</Text>
+                </View>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTextDark}>Height</Text>
+                  <Text style={styles.bookingTextDark}>{val?.height}</Text>
+                </View>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTextDark}>Length</Text>
+                  <Text style={styles.bookingTextDark}>{`${val?.length}`}</Text>
+                </View>
+                <View style={styles.bookingItem}>
+                  <Text style={styles.bookingTextDark}>Weight</Text>
+                  <Text style={styles.bookingTextDark}>{`${val?.weight}`}</Text>
+                </View>
               </View>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTitle}>PAID</Text>
-                <Text style={styles.bookingText}>
-                  {
-                      val?.pay_amount
-                        ?(`${val?.pay_amount} USD`)
-                        :(`${val?.fare} USD`)
-                  
-                  }
-                </Text>
-              </View>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTitle}>PICKUP TIME</Text>
-                <Text style={styles.bookingText}>
-                {val?.time ? 
-      `${new Date(val.time).getFullYear()}-${(new Date(val.time).getMonth() + 1).toString().padStart(2, '0')}-${new Date(val.time).getDate().toString().padStart(2, '0')} ${new Date(val.time).getHours().toString().padStart(2, '0')}:${new Date(val.time).getMinutes().toString().padStart(2, '0')}` 
-      : ""}
-                </Text>
-              </View>
-             
-            </View>
-            <View style={styles.documentInfo}>
-              <Text style={styles.documentText}>PACKAGES</Text>
-              <Text style={styles.checkoutText}>
-                Checkout your package informations
-              </Text>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTitle}>DIMENSION</Text>
-                <Text style={styles.bookingTitle}>QUANTITY</Text>
-              </View>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTextDark}>Width</Text>
-                <Text style={styles.bookingTextDark}>
-                  (`${val?.width}`)
-                </Text>
-              </View>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTextDark}>Height</Text>
-                <Text style={styles.bookingTextDark}>
-                  `${val?.height}`
-                </Text>
-              </View>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTextDark}>Length</Text>
-                <Text style={styles.bookingTextDark}>
-                  {(`${val?.length}`)}
-                </Text>
-              </View>
-              <View style={styles.bookingItem}>
-                <Text style={styles.bookingTextDark}>Weight</Text>
-                <Text style={styles.bookingTextDark}>
-                  {(`${val?.weight}`)}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.driverDetail}>
-              <View style={styles.driverInfo}>
+              <View style={styles.driverDetail}>
+                <View style={styles.driverInfo}>
+                  <View>
+                    <Text style={styles.driverText}>DRIVER</Text>
+                    <Text style={styles.driverTextInfo}>
+                      {'Driver informations'}
+                    </Text>
+                  </View>
+                  <Button
+                    onPress={() => {
+                      // navigate("CustomerManageProfile");
+                    }}>
+                    <Image
+                      source={{
+                        uri:
+                          val?.rider_id?.avatar ||
+                          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                      }}
+                      style={styles.driverImg}
+                    />
+                  </Button>
+                </View>
                 <View>
-                  <Text style={styles.driverText}>DRIVER</Text>
-                  <Text style={styles.driverTextInfo}>
-                    {("Driver informations")}
-                  </Text>
-                </View>
-                <Button
-                  onPress={() => {
-                    // navigate("CustomerManageProfile");
-                  }}
-                >
-                  <Image
-                    source={{
-                      uri:
-                        val?.rider_id?.avatar ||
-                        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                    }}
-                    style={styles.driverImg}
-                  />
-                </Button>
-              </View>
-              <View>
-                <View style={styles.bookingItem}>
-                  <Text style={styles.bookingTitle}>NAME</Text>
-                  <Text style={styles.bookingTextDark}>
-                    {(`${val?.rider_id?.first_name}`)}
-                  </Text>
-                </View>
-                <View style={styles.bookingItem}>
-                  <Text style={styles.bookingTitle}>VEHICAL NO</Text>
-                  <Text style={styles.bookingTextDark}>
-                    {(`${val?.rider_id?.vehicle_no}`)}
-                  </Text>
-                </View>
-                <View style={styles.bookingItem}>
-                  <Text style={styles.bookingTitle}>RATING</Text>
-                  <View style={styles.ratingInfo}>
-                    <Icon
-                      name="star"
-                      type="FontAwesome"
-                      style={styles.ratingIconSelected}
-                    />
-                    <Icon
-                      name="star"
-                      type="FontAwesome"
-                      style={styles.ratingIconSelected}
-                    />
-                    <Icon
-                      name="star"
-                      type="FontAwesome"
-                      style={styles.ratingIconSelected}
-                    />
-                    <Icon
-                      name="star"
-                      type="FontAwesome"
-                      style={styles.ratingIconSelected}
-                    />
-                    <Icon
-                      name="star"
-                      type="FontAwesome"
-                      style={styles.ratingIcon}
-                    />
+                  <View style={styles.bookingItem}>
+                    <Text style={styles.bookingTitle}>NAME</Text>
+                    <Text style={styles.bookingTextDark}>
+                      {`${val?.rider_id?.first_name}`}
+                    </Text>
+                  </View>
+                  <View style={styles.bookingItem}>
+                    <Text style={styles.bookingTitle}>VEHICAL NO</Text>
+                    <Text style={styles.bookingTextDark}>
+                      {`${val?.rider_id?.vehicle_no}`}
+                    </Text>
+                  </View>
+                  <View style={styles.bookingItem}>
+                    <Text style={styles.bookingTitle}>RATING</Text>
+                    <View style={styles.ratingInfo}>
+                      {[1, 2, 3, 4, 5].map((item, index) => (
+                        <Icon
+                          key={index}
+                          name="star"
+                          type="FontAwesome"
+                          style={
+                            index < 4
+                              ? styles.ratingIconSelected
+                              : styles.ratingIcon
+                          }
+                        />
+                      ))}
+                    </View>
                   </View>
                 </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
         </KeyboardAvoidingView>
       </Content>
       <Modal
-        position={"center"}
+        position={'center'}
         isOpen={isOpen}
         onClosed={() => setIsOpen(false)}
         isDisabled={isDisabled}
-        style={styles.modalRating}
-      >
+        style={styles.modalRating}>
         <View style={styles.modalRatingContainer}>
           <Button style={styles.closeSortDesc}>
             <Icon
@@ -270,41 +266,38 @@ export default function BookingComplete(props) {
               placeholderTextColor="#ccc"
               multiline
               numberOfLines={7}
-              textAlignVertical={"top"}
+              textAlignVertical={'top'}
               value={description}
-              onChangeText={(e) => {
+              onChangeText={e => {
                 setDescription(e);
               }}
               // onChangeText={(v) => this.onChangeText("comment", v)}
-              style={[styles.formInput, { backgroundColor: "#ededed" }]}
+              style={[styles.formInput, {backgroundColor: '#ededed'}]}
             />
           </View>
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
+              flexDirection: 'row',
+              justifyContent: 'space-between',
               marginTop: 60,
-            }}
-          >
-            <View style={{ width: "47%", height: 50 }}>
+            }}>
+            <View style={{width: '47%', height: 50}}>
               <Button
                 style={styles.mailBtn}
                 onPress={() => {
                   getPhotoFromGallery();
-                }}
-              >
+                }}>
                 <Text style={styles.tripText}>ATTACH FILE HERE</Text>
               </Button>
             </View>
-            <View style={{ width: "47%", height: 50 }}>
+            <View style={{width: '47%', height: 50}}>
               <Button
                 style={styles.mailBtn}
                 onPress={() => {
                   postComplain();
                   setIsOpen(false);
-                }}
-              >
+                }}>
                 <Text style={styles.tripText}>SEND</Text>
               </Button>
             </View>
@@ -312,28 +305,28 @@ export default function BookingComplete(props) {
         </View>
       </Modal>
       <View style={styles.mailBtnInfo}>
-  {val?.status !== 'completed' && ( 
-    <Button
-      style={[styles.mailBtn, { backgroundColor: "red" }]}
-      onPress={() => {
-        // navigate("CustomerWriteUs");
-        cancelTrip();
-      }}
-    >
-      <Text style={styles.tripText}>CANCEL</Text>
-    </Button>
-  )}
-  
-  <Button
-    style={styles.mailInvoiceBtn}
-    onPress={() => {
-      setIsOpen(true);
-    }}
-  >
-    <Text style={styles.tripText}>COMPLAIN</Text>
-  </Button>
-</View>
+        {val?.status !== 'completed' && (
+          <Button
+            style={[styles.mailBtn, {backgroundColor: 'red'}]}
+            onPress={() => {
+              cancelTrip();
+            }}>
+            {isLoading ? (
+              <AppSpinner color={COLOR.LIGHT} size="large" />
+            ) : (
+              <Text style={styles.tripText}>CANCEL</Text>
+            )}
+          </Button>
+        )}
 
+        <Button
+          style={styles.mailInvoiceBtn}
+          onPress={() => {
+            setIsOpen(true);
+          }}>
+          <Text style={styles.tripText}>COMPLAIN</Text>
+        </Button>
+      </View>
     </Container>
   );
 }

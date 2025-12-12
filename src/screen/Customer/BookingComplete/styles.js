@@ -1,13 +1,13 @@
-import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 
-const React = require("react-native");
-const { Platform } = React;
+const React = require('react-native');
+const {Platform} = React;
 
 export default {
   bookingHeader: {
     backgroundColor: COLOR.PRIMARY,
     paddingHorizontal: 15,
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
   bookingHeaderTitle: {
     fontFamily: FAMILY.BOLD,
@@ -33,9 +33,9 @@ export default {
     marginVertical: 10,
   },
   bookingDetail: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 20,
     paddingHorizontal: 15,
     paddingVertical: 15,
@@ -56,9 +56,9 @@ export default {
     paddingVertical: 3,
   },
   bookingItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: COLOR.GREYLIGHT,
     paddingHorizontal: 15,
@@ -106,9 +106,9 @@ export default {
   },
   driverInfo: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   driverText: {
     fontFamily: FAMILY.BOLD,
@@ -131,15 +131,15 @@ export default {
     marginTop: 10,
   },
   mailBtnInfo: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginVertical: 10,
     marginHorizontal: 20,
   },
   mailBtn: {
     flex: 5,
-    alignItems: "flex-start",
-    justifyContent: "center",
-    alignItems: "center",
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 5,
     paddingLeft: 15,
@@ -158,13 +158,13 @@ export default {
     color: COLOR.LIGHT,
   },
   ratingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 15,
   },
   ratingIconSelected: {
     fontSize: SIZE.SIZE_20,
-    color: "rgb(234, 201, 78)",
+    color: 'rgb(234, 201, 78)',
     paddingHorizontal: 2,
     paddingVertical: 2,
   },
@@ -175,21 +175,21 @@ export default {
     // dingVertical: 2,
   },
   modalRating: {
-    width: "90%",
+    width: '90%',
     height: 320,
     borderRadius: 10,
   },
   modalRatingContainer: {
     marginHorizontal: 15,
-    position: "relative",
+    position: 'relative',
     height: 200,
   },
   closeSortDesc: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
     marginVertical: 10,
   },
   formInput3: {
-    width: "90%",
+    width: '90%',
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.DARK,
@@ -217,9 +217,9 @@ export default {
     borderColor: COLOR.LIGHTVIOLET,
   },
   accordionBtn: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -232,7 +232,7 @@ export default {
     color: COLOR.DARKBLUE,
   },
   accordion: {
-    width: "100%",
+    width: '100%',
     marginBottom: 5,
   },
 };
