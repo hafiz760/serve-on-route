@@ -1,10 +1,10 @@
-import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-const React = require("react-native");
-const { Platform } = React;
+} from 'react-native-responsive-screen';
+const React = require('react-native');
+const {Platform} = React;
 
 export default {
   profileHeader: {
@@ -36,47 +36,46 @@ export default {
     // marginVertical: 5,
   },
   profileImgItem: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileImgDetail: {
     paddingHorizontal: 10,
     // paddingVertical: 10,
   },
   avatarImg: {
-    width: 105,
-    height: 105,
+    width: 100,
+    height: 100,
     borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 10,
     shadowOffset: {
       width: 15,
       height: 15,
     },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.9,
     shadowRadius: 0,
     backgroundColor: COLOR.LIGHT,
     // marginTop: 15,
-    alignSelf: "center",
-    top: -5
+    alignSelf: 'center',
+    top: 10,
   },
   profileImg: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    
   },
   iconDetail: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    position: "absolute",
+    position: 'absolute',
     right: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLOR.LIGHT,
     shadowOpacity: 0.9,
     elevation: 10,
@@ -84,24 +83,24 @@ export default {
       height: 0,
     },
     shadowRadius: 0,
-    shadowColor: "#CCC",
+    shadowColor: '#CCC',
   },
   editBtn: {
     width: 30,
     height: 30,
-    position: "absolute",
+    position: 'absolute',
     right: 5,
     bottom: 10,
     backgroundColor: COLOR.LIGHT,
     borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 10,
     shadowOffset: {
       width: 15,
       height: 15,
     },
-    shadowColor: "#333",
+    shadowColor: '#333',
     shadowOpacity: 0.9,
     shadowRadius: 0,
   },
@@ -128,29 +127,28 @@ export default {
     paddingHorizontal: 0,
   },
   profileBtnInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: COLOR.LIGHTVIOLET,
-   
   },
   profileBtnInfoTwo: {
     borderBottomWidth: 0,
   },
 
   permissionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   permissionBtn: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     backgroundColor: COLOR.GREYVIOLET,
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 15,
   },
   uploadBtn: {
-    alignSelf: "center",
+    alignSelf: 'center',
     backgroundColor: COLOR.BLUE,
     borderRadius: 5,
     paddingVertical: 10,
@@ -167,8 +165,8 @@ export default {
     color: COLOR.LIGHT,
   },
   saveBtn: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -183,14 +181,14 @@ export default {
 
   /* --Tab-- */
   tabInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginVertical: 10,
-    backgroundColor: "green",
+    backgroundColor: 'green',
   },
   tabActive: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: COLOR.BLUE,
     borderRadius: 3,
     paddingVertical: 10,
@@ -198,8 +196,8 @@ export default {
   },
   tabInactive: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.1)",
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 3,
     paddingVertical: 10,
     marginHorizontal: 5,
@@ -212,7 +210,7 @@ export default {
   tabTextInactive: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
-    color: "rgba(255,255,255,0.5)",
+    color: 'rgba(255,255,255,0.5)',
   },
   /* --Content-- */
   profileHeader: {
@@ -244,13 +242,13 @@ export default {
     paddingVertical: 10,
   },
   profileImgInfo: {
-    alignSelf: "center",
-    justifyContent: "center",
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
   profileBgImg: {
     width: 100,
     height: 100,
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 50,
     shadowOpacity: 0.9,
@@ -259,24 +257,24 @@ export default {
       height: 0,
     },
     shadowRadius: 0,
-    shadowColor: "#CCC",
+    shadowColor: '#CCC',
   },
   profileImg: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    position: "absolute",
-    alignSelf: "center",
+    position: 'absolute',
+    alignSelf: 'center',
   },
   iconDetail: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    position: "absolute",
+    position: 'absolute',
     right: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLOR.LIGHT,
     shadowOpacity: 0.9,
     elevation: 10,
@@ -284,7 +282,7 @@ export default {
       height: 0,
     },
     shadowRadius: 0,
-    shadowColor: "#CCC",
+    shadowColor: '#CCC',
   },
   editName: {
     fontFamily: FAMILY.BOLD,
@@ -315,7 +313,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
     paddingVertical: 15,
   },
   /* --permission-- */
@@ -323,11 +321,11 @@ export default {
   profileInputDetail: {
     marginBottom: 20,
     paddingTop: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   profileform: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   permissionHeader: {
     fontFamily: FAMILY.BOLD,
@@ -348,13 +346,13 @@ export default {
     marginBottom: 5,
   },
   switchInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: COLOR.SMOKELIGHT,
     // backgroundColor:'red',
-    width: "92%",
+    width: '92%',
   },
   switchText: {
     fontFamily: FAMILY.BOLD,
@@ -369,16 +367,16 @@ export default {
     color: COLOR.DARKBLUE,
   },
   insuranceDetail: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: COLOR.SMOKELIGHT,
     paddingVertical: 15,
   },
   checkDetail: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   checkText: {
     fontFamily: FAMILY.REGULAR,
@@ -386,7 +384,7 @@ export default {
     color: COLOR.DARK,
   },
   coverageBtn: {
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
     backgroundColor: COLOR.BLUE,
     borderRadius: 5,
   },
@@ -394,19 +392,19 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_10,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
     paddingVertical: 10,
     paddingHorizontal: 10,
   },
   /** - - Modal Box Booking- - **/
   modalSort: {
-    height: "60%",
-    width: "90%",
+    height: '60%',
+    width: '90%',
     borderRadius: 10,
     backgroundColor: COLOR.LIGHT,
   },
   closeHiddenDesc: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
@@ -428,7 +426,7 @@ export default {
     paddingHorizontal: 20,
   },
   paymentHeader: {
-    backgroundColor: "rgba(89, 73, 158, 1)",
+    backgroundColor: 'rgba(89, 73, 158, 1)',
     paddingHorizontal: 15,
     paddingBottom: 40,
   },
@@ -454,9 +452,9 @@ export default {
   },
   /* --PaymentTab-- */
   tabInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 2,
     paddingVertical: 2,
     marginVertical: 15,
@@ -464,7 +462,7 @@ export default {
   },
   tabActive1: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 3,
     paddingHorizontal: 10,
@@ -473,12 +471,12 @@ export default {
   },
   tabInactive: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     marginHorizontal: 3,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    backgroundColor: "rgba(49,51,86,0.05)",
+    backgroundColor: 'rgba(49,51,86,0.05)',
   },
   tabImgActive: {
     width: 40,
@@ -506,7 +504,7 @@ export default {
     marginVertical: 5,
   },
   formRow2: {
-    width:wp(41),
+    width: wp(41),
     // backgroundColor:'red'
   },
   inputInfo: {
@@ -522,24 +520,24 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_14,
     color: COLOR.DARK,
-    borderColor: "rgba(42,33,77,0.1)",
+    borderColor: 'rgba(42,33,77,0.1)',
     borderBottomWidth: 1,
     paddingVertical: 10,
   },
   cardInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   payBtn: {
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 5,
     paddingVertical: 15,
     marginHorizontal: 20,
     marginBottom: 10,
-    position: "absolute",
+    position: 'absolute',
     top: 500,
-    width: "90%",
+    width: '90%',
   },
   payBtnText: {
     fontFamily: FAMILY.BOLD,
@@ -547,34 +545,33 @@ export default {
     color: COLOR.LIGHT,
   },
   loaderContainerStyles: {
-    width: "100%",
+    width: '100%',
     height: 500,
-    alignItems: "center",
-    justifyContent: "center",
-  
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  uploadbtn2:{
-    width:wp(90),
-    alignSelf:'center',
-    backgroundColor:'#5CBA47',
-    alignItems:'center',
-    height:hp(6),
-    borderRadius:10,
-    justifyContent:'center',
-    bottom:hp(-15)
+  uploadbtn2: {
+    width: wp(90),
+    alignSelf: 'center',
+    backgroundColor: '#5CBA47',
+    alignItems: 'center',
+    height: hp(6),
+    borderRadius: 10,
+    justifyContent: 'center',
+    bottom: hp(-15),
   },
-  saveBtnText2:{
-    color:"#fff"
+  saveBtnText2: {
+    color: '#fff',
   },
-  icon:{
+  icon: {
     fontSize: SIZE.SIZE_20,
-    color: "red"
+    color: 'red',
   },
-  crossView:{
-    backgroundColor:"#fff",
-    position:'absolute',
-    right:0,
-    borderRadius:100,
-    padding:2,
-  }
+  crossView: {
+    backgroundColor: '#fff',
+    position: 'absolute',
+    right: 0,
+    borderRadius: 100,
+    padding: 2,
+  },
 };

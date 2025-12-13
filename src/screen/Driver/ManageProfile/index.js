@@ -272,7 +272,7 @@ export default function ManageProfile({navigation, route}) {
 
       const userData = res.data.data;
       console.log('res account no>>>>>>', JSON.stringify(userData, null, 2));
-      dispatch(updateUser(userData));
+      // dispatch(updateUser(userData));
       setName(sanitizeValue(userData.first_name));
       SetCarNumber(userData?.vehicle_no || '');
       setDrivingLiscence(userData.license_id || '');
@@ -301,6 +301,7 @@ export default function ManageProfile({navigation, route}) {
       setLoading(false);
     } catch (err) {
       console.log('Get data account error', err);
+    } finally {
       setLoading(false);
     }
   };
@@ -730,6 +731,7 @@ export default function ManageProfile({navigation, route}) {
               color: '#59499E',
               fontFamily: FAMILY.BOLD,
               fontSize: SIZE.SIZE_18,
+              marginTop: hp(2),
             }}>
             {name}
           </Text>

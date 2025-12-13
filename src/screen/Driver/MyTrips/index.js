@@ -56,7 +56,6 @@ export default function MyTrip() {
   const { socket } = useSelector((state) => state.socket);
 
   const handleNavigation = (val) => {
-    // Defensive: Remove quotes and trim
     const fromCor = val.from_location_cor ? val.from_location_cor.replace(/['"']+/g, '').trim() : '';
     const toCor = val.to_location_cor ? val.to_location_cor.replace(/['"']+/g, '').trim() : '';
 
