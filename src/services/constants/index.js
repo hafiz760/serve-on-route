@@ -1,6 +1,6 @@
-export const baseURL = 'https://api.serveonroute.com/v1/auth/'
+export const baseURL = 'https://api.serveonroute.com/v1/';
 export const endPoints = {
-    logIn: 'login',
-    signUp: 'register',
-   
-}
+  logIn: 'auth/login',
+  signUp: 'auth/register',
+  updateUser: 'users/update-user',
+};

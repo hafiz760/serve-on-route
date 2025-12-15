@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   ScrollView,
@@ -10,14 +10,12 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import {COLOR} from '../../../theme/typography';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
+import {Button, ToggleSwitch} from '../../../component/Form';
 import DatePicker from 'react-native-date-picker';
-
 import styles from './styles';
 import theme from '../../../theme/styles';
-
 import Header from '../../../component/Header';
 import Support from '../../../component/Support';
 import {DarkStatusBar} from '../../../component/StatusBar';
@@ -35,32 +33,22 @@ import TextInputComp from '../../../component/TextInputComp';
 import ImagePicker from 'react-native-image-crop-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {useDispatch} from 'react-redux';
-import {navigate, navigateReset} from '../../../navigations';
-import {updateUser} from '../../../store/reducers/session';
-const imagedata = [
-  {id: 1, image: require('../../../assets/images/car1.png')},
-  {id: 2, image: require('../../../assets/images/car2.png')},
-  {id: 3, image: require('../../../assets/images/car3.png')},
-];
+import {navigateReset} from '../../../navigations';
+import {
+  updateDriverProfile,
+  fetchDriverById,
+} from '../../../services/apicalls/driver';
 export default function ManageProfile({navigation, route}) {
   const param = route.params;
   console.log('param', param);
-  const [selected, setSelected] = useState('');
-  const [value, setValue] = useState();
   const [urlValue, setUrlValue] = useState();
   console.log('urlValue', urlValue);
   const [tabSelected, setTabSelected] = useState('profile');
   const [isEnabled, setIsEnabled] = useState(false);
   console.log('isEnabled', isEnabled);
-  const [idCardCheck, setIdCardCheck] = useState();
   const [profile, setProfile] = useState();
-
   const [profileHttp, setProfileHttp] = useState('');
-  // console.log('whatprofile',profileHttp)
-  console.log('profileHttp', profileHttp);
   const [name, setName] = useState('');
-  // const [second, setSecond] = useState("");
-
   const [email, setEmail] = useState('');
   const [vehicalNumber, setVehicalNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -72,28 +60,18 @@ export default function ManageProfile({navigation, route}) {
   const [imageForShow, setImageForShow] = useState([]);
   const [imagesSelfi, setImagesSelfi] = useState();
   const [imageForShowSelfi, setImageForShowSelfi] = useState([]);
-  // console.log("imageForShow",imageForShow);
-  const [licenseProofCheck, setLicenseProofCheck] = useState();
   const [license, setLicense] = useState('');
   const [date, setDate] = useState(new Date());
-  const [date2, setDate2] = useState(new Date());
   const [displayDate, setDisplayDate] = useState('');
   const [isDateExist, setIsDateExist] = useState(false);
   const [open, setOpen] = useState(false);
-  const [values, setValues] = useState();
-  const [open2, setOpen2] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [inputs, setInputs] = useState(true);
-  const phoneInput = useRef();
   const [openModel, setOpenModel] = useState(false);
   const [items, setItems] = useState([
     {label: 'Male', value: 'Male'},
     {label: 'Female', value: 'Female'},
   ]);
   const [itemsType, setItemsType] = useState('Male');
-  const [itemsType2, setItemsType2] = useState('00/00/0000');
-  // acct_1MwmIbPu2iasesq5
-  const [PaymentTabSelected, setPaymentTabSelected] = useState('card');
   const [frontIdImage, setFrontIdImage] = useState(null);
   const [backIdImage, setBackIdImage] = useState(null);
   const [frontLicenseImage, setFrontLicenseImage] = useState(null);
@@ -133,10 +111,6 @@ export default function ManageProfile({navigation, route}) {
           uri: image.path,
         };
         setFrontIdImage(format);
-
-        // const uploadedPath = await uploadSingleImage(format, 'national_ID_file');
-        // console.log("uploadedPath",uploadedPath);
-        // setUploadedFrontIdPath(uploadedPath); // <-- Save this for final submit
       })
       .catch(e => console.log(e));
   };
@@ -156,9 +130,6 @@ export default function ManageProfile({navigation, route}) {
           uri: image.path,
         };
         setBackIdImage(format);
-
-        // const uploadedPath = await uploadSingleImage(format, 'national_ID_file');
-        // setUploadedBackIdPath(uploadedPath);
       })
       .catch(e => console.log(e));
   };
@@ -181,9 +152,6 @@ export default function ManageProfile({navigation, route}) {
           uri: image.path,
         };
         setFrontLicenseImage(format);
-
-        // const uploadedPath = await uploadSingleImage(format, 'driving_license_file');
-        // setUploadedFrontLicensePath(uploadedPath);
       })
       .catch(e => console.log(e));
   };
@@ -203,10 +171,6 @@ export default function ManageProfile({navigation, route}) {
           uri: image.path,
         };
         setBackLicenseImage(format);
-
-        // const uploadedPath = await uploadSingleImage(format, 'driving_license_file');
-        // console.log("uploadedPath",uploadedPath);
-        // setUploadedBackLicensePath(uploadedPath);
       })
       .catch(e => console.log(e));
   };
@@ -218,11 +182,8 @@ export default function ManageProfile({navigation, route}) {
       });
       console.log('res data', res[0]);
       setPath(res[0]);
-
-      // console.log(res[0]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker, exit any dialogs or menus and move on
       } else {
         throw err;
       }
@@ -237,7 +198,6 @@ export default function ManageProfile({navigation, route}) {
   }, []);
   const removeImage = (idToRemove, index) => {
     const updatedImageData = imageForShow.filter(item => item !== idToRemove);
-    // const updatedImageData = imageForShow.filter(index => console.log(">>>",index));
     console.log('0000', updatedImageData);
     setImageForShow(updatedImageData);
   };
@@ -245,7 +205,6 @@ export default function ManageProfile({navigation, route}) {
     const updatedImageData = imageForShowSelfi.filter(
       item => item !== idToRemove,
     );
-    // const updatedImageData = imageForShow.filter(index => console.log(">>>",index));
     setImageForShowSelfi(updatedImageData);
   };
 
@@ -258,47 +217,42 @@ export default function ManageProfile({navigation, route}) {
 
   const getData = async () => {
     try {
+      setLoading(true);
       const data = await AsyncStorage.getItem('response');
       const datas = JSON.parse(data);
 
-      const res = await axios.get(
-        `https://api.serveonroute.com/v1/users/user-by-id/${datas._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
-        },
-      );
+      const res = await fetchDriverById(datas._id, datas.access_token);
 
-      const userData = res.data.data;
-      console.log('res account no>>>>>>', JSON.stringify(userData, null, 2));
-      // dispatch(updateUser(userData));
-      setName(sanitizeValue(userData.first_name));
-      SetCarNumber(userData?.vehicle_no || '');
-      setDrivingLiscence(userData.license_id || '');
-      setProfile(sanitizeValue(userData.cover_image));
-      setVehicalNumber(sanitizeValue(userData.vehicle_no));
-      setFrontIdImage(userData?.driving_license?.[0] || null);
-      setBackIdImage(userData?.driving_license?.[1] || null);
-      setFrontLicenseImage(userData?.ID_file?.[0] || null);
-      setBackLicenseImage(userData?.ID_file?.[1] || null);
-      SetCarName(sanitizeValue(userData.car_name));
-      setLicense(userData?.driving_license?.[0] || null);
-      setDisplayDate(sanitizeValue(userData.driving_license_expiry));
+      if (res.success) {
+        const userData = res.data;
 
-      if (
-        userData?.driving_license_expiry &&
-        sanitizeValue(userData.driving_license_expiry)
-      ) {
-        setIsDateExist(true);
+        setName(sanitizeValue(userData.first_name));
+        SetCarNumber(userData?.vehicle_no || '');
+        setDrivingLiscence(userData.license_id || '');
+        setProfile(sanitizeValue(userData.cover_image));
+        setVehicalNumber(sanitizeValue(userData.vehicle_no));
+        setFrontIdImage(userData?.driving_license?.[0] || null);
+        setBackIdImage(userData?.driving_license?.[1] || null);
+        setFrontLicenseImage(userData?.ID_file?.[0] || null);
+        setBackLicenseImage(userData?.ID_file?.[1] || null);
+        SetCarName(sanitizeValue(userData.car_name));
+        setLicense(userData?.driving_license?.[0] || null); 
+        setDisplayDate(sanitizeValue(userData.driving_license_expiry));
+
+        if (
+          userData?.driving_license_expiry &&
+          sanitizeValue(userData.driving_license_expiry)
+        ) {
+          setIsDateExist(true);
+        }
+
+        setPhoneNumber(sanitizeValue(userData.phone));
+        setProfileHttp(sanitizeValue(userData.avatar));
+        setEmail(sanitizeValue(userData.email));
+        setNationalCard(sanitizeValue(userData.ID));
+      } else {
+        console.log('Failed to fetch driver data:', res.message);
       }
-
-      setPhoneNumber(sanitizeValue(userData.phone));
-      setProfileHttp(sanitizeValue(userData.avatar));
-      setEmail(sanitizeValue(userData.email));
-      setNationalCard(sanitizeValue(userData.ID));
-
-      setLoading(false);
     } catch (err) {
       console.log('Get data account error', err);
     } finally {
@@ -335,11 +289,10 @@ export default function ManageProfile({navigation, route}) {
 
   const connectAccount = async (account, parsedData) => {
     try {
-      console.log('Access Token:', parsedData.access_token);
       console.log('account:', account);
 
       const response = await axios.post(
-        `https://api.serveonroute.com/v1/users/link-account`, // Fixed URL
+        `https://api.serveonroute.com/v1/users/link-account`,
         {
           account: account,
           refresh_url: 'https://example.com/reauth',
@@ -360,7 +313,6 @@ export default function ManageProfile({navigation, route}) {
           Linking.openURL(response.data.url);
         }, 10);
       }
-      // Ensure this is defined with useState
     } catch (error) {
       console.error('Error in connectAccount:', error.message);
     }
@@ -475,7 +427,7 @@ export default function ManageProfile({navigation, route}) {
       backLicenseImage,
     );
     try {
-      const sanitize = v => (v && typeof v === 'string' ? v.trim() : v || ''); // handle null/undefined
+      const sanitize = v => (v && typeof v === 'string' ? v.trim() : v || '');
 
       const requiredFields = {
         name: sanitize(name),
@@ -494,7 +446,7 @@ export default function ManageProfile({navigation, route}) {
             `Please fill in ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
           );
           setLoading(false);
-          return; // stop execution
+          return;
         }
       }
       if (!frontIdImage || !backIdImage) {
@@ -545,7 +497,6 @@ export default function ManageProfile({navigation, route}) {
         });
       }
 
-      // national_ID_file (array of front & back)
       if (frontIdImage) {
         formData.append('national_ID_file', {
           uri: frontIdImage.uri || frontIdImage,
@@ -590,35 +541,10 @@ export default function ManageProfile({navigation, route}) {
 
       console.log('FormData:', formData);
 
-      const requestOptions = {
-        // method: 'PUT',
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${datas.access_token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-        body: formData,
-      };
+      const result = await updateDriverProfile(formData, datas.access_token);
+      console.log('update result', result);
 
-      const res = await fetch(
-        'https://api.serveonroute.com/v1/users/update-user',
-        requestOptions,
-      );
-      // console.log('update res', res);
-      // const result = await res.json();
-      // console.log('update result', result);
-      const resText = await res; // Get raw text response first
-      console.log('update raw response', JSON.stringify(resText, null, 2));
-
-      let result;
-      try {
-        result = JSON.parse(resText); // Try parsing it safely
-        console.log('update result', result);
-      } catch (err) {
-        console.log('❌ Failed to parse JSON:', err);
-      }
-
-      if (res.status === 200) {
+      if (result.success) {
         getData();
         showMessage('success', 'Profile Updated Successfully');
         AsyncStorage.setItem('userName', name);
@@ -634,76 +560,14 @@ export default function ManageProfile({navigation, route}) {
     }
   };
 
-  function renderCard() {
-    return (
-      <View>
-        <View style={styles.paymentForm}>
-          <View style={styles.formRow}>
-            <Text style={styles.formText}>NAME ON CARD</Text>
-            <TextInput
-              placeholder="Carol cartex"
-              placeholderTextColor="#000"
-              style={styles.formInput}
-            />
-          </View>
-          <View style={styles.formRow}>
-            <Text style={styles.formText}>CARD NUMBER</Text>
-            <TextInput
-              placeholder="0000 3434 7867 9523"
-              keyboardType="numeric"
-              placeholderTextColor="#000"
-              style={styles.formInput}
-            />
-          </View>
-          <View style={styles.cardInfo}>
-            <View style={styles.formRow2}>
-              <Text style={styles.formText}>EXPIRY DATE</Text>
-              <TextInput
-                placeholder="19 / 2019"
-                placeholderTextColor="#000"
-                keyboardType="numeric"
-                style={styles.formInput}
-              />
-            </View>
-            <View style={styles.formRow}>
-              <Text style={styles.formText}>CVV</Text>
-              <TextInput
-                placeholder="657"
-                placeholderTextColor="#000"
-                keyboardType="numeric"
-                style={styles.formInput}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  function renderPayPal() {
-    return (
-      <View style={styles.payPalInfo}>
-        <Button>
-          <Image
-            style={styles.cardImg}
-            source={require('../../../assets/images/downloadicon.png')}
-          />
-        </Button>
-      </View>
-    );
-  }
-  function onValueChange() {
-    setSelected('');
-  }
-
   function renderProfile() {
     return loading ? (
       <View style={styles.loaderContainerStyles}>
         <AppSpinner size="large" color={COLOR.PRIMARY} />
       </View>
     ) : (
-      <SafeAreaView style={{width: '100%', height: '79%'}}>
-        <View style={{alignSelf: 'center', alignItems: 'center'}}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.centerContainer}>
           <View style={styles.avatarImg}>
             <Image
               source={{
@@ -726,40 +590,16 @@ export default function ManageProfile({navigation, route}) {
               />
             </Button>
           </View>
-          <Text
-            style={{
-              color: '#59499E',
-              fontFamily: FAMILY.BOLD,
-              fontSize: SIZE.SIZE_18,
-              marginTop: hp(2),
-            }}>
-            {name}
-          </Text>
+          <Text style={styles.nameText}>{name}</Text>
         </View>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+          style={styles.flexOne}>
           <ScrollView>
-            <View style={{width: wp(90), alignSelf: 'center'}}>
-              <Text
-                style={{
-                  color: '#59499E',
-                  fontFamily: FAMILY.BOLD,
-                  fontSize: SIZE.SIZE_18,
-                  marginTop: hp(2),
-                  marginBottom: hp(2),
-                }}>
-                Personal informations
-              </Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Personal informations</Text>
             </View>
-            <View
-              style={{
-                padding: 15,
-                borderRadius: 15,
-                backgroundColor: '#fff',
-                width: wp(90),
-                alignSelf: 'center',
-              }}>
+            <View style={styles.whiteBox}>
               <View style>
                 <TextInputComp
                   placeholder="Enter your name"
@@ -777,25 +617,10 @@ export default function ManageProfile({navigation, route}) {
                   title="Phone Number"
                 />
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  width: wp(84),
-                  justifyContent: 'space-between',
-                }}>
+              <View style={styles.rowBetween}>
                 <View>
-                  <Text
-                    style={{
-                      fontWeight: '400',
-                      fontSize: 14,
-                      color: '#59499E',
-                    }}>
-                    Gander
-                  </Text>
-                  <View
-                    style={{
-                      width: wp(41),
-                    }}>
+                  <Text style={styles.label}>Gander</Text>
+                  <View style={styles.halfWidth}>
                     <DropDownPicker
                       open={openModel}
                       items={items}
@@ -803,29 +628,13 @@ export default function ManageProfile({navigation, route}) {
                       value={itemsType}
                       onSelectItem={e => setItemsType(e.value)}
                       setItems={setItems}
-                      style={{
-                        paddingVertical: 19,
-                        // marginTop: 10,
-                        marginBottom: 5,
-                        borderWidth: 0,
-                        color: COLOR.PRIMARY,
-                        fontSize: SIZE.SIZE_14,
-                        fontFamily: FAMILY.REGULAR,
-                        backgroundColor: '#E6E6E6',
-                      }}
+                      style={styles.dropdown}
                     />
                   </View>
                 </View>
                 <View style={[styles.profileBtnInfo, styles.profileBtnInfoTwo]}>
                   <View style={styles.formRow2}>
-                    <Text
-                      style={{
-                        fontWeight: '400',
-                        fontSize: 14,
-                        color: '#59499E',
-                      }}>
-                      DOB
-                    </Text>
+                    <Text style={styles.label}>DOB</Text>
                     <View style={{}}>
                       <DatePicker
                         mode="date"
@@ -842,24 +651,14 @@ export default function ManageProfile({navigation, route}) {
                         }}
                       />
                     </View>
-                    <View
-                      style={{
-                        height: hp(7),
-                        borderRadius: 10,
-                        justifyContent: 'space-between',
-                        // marginTop: hp(1),
-                        backgroundColor: '#E6E6E6',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        paddingHorizontal: wp(2),
-                      }}>
+                    <View style={styles.dateBox}>
                       <Text>
                         {displayDate ? displayDate.substr(0, 10) : 'NO DATE'}
                       </Text>
                       <TouchableOpacity onPress={() => setOpen(true)}>
                         <Image
                           source={require('../../../assets/images/blackdrop.png')}
-                          style={{backgroundColor: '#E6E6E6'}}
+                          style={styles.borderE6}
                           resizeMode="contain"
                         />
                       </TouchableOpacity>
@@ -875,85 +674,25 @@ export default function ManageProfile({navigation, route}) {
                   title="ID card"
                 />
               </View>
-              {/* <View>
-              <Text
-                style={{
-                  fontWeight: '400',
-                  fontSize: 14,
-                  color: '#59499E',
-                }}>
-                ID Pictures
-              </Text>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  height: hp(7),
-                  backgroundColor: '#E6E6E6',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  paddingHorizontal: wp(5),
-                }}
-                // onPress={() => navigate('DriverGovernmentId')}
-                >
-                <Text style={{color: '#59499E99'}}>upload id card picture</Text>
-                <Image
-                  source={require('../../../assets/images/farword.png')}
-                  style={{}}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View> */}
-              <View style={{marginVertical: hp(2)}}>
-                <Text
-                  style={{
-                    fontWeight: '400',
-                    fontSize: 14,
-                    color: '#59499E',
-                    marginBottom: 7,
-                  }}>
-                  ID Card Pictures
-                </Text>
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+              <View style={styles.marginVerticalHp2}>
+                <Text style={styles.labelWithMargin}>ID Card Pictures</Text>
+
+                <View style={styles.idCardPictureContainer}>
                   {/* Front */}
                   <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      borderColor: '#A3A3A3',
-                      borderStyle: 'dashed',
-                      borderRadius: 10,
-                      width: wp(40),
-                      height: hp(12),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      overflow: 'hidden', // so image corners stay rounded
-                    }}
+                    style={styles.uploadBox}
                     onPress={getPhotoForFront}>
                     {frontIdImage ? (
                       <>
                         <Image
                           source={{uri: frontIdImage.uri || frontIdImage}}
-                          style={{width: '100%', height: '100%'}}
+                          style={styles.fullImage}
                           resizeMode="cover"
                         />
                         <TouchableOpacity
                           onPress={removeFrontIdImage}
-                          style={{
-                            position: 'absolute',
-                            top: 5,
-                            right: 5,
-                            backgroundColor: '#fff',
-                            borderRadius: 12,
-                            width: 24,
-                            height: 24,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
+                          style={styles.closeIconContainer}>
                           <Icon
                             name="x"
                             type="Feather"
@@ -966,49 +705,26 @@ export default function ManageProfile({navigation, route}) {
                         <Icon
                           name="camera"
                           type="Feather"
-                          style={{fontSize: 20, color: '#59499E'}}
+                          style={styles.cameraIcon}
                         />
-                        <Text style={{color: '#59499E99', marginTop: 5}}>
-                          Front
-                        </Text>
+                        <Text style={styles.cameraText}>Front</Text>
                       </>
                     )}
                   </TouchableOpacity>
 
-                  {/* Back */}
                   <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      borderColor: '#A3A3A3',
-                      borderStyle: 'dashed',
-                      borderRadius: 10,
-                      width: wp(40),
-                      height: hp(12),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      overflow: 'hidden',
-                    }}
+                    style={styles.uploadBox}
                     onPress={getPhotoForBack}>
                     {backIdImage ? (
                       <>
                         <Image
                           source={{uri: backIdImage.uri || backIdImage}}
-                          style={{width: '100%', height: '100%'}}
+                          style={styles.fullImage}
                           resizeMode="cover"
                         />
                         <TouchableOpacity
                           onPress={removeBackIdImage}
-                          style={{
-                            position: 'absolute',
-                            top: 5,
-                            right: 5,
-                            backgroundColor: '#fff',
-                            borderRadius: 12,
-                            width: 24,
-                            height: 24,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
+                          style={styles.closeIconContainer}>
                           <Icon
                             name={'x'}
                             type="Feather"
@@ -1022,11 +738,9 @@ export default function ManageProfile({navigation, route}) {
                         <Icon
                           name="camera"
                           type="Feather"
-                          style={{fontSize: 20, color: '#59499E'}}
+                          style={styles.cameraIcon}
                         />
-                        <Text style={{color: '#59499E99', marginTop: 5}}>
-                          Back
-                        </Text>
+                        <Text style={styles.cameraText}>Back</Text>
                       </>
                     )}
                   </TouchableOpacity>
@@ -1034,29 +748,13 @@ export default function ManageProfile({navigation, route}) {
               </View>
 
               <View>
-                <Text
-                  style={{
-                    fontWeight: '400',
-                    fontSize: 14,
-                    color: '#59499E',
-                    marginTop: 7,
-                  }}>
-                  Take a Selfi
-                </Text>
+                <Text style={styles.labelWithMarginTop}>Take a Selfie</Text>
                 <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    height: hp(7),
-                    backgroundColor: '#E6E6E6',
-                    alignItems: 'center',
-                    borderRadius: 10,
-                    paddingHorizontal: wp(5),
-                  }}
+                  style={styles.uploadBar}
                   onPress={() => {
                     getPhotoFromGallery1();
                   }}>
-                  <Text style={{color: '#59499E99'}}>
+                  <Text style={styles.uploadBarText}>
                     Upload for verification
                   </Text>
                   <Image
@@ -1066,7 +764,7 @@ export default function ManageProfile({navigation, route}) {
                   />
                 </TouchableOpacity>
               </View>
-              <View style={{flexDirection: 'row'}}>
+              <View style={styles.row}>
                 {imageForShowSelfi.map((item, index) => (
                   <View>
                     <ImageBackground
@@ -1077,7 +775,7 @@ export default function ManageProfile({navigation, route}) {
                           'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
                         i: 'file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg',
                       }}
-                      style={{width: 100, height: 100, margin: 5}}
+                      style={styles.imageThumbnail}
                       imageStyle={{borderRadius: 10}}>
                       <TouchableOpacity
                         style={styles.crossView}
@@ -1094,27 +792,10 @@ export default function ManageProfile({navigation, route}) {
                 ))}
               </View>
             </View>
-            <View style={{width: wp(90), alignSelf: 'center'}}>
-              <Text
-                style={{
-                  color: '#59499E',
-                  fontFamily: FAMILY.BOLD,
-                  fontSize: SIZE.SIZE_18,
-                  marginTop: hp(2),
-                  marginBottom: hp(2),
-                }}>
-                Vehicle information
-              </Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Vehicle information</Text>
             </View>
-            <View
-              style={{
-                padding: 15,
-                borderRadius: 15,
-                backgroundColor: '#fff',
-                width: wp(90),
-                alignSelf: 'center',
-                // marginBottom:hp(5)
-              }}>
+            <View style={styles.whiteBox}>
               <View style>
                 <TextInputComp
                   placeholder="Enter license number"
@@ -1151,35 +832,13 @@ export default function ManageProfile({navigation, route}) {
                 />
               </TouchableOpacity>
             </View> */}
-              <View style={{marginVertical: hp(2)}}>
-                <Text
-                  style={{
-                    fontWeight: '400',
-                    fontSize: 14,
-                    color: '#59499E',
-                    marginBottom: 7,
-                  }}>
-                  License Pictures
-                </Text>
+              <View style={styles.marginVerticalHp2}>
+                <Text style={styles.labelWithMargin}>License Pictures</Text>
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+                <View style={styles.idCardPictureContainer}>
                   {/* Front license */}
                   <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      borderColor: '#A3A3A3',
-                      borderStyle: 'dashed',
-                      borderRadius: 10,
-                      width: wp(40),
-                      height: hp(12),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      overflow: 'hidden',
-                    }}
+                    style={styles.uploadBox}
                     onPress={getPhotoForFrontLicense}>
                     {frontLicenseImage ? (
                       <>
@@ -1187,22 +846,12 @@ export default function ManageProfile({navigation, route}) {
                           source={{
                             uri: frontLicenseImage.uri || frontLicenseImage,
                           }}
-                          style={{width: '100%', height: '100%'}}
+                          style={styles.fullImage}
                           resizeMode="cover"
                         />
                         <TouchableOpacity
                           onPress={removeFrontLicenseImage}
-                          style={{
-                            position: 'absolute',
-                            top: 5,
-                            right: 5,
-                            backgroundColor: '#fff',
-                            borderRadius: 12,
-                            width: 24,
-                            height: 24,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
+                          style={styles.closeIconContainer}>
                           <Icon
                             name="x"
                             type="Feather"
@@ -1215,28 +864,16 @@ export default function ManageProfile({navigation, route}) {
                         <Icon
                           name="camera"
                           type="Feather"
-                          style={{fontSize: 20, color: '#59499E'}}
+                          style={styles.cameraIcon}
                         />
-                        <Text style={{color: '#59499E99', marginTop: 5}}>
-                          Front
-                        </Text>
+                        <Text style={styles.cameraText}>Front</Text>
                       </>
                     )}
                   </TouchableOpacity>
 
                   {/* Back license */}
                   <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      borderColor: '#A3A3A3',
-                      borderStyle: 'dashed',
-                      borderRadius: 10,
-                      width: wp(40),
-                      height: hp(12),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      overflow: 'hidden',
-                    }}
+                    style={styles.uploadBox}
                     onPress={getPhotoForBackLicense}>
                     {backLicenseImage ? (
                       <>
@@ -1244,22 +881,12 @@ export default function ManageProfile({navigation, route}) {
                           source={{
                             uri: backLicenseImage.uri || backLicenseImage,
                           }}
-                          style={{width: '100%', height: '100%'}}
+                          style={styles.fullImage}
                           resizeMode="cover"
                         />
                         <TouchableOpacity
                           onPress={removeBackLicenseImage}
-                          style={{
-                            position: 'absolute',
-                            top: 5,
-                            right: 5,
-                            backgroundColor: '#fff',
-                            borderRadius: 12,
-                            width: 24,
-                            height: 24,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
+                          style={styles.closeIconContainer}>
                           <Icon
                             name="x"
                             type="Feather"
@@ -1272,11 +899,9 @@ export default function ManageProfile({navigation, route}) {
                         <Icon
                           name="camera"
                           type="Feather"
-                          style={{fontSize: 20, color: '#59499E'}}
+                          style={styles.cameraIcon}
                         />
-                        <Text style={{color: '#59499E99', marginTop: 5}}>
-                          Back
-                        </Text>
+                        <Text style={styles.cameraText}>Back</Text>
                       </>
                     )}
                   </TouchableOpacity>
@@ -1300,28 +925,13 @@ export default function ManageProfile({navigation, route}) {
                 />
               </View>
               <View>
-                <Text
-                  style={{
-                    fontWeight: '400',
-                    fontSize: 14,
-                    color: '#59499E',
-                  }}>
-                  Car Pictures
-                </Text>
+                <Text style={styles.label}>Car Pictures</Text>
                 <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    height: hp(7),
-                    backgroundColor: '#E6E6E6',
-                    alignItems: 'center',
-                    borderRadius: 10,
-                    paddingHorizontal: wp(5),
-                  }}
+                  style={styles.uploadBar}
                   onPress={() => {
                     getPhotoFromGallery();
                   }}>
-                  <Text style={{color: '#59499E99'}}>Upload car Pictures</Text>
+                  <Text style={styles.uploadBarText}>Upload car Pictures</Text>
                   <Image
                     source={require('../../../assets/images/upload.png')}
                     style={{}}
@@ -1329,7 +939,7 @@ export default function ManageProfile({navigation, route}) {
                   />
                 </TouchableOpacity>
               </View>
-              <View style={{flexDirection: 'row'}}>
+              <View style={styles.row}>
                 {imageForShow.map((item, index) => (
                   <View>
                     <ImageBackground
@@ -1340,7 +950,7 @@ export default function ManageProfile({navigation, route}) {
                           'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
                         i: 'file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg',
                       }}
-                      style={{width: 100, height: 100, margin: 5}}
+                      style={styles.imageThumbnail}
                       imageStyle={{borderRadius: 10}}>
                       <TouchableOpacity
                         style={styles.crossView}
@@ -1368,13 +978,11 @@ export default function ManageProfile({navigation, route}) {
     );
   }
 
-  // console.log("uRLVALUE", urlValue);
   function renderPermission() {
     return (
       <View style={styles.profileContainer}>
         <View style={styles.profileContent}>
           <View style={[styles.profileInputDetail, {paddingBottom: -100}]}>
-            {/* <Text style={styles.permissionHeader}>{__("PAYMENT PROCESS")}</Text> */}
             <View style={styles.switchInfo}>
               <Text style={styles.switchText}>Connect your stripe account</Text>
               <ToggleSwitch
@@ -1415,72 +1023,8 @@ export default function ManageProfile({navigation, route}) {
       </View>
     );
   }
-  function renderInsurance() {
-    return (
-      <Container>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles.tabInfo}>
-              <Button
-                style={
-                  PaymentTabSelected === 'card'
-                    ? styles.tabActive1
-                    : styles.tabInactive
-                }
-                onPress={() => setPaymentTabSelected('card')}>
-                <Image
-                  source={require('../../../assets/images/payment-card.png')}
-                  style={
-                    PaymentTabSelected === 'card'
-                      ? styles.tabImgActive
-                      : styles.tabImgInactive
-                  }
-                  resizeMode="contain"
-                />
-              </Button>
-              <Button
-                style={
-                  PaymentTabSelected === 'paypal'
-                    ? styles.tabActive1
-                    : styles.tabInactive
-                }
-                onPress={() => setPaymentTabSelected('paypal')}>
-                <Image
-                  source={require('../../../assets/images//download.png')}
-                  style={
-                    PaymentTabSelected === 'paypal'
-                      ? styles.tabImgActive
-                      : styles.tabImgInactive
-                  }
-                  resizeMode="contain"
-                />
-              </Button>
-            </View>
-            <View style={styles.paymentContainer}>
-              {PaymentTabSelected === 'card'
-                ? renderCard()
-                : PaymentTabSelected === 'paypal'
-                ? renderPayPal()
-                : null}
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        <Button style={styles.payBtn} onPress={onSubmit}>
-          <Text style={styles.payBtnText}>MAKE A PAYMENT</Text>
-        </Button>
-      </Container>
-    );
-  }
 
-  const handleChange = (e, name) => {
-    setInputs(prev => {
-      return {...prev, [name]: e};
-    });
-  };
   const getPhotoFromGallery = () => {
-    // setBottomModal(true);
     if (imageForShow.length >= 3) {
       showMessage('error', "You can't uploaded more than three images");
     } else {
@@ -1488,7 +1032,6 @@ export default function ManageProfile({navigation, route}) {
     }
   };
   const getPhotoFromGallery1 = () => {
-    // setBottomModal(true);
     if (imageForShowSelfi.length >= 1) {
       showMessage('error', "You can't uploaded more than one images");
     } else {
@@ -1538,387 +1081,13 @@ export default function ManageProfile({navigation, route}) {
                     PERMISSION
                   </Text>
                 </Button>
-                {/* <Button
-                  style={
-                    tabSelected === 'insurance'
-                      ? styles.tabActive
-                      : styles.tabInactive
-                  }
-                  onPress={() => setTabSelected('insurance')}>
-                  <Text
-                    style={
-                      tabSelected === 'insurance'
-                        ? styles.tabTextActive
-                        : styles.tabTextInactive
-                    }>
-                    PAYMENT
-                  </Text>
-                </Button> */}
               </View>
             </View>
             {tabSelected === 'profile' && renderProfile()}
             {tabSelected === 'permission' && renderPermission()}
-            {tabSelected === 'insurance' && renderInsurance()}
           </View>
         </Content>
       </Container>
-      {/* <Container>
-    <View style={{ alignSelf: "center", alignItems: "center" }}>
-        <View style={styles.avatarImg}>
-          <Image
-            source={{
-              uri:
-                profile?.uri ||
-                profileHttp ||
-                "https://images.pexels.com/photos/736716/pexels-photo-736716.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-            }}
-            style={styles.profileImg}
-          />
-          <Button
-                style={styles.iconDetail}
-                onPress={() => {
-                  UploadData(setProfile);
-                }}
-              >
-                <Icon
-                  name="pencil"
-                  type="EvilIcons"
-                  style={[theme.SIZE_24, theme.GREYDARK]}
-                />
-              </Button>
-        </View>
-        <Text
-          style={{
-            color: "#59499E",
-            fontFamily: FAMILY.BOLD,
-            fontSize: SIZE.SIZE_18,
-          }}
-        >
-          {name}
-        </Text>
-      </View>
-      <ScrollView>
-        <View style={{ width: wp(90), alignSelf: "center" }}>
-          <Text
-            style={{
-              color: "#59499E",
-              fontFamily: FAMILY.BOLD,
-              fontSize: SIZE.SIZE_18,
-              marginTop: hp(2),
-              marginBottom: hp(2),
-            }}
-          >
-            Personal informations
-          </Text>
-        </View>
-        <View
-          style={{
-            padding: 15,
-            borderRadius: 15,
-            backgroundColor: "#fff",
-            width: wp(90),
-            alignSelf: "center",
-          }}
-        >
-          <View style>
-            <TextInputComp
-              placeholder="Enter your name"
-              value={name}
-              onChangeText={(text) => setName(text)}
-              title="Name"
-            />
-          </View>
-          <View style>
-            <TextInputComp
-            editable={false}
-              placeholder="Enter your name"
-              value={phoneNumber}
-              onChangeText={(text)=>setPhoneNumber(text)}
-              title="Phone Number"
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              width: wp(84),
-              justifyContent: "space-between",
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontWeight: "400",
-                  fontSize: 14,
-                  color: "#59499E",
-                }}
-              >
-               
-                Gander
-              </Text>
-              <View
-                style={{
-                  width: wp(41),
-                }}
-              >
-                <DropDownPicker
-                  open={openModel}
-                  items={items}
-                  setOpen={setOpenModel}
-                  value={itemsType}
-                  onSelectItem={(e) => setItemsType(e.value)}
-                  setItems={setItems}
-                  style={{
-                    paddingVertical: 19,
-                    // marginTop: 10,
-                    marginBottom: 5,
-                    borderWidth: 0,
-                    color: COLOR.PRIMARY,
-                    fontSize: SIZE.SIZE_14,
-                    fontFamily: FAMILY.REGULAR,
-                    backgroundColor: "#E6E6E6",
-                  }}
-                />
-              </View>
-            </View>
-            <View style={[styles.profileBtnInfo, styles.profileBtnInfoTwo]}>
-              <View style={styles.formRow2}>
-                <Text
-                  style={{
-                    fontWeight: "400",
-                    fontSize: 14,
-                    color: "#59499E",
-                  }}
-                >
-                  DOB
-                </Text>
-                <View style={{}}>
-                  <DatePicker
-                    mode="date"
-                    modal
-                    open={open}
-                    date={date}
-                    onConfirm={(date) => {
-                      setOpen(false);
-                      setDate(date);
-                      setDisplayDate(date.toISOString());
-                    }}
-                    onCancel={() => {
-                      setOpen(false);
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    height: hp(7),
-                    borderRadius: 10,
-                    justifyContent: "space-between",
-                    // marginTop: hp(1),
-                    backgroundColor: "#E6E6E6",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: wp(2),
-                  }}
-                >
-                  <Text>
-                    {displayDate ? displayDate.substr(0, 10) : "NO DATE"}
-                  </Text>
-                  <TouchableOpacity onPress={() => setOpen(true)}>
-                    <Image
-                      source={require("../../../assets/images/blackdrop.png")}
-                      style={{ backgroundColor: "#E6E6E6" }}
-                      resizeMode="contain"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style>
-            <TextInputComp
-              placeholder="Enter id card number"
-              value={nationalCard}
-              onChangeText={(e) => setNationalCard(e)}
-              title="ID card"
-            />
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 14,
-                color: "#59499E",
-              }}
-            >
-              ID Pictures
-            </Text>
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                height: hp(7),
-                backgroundColor: "#E6E6E6",
-                alignItems: "center",
-                borderRadius: 10,
-                paddingHorizontal: wp(5),
-              }}
-              onPress={() => navigate("DriverGovernmentId")}
-            >
-              <Text style={{ color: "#59499E99" }}>upload id card picture</Text>
-              <Image
-                source={require("../../../assets/images/farword.png")}
-                style={{}}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={{ width: wp(90), alignSelf: "center" }}>
-          <Text
-            style={{
-              color: "#59499E",
-              fontFamily: FAMILY.BOLD,
-              fontSize: SIZE.SIZE_18,
-              marginTop: hp(2),
-              marginBottom: hp(2),
-            }}
-          >
-            Vehicle information
-          </Text>
-        </View>
-        <View
-          style={{
-            padding: 15,
-            borderRadius: 15,
-            backgroundColor: "#fff",
-            width: wp(90),
-            alignSelf: "center",
-            // marginBottom:hp(5)
-          }}
-        >
-          <View style>
-            <TextInputComp
-              placeholder="Enter license number"
-              value={drivingLiscence}
-              onChangeText={(e) => setDrivingLiscence(e)}
-              title="License"
-            />
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 14,
-                color: "#59499E",
-              }}
-            >
-              License Pictures
-            </Text>
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                height: hp(7),
-                backgroundColor: "#E6E6E6",
-                alignItems: "center",
-                borderRadius: 10,
-                paddingHorizontal: wp(5),
-              }}
-              onPress={() => navigate("DriverDrivingLicense")}
-            >
-              <Text style={{ color: "#59499E99" }}>upload id card picture</Text>
-              <Image
-                source={require("../../../assets/images/farword.png")}
-                style={{}}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          </View>
-          <View style>
-            <TextInputComp
-              placeholder="Enter car name"
-              value={carname}
-              onChangeText={(e) => SetCarName(e, "name")}
-              title="Car Name"
-            />
-          </View>
-          <View style>
-            <TextInputComp
-              placeholder="Enter car number"
-              value={carnumber}
-              onChangeText={(e) => SetCarNumber(e)}
-              title="Car Number"
-            />
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 14,
-                color: "#59499E",
-              }}
-            >
-              Car Pictures
-            </Text>
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                height: hp(7),
-                backgroundColor: "#E6E6E6",
-                alignItems: "center",
-                borderRadius: 10,
-                paddingHorizontal: wp(5),
-              }}
-              onPress={() => {
-                getPhotoFromGallery();
-              }}
-            >
-              <Text style={{ color: "#59499E99" }}>Upload car Pictures</Text>
-              <Image
-                source={require("../../../assets/images/upload.png")}
-                style={{}}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            {imageForShow.map((item, index) => (
-              <View>
-                <ImageBackground
-                  key={item.id}
-                  source={{
-                    uri:
-                      item?.uri ||
-                      "https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg",
-                    i: "file:///storage/emulated/0/Android/data/com.wditechy.truckie/files/Pictures/fb3506d2-0efc-49f7-9dfc-dc6f5897d544.jpg",
-                  }}
-                  style={{ width: 100, height: 100, margin: 5 }}
-                  imageStyle={{ borderRadius: 10 }}
-                >
-                  <TouchableOpacity
-                    style={styles.crossView}
-                    onPress={() => removeImage(item, index)}
-                  >
-                    <Icon
-                      name={"x"}
-                      type="Feather"
-                      style={styles.icon}
-                      COLOR={"red"}
-                    />
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-            ))}
-          </View>
-        </View>
-        <Button
-          style={[styles.uploadbtn2, { marginBottom: hp(6), bottom: 0 }]}
-          onPress={submit}
-        >
-          <Text style={styles.saveBtnText2}>SAVE</Text>
-        </Button>
-      </ScrollView>
-    </Container> */}
     </>
   );
 }

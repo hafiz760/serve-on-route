@@ -574,4 +574,152 @@ export default {
     borderRadius: 100,
     padding: 2,
   },
+  // Refactored styles
+  safeArea: {
+    width: '100%',
+    height: '79%',
+  },
+  centerContainer: {
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+  nameText: {
+    color: '#59499E',
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_18,
+    marginTop: hp(2),
+  },
+  flexOne: {
+    flex: 1,
+  },
+  sectionTitle: {
+    color: '#59499E',
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_18,
+    marginTop: hp(2),
+    marginBottom: hp(2),
+  },
+  whiteBox: {
+    padding: 15,
+    borderRadius: 15,
+    backgroundColor: '#fff',
+    width: wp(90),
+    alignSelf: 'center',
+  },
+  rowBetween: {
+    flexDirection: 'row',
+    width: wp(84),
+    justifyContent: 'space-between',
+  },
+  label: {
+    fontWeight: '400',
+    fontSize: 14,
+    color: '#59499E',
+  },
+  halfWidth: {
+    width: wp(41),
+  },
+  dropdown: {
+    paddingVertical: 19,
+    // marginTop: 10,
+    marginBottom: 5,
+    borderWidth: 0,
+    color: COLOR.PRIMARY,
+    fontSize: SIZE.SIZE_14,
+    fontFamily: FAMILY.REGULAR,
+    backgroundColor: '#E6E6E6',
+  },
+  dateBox: {
+    height: hp(7),
+    borderRadius: 10,
+    justifyContent: 'space-between',
+    // marginTop: hp(1),
+    backgroundColor: '#E6E6E6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: wp(2),
+  },
+  labelWithMargin: {
+    fontWeight: '400',
+    fontSize: 14,
+    color: '#59499E',
+    marginBottom: 7,
+  },
+  idCardPictureContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  uploadBox: {
+    borderWidth: 1,
+    borderColor: '#A3A3A3',
+    borderStyle: 'dashed',
+    borderRadius: 10,
+    width: wp(40),
+    height: hp(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  fullImage: {
+    width: '100%',
+    height: '100%',
+  },
+  closeIconContainer: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: hp(7),
+    backgroundColor: '#E6E6E6',
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingHorizontal: wp(5),
+  },
+  uploadBarText: {
+    color: '#59499E99',
+  },
+  marginTop7: {
+    marginTop: 7,
+  },
+  labelWithMarginTop: {
+    fontWeight: '400',
+    fontSize: 14,
+    color: '#59499E',
+    marginTop: 7,
+  },
+  imageThumbnail: {
+    width: 100,
+    height: 100,
+    margin: 5,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  sectionTitleContainer: {
+    width: wp(90),
+    alignSelf: 'center',
+  },
+  marginVerticalHp2: {
+    marginVertical: hp(2),
+  },
+  borderE6: {
+    backgroundColor: '#E6E6E6',
+  },
+  cameraIcon: {
+    fontSize: 20,
+    color: '#59499E',
+  },
+  cameraText: {
+    color: '#59499E99',
+    marginTop: 5,
+  },
 };

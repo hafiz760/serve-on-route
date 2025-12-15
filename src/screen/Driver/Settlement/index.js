@@ -11,8 +11,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function TransactionHistory() {
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState([]);
   useEffect(() => {
     getTransactionHistory();

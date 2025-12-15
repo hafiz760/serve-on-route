@@ -1,25 +1,27 @@
-import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 
-const React = require("react-native");
-const { Platform } = React;
+const React = require('react-native');
 
 export default {
   // --content--//
 
   homeContainer: {
-    backgroundColor: COLOR.PRIMARY,
-    paddingVertical: 20,
+    backgroundColor: '#F5F7FA', // Verified lighter background for better contrast
+    flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: 30,
   },
   btnIcon: {
-    alignItems: "center",
+    alignItems: 'center',
     margin: 10,
     marginTop: 20,
-    color: "black",
+    color: 'black',
   },
   formRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "black",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'black',
 
     borderRadius: 3,
     marginBottom: 20,
@@ -37,15 +39,15 @@ export default {
     backgroundColor: COLOR.PRIMARY,
   },
   footerBtnInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     margin: 20,
   },
   selectBtn: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 3,
     marginRight: 5,
@@ -53,8 +55,8 @@ export default {
   },
   shareBtn: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLOR.BLUE,
     borderRadius: 3,
     paddingVertical: 15,
@@ -68,13 +70,13 @@ export default {
   biddingCardText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
-    color: "black",
-    marginBottom:1
+    color: 'black',
+    marginBottom: 1,
   },
   // --map--//
   mMap: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderColor: COLOR.LIGHT,
     borderWidth: 1,
   },
@@ -92,25 +94,25 @@ export default {
     borderRadius: 5,
     marginVertical: 10,
     marginHorizontal: 20,
-    alignItems:'center',
-    justifyContent:'center'
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bookingBtnText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
     paddingVertical: 15,
   },
-   /* -- Accordion -- */
-   tripsAllLable: {
+  /* -- Accordion -- */
+  tripsAllLable: {
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
   },
   accordionTab: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
     paddingHorizontal: 20,
@@ -119,7 +121,7 @@ export default {
   accordionTabText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
-    color: "#333",
+    color: '#333',
   },
 
   /** Content */
@@ -131,7 +133,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: 12,
     color: COLOR.LIGHT,
-    alignSelf: "center",
+    alignSelf: 'center',
     backgroundColor: COLOR.BLUE,
     borderRadius: 15,
     paddingHorizontal: 15,
@@ -141,16 +143,16 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    alignSelf: "center",
+    alignSelf: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 3,
   },
   bookingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: COLOR.SMOKELIGHT,
     paddingHorizontal: 20,
@@ -162,8 +164,8 @@ export default {
     color: COLOR.DARKBLUE,
   },
   bookingDetailInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   bookingDetail: {
     fontFamily: FAMILY.BOLD,
@@ -181,16 +183,16 @@ export default {
     paddingLeft: 5,
   },
   btnInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     margin: 15,
   },
   cancelBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    backgroundColor: "red",
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'red',
     borderRadius: 5,
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -203,9 +205,9 @@ export default {
     marginLeft: 5,
   },
   detailBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
     backgroundColor: COLOR.SMOKELIGHT,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -229,8 +231,8 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
-    backgroundColor: "rgba(249,64,65,1)",
+    textAlign: 'center',
+    backgroundColor: 'rgba(249,64,65,1)',
     borderRadius: 5,
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -239,7 +241,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
     backgroundColor: COLOR.PRIMARY,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -247,7 +249,7 @@ export default {
   },
   /** * -- ModalLayout -- ***/
   modalRating: {
-    width: "90%",
+    width: '90%',
     height: 400,
     borderRadius: 10,
     zIndex: 2,
@@ -256,19 +258,19 @@ export default {
     marginHorizontal: 15,
   },
   closeSortDesc: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
     marginVertical: 10,
   },
   starImg: {
     width: 80,
     height: 80,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   modalRatingTitle: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_20,
     color: COLOR.DARKLIGHT,
-    alignSelf: "center",
+    alignSelf: 'center',
     paddingTop: 10,
     paddingBottom: 5,
   },
@@ -276,19 +278,19 @@ export default {
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.GREYVIOLET,
-    alignSelf: "center",
-    textAlign: "center",
+    alignSelf: 'center',
+    textAlign: 'center',
     lineHeight: 20,
   },
   modalRatingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
     marginVertical: 20,
   },
   modalStarIcon: {
     fontSize: SIZE.SIZE_30,
-    color: "rgba(255, 178, 41, 1)",
+    color: 'rgba(255, 178, 41, 1)',
     paddingHorizontal: 5,
     paddingVertical: 5,
   },
@@ -302,23 +304,23 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
   },
-   /** * -- Accordion -- ***/
-   saccordionContent: {
+  /** * -- Accordion -- ***/
+  saccordionContent: {
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
     paddingVertical: 15,
     marginTop: 5,
   },
   accordion: {
-    width: "100%",
+    width: '100%',
     marginBottom: 5,
   },
   accordionBtn: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -348,14 +350,14 @@ export default {
     paddingHorizontal: 20,
   },
   accordionInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   accordionActiveText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    backgroundColor: "rgba(53,190,224,1)",
+    backgroundColor: 'rgba(53,190,224,1)',
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 5,
@@ -364,7 +366,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    backgroundColor: "rgba(92,186,71,1)",
+    backgroundColor: 'rgba(92,186,71,1)',
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 5,
@@ -377,9 +379,9 @@ export default {
   },
   wrapimg: {
     flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
@@ -390,13 +392,13 @@ export default {
   },
 
   sender: {
-    minWidth: "1%",
-    maxWidth: "80%",
-    alignItems: "flex-end",
+    minWidth: '1%',
+    maxWidth: '80%',
+    alignItems: 'flex-end',
     backgroundColor: COLOR.GREY,
     marginTop: 5,
     paddingBottom: 5,
-    marginLeft: "auto",
+    marginLeft: 'auto',
     paddingTop: 5,
     paddingRight: 10,
     borderRadius: 4,
@@ -410,21 +412,21 @@ export default {
   },
 
   reciver: {
-    minWidth: "1%",
-    maxWidth: "80%",
+    minWidth: '1%',
+    maxWidth: '80%',
     marginTop: 5,
     paddingBottom: 5,
     borderRadius: 6,
     paddingTop: 5,
     paddingLeft: 7,
-    marginRight: "auto",
+    marginRight: 'auto',
     fontSize: SIZE.SIZE_12,
     backgroundColor: COLOR.BLUE,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   formInput3: {
-    width: "90%",
+    width: '90%',
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.DARK,
@@ -435,13 +437,64 @@ export default {
   },
 
   noTripsFoundContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 100,
+    paddingHorizontal: 30,
   },
-
+  noTripsFoundIcon: {
+    fontSize: 70,
+    color: '#CBD5E0', // Soft grey for the icon
+    marginBottom: 20,
+  },
   noTripsFoundText: {
-    color: "#000",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_20,
+    color: COLOR.DARK,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  noTripsFoundSubText: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_14,
+    color: COLOR.GREYVIOLET,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  listHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    marginBottom: 15,
+  },
+  listHeaderTitle: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_18,
+    color: COLOR.DARK,
+  },
+  listHeaderCount: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.PRIMARY,
+    backgroundColor: COLOR.SMOKEBLUE,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  welcomeContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  welcomeTitle: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_24,
+    color: COLOR.DARK,
+  },
+  welcomeSubtitle: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_14,
+    color: COLOR.GREYVIOLET,
   },
 };
