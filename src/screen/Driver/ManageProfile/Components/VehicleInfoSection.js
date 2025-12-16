@@ -1,19 +1,13 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ImageBackground,
-} from 'react-native';
-import {Icon} from '../../../component/Basic';
-import TextInputComp from '../../../component/TextInputComp';
+import {View, Text} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {FAMILY, SIZE} from '../../../theme/typography';
-import styles from './styles';
+import {FAMILY, SIZE} from '../../../../theme/typography';
+import LicenseUpload from './LicenseUpload';
+import CarPicturesUpload from './CarPicturesUpload';
+import TextInputComp from '../../../../component/TextInputComp';
 
 export default function VehicleInfoSection({
   drivingLiscence,

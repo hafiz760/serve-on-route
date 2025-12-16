@@ -4,14 +4,17 @@ import {useSelector} from 'react-redux';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
 import {Button} from '../../../component/Form';
 import styles from './styles';
-import axios from 'axios';
+
 import Modal from 'react-native-modalbox';
 
 import Accordion from '../../Driver/MyTrips/Accordion';
 import {DarkStatusBar} from '../../../component/StatusBar';
 import BiddingCard from './BiddingCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import {BASE_URL,URL_V} from "@env"
+import {
+  getParcelsByRider,
+  getParcelById as getParcelByIdService,
+} from '../../../services/apicalls/driver';
 import {BASE_URL, URL_V} from '../../../utilities/helper';
 import Header from '../../../component/Header';
 
@@ -42,7 +45,7 @@ export default function Home({route}) {
     };
     console.log('requestPayload', requestPayload);
     try {
-      // const responseOne = await axios.post(
+      // const response = await axios.post(
       //   "https://api.serveonroute.com/v1/bid",
       //   requestPayload,
       //   {
@@ -52,7 +55,7 @@ export default function Home({route}) {
       //   }
       // );
 
-      // console.log("SUCCESSFULL RESPONSE ==>", responseOne.data);
+      // console.log("SUCCESSFULL RESPONSE ==>", response.data);
       setMainModel(false);
       socket.emit('bidding', requestPayload);
 
@@ -68,31 +71,29 @@ export default function Home({route}) {
   const ModalNotification = useRef();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const fetchData = async () => {
-    var data = await AsyncStorage.getItem('response');
-    var datas = JSON.parse(data);
+    try {
+      var data = await AsyncStorage.getItem('response');
+      var datas = JSON.parse(data);
+      console.log('Fetching parcels for rider_id:', datas._id);
 
-    const res = axios
-      .get(
-        `${BASE_URL}${URL_V}parcel?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&rider_id=${datas._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
-        },
-      )
-      .then(data => {
-        const incompleteData = data.data.docs.filter(
+      const res = await getParcelsByRider(datas._id, datas.access_token);
+      console.log('getParcelsByRider response:', res);
+
+      if (res?.success) {
+        const incompleteData = res.data.docs.filter(
           item => item.status === 'in_progress',
         );
-
         setData(incompleteData);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log(('error', err.response));
-        setLoading(false);
-      });
+      } else {
+        console.log('Failed to fetch parcels:', res.message);
+      }
+    } catch (err) {
+      console.log('error fetching data', err);
+    } finally {
+      setLoading(false);
+    }
   };
   const getParcelById = async parcelId => {
     console.log('getParcelById called');
@@ -100,36 +101,33 @@ export default function Home({route}) {
     var datas = JSON.parse(data);
 
     try {
-      const responseOne = await axios.get(
-        `${BASE_URL}${URL_V}parcel/${parcelId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
-        },
-      );
+      const response = await getParcelByIdService(parcelId, datas.access_token);
 
-      console.log('RESPONSE ====>', responseOne);
+      console.log('RESPONSE ====>', response);
 
-      const exists = incomingParcelNotifications.some(
-        item => item.id === responseOne.data.id,
-      );
+      if (response.success) {
+        const exists = incomingParcelNotifications.some(
+          item => item.id === response.data.id,
+        );
 
-      if (!exists) {
-        setIncomingParcelNotifications([
-          ...incomingParcelNotifications,
-          responseOne.data,
-        ]);
+        if (!exists) {
+          setIncomingParcelNotifications([
+            ...incomingParcelNotifications,
+            response.data,
+          ]);
+        } else {
+          console.log('Parcel already exists, not adding again');
+        }
+
+        if (!mainModel) {
+          setMainModel(true);
+        }
       } else {
-        console.log('Parcel already exists, not adding again');
-      }
-
-      if (!mainModel) {
-        setMainModel(true);
+        console.log('Failed to fetch parcel by ID:', response.message);
       }
     } catch (err) {
       alert('Something went wrong while fetching parcel');
-      console.log(err?.response);
+      console.log(err);
     }
   };
   useEffect(() => {

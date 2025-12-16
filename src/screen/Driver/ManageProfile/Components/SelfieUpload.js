@@ -6,12 +6,11 @@ import {
   Image,
   ImageBackground,
 } from 'react-native';
-import {Icon} from '../../../component/Basic';
+import {Icon} from '../../../../component/Basic';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import styles from './styles';
 
 export default function SelfieUpload({
   getPhotoFromGallery1,
@@ -45,7 +44,7 @@ export default function SelfieUpload({
           }}>
           <Text style={{color: '#59499E99'}}>Upload for verification</Text>
           <Image
-            source={require('../../../assets/images/upload.png')}
+            source={require('../../../../assets/images/upload.png')}
             style={{}}
             resizeMode="contain"
           />

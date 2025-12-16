@@ -58,7 +58,7 @@ export default {
     shadowOpacity: 0.9,
     shadowRadius: 0,
     backgroundColor: COLOR.LIGHT,
-    // marginTop: 15,
+    marginBottom: 15,
     alignSelf: 'center',
     top: 10,
   },
@@ -558,7 +558,7 @@ export default {
     height: hp(6),
     borderRadius: 10,
     justifyContent: 'center',
-    bottom: hp(-15),
+    marginVertical: hp(3),
   },
   saveBtnText2: {
     color: '#fff',

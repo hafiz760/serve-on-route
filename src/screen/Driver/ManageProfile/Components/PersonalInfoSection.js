@@ -1,16 +1,22 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Image, ImageBackground} from 'react-native';
-import {Icon} from '../../../component/Basic';
-import TextInputComp from '../../../component/TextInputComp';
+import {View, Text, TouchableOpacity, Image} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DatePicker from 'react-native-date-picker';
-import {COLOR} from '../../../theme/typography';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import styles from './styles';
+import {COLOR} from '../../../../theme/typography';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import styles from '../styles';
+import IDCardUpload from './IDCardUpload';
+import SelfieUpload from './SelfieUpload';
+import TextInputComp from '../../../../component/TextInputComp';
 
 export default function PersonalInfoSection({
   name,
   setName,
+  lastName,
+  setLastName,
   phoneNumber,
   setPhoneNumber,
   itemsType,
@@ -40,13 +46,38 @@ export default function PersonalInfoSection({
   return (
     <>
       <View style={{width: wp(90), alignSelf: 'center'}}>
-        <Text style={{color: '#59499E', fontFamily: 'bold', fontSize: 18, marginTop: hp(2), marginBottom: hp(2)}}>
+        <Text
+          style={{
+            color: '#59499E',
+            fontFamily: 'bold',
+            fontSize: 18,
+            marginTop: hp(2),
+            marginBottom: hp(2),
+          }}>
           Personal informations
         </Text>
       </View>
 
-      <View style={{padding: 15, borderRadius: 15, backgroundColor: '#fff', width: wp(90), alignSelf: 'center'}}>
-        <TextInputComp placeholder="Enter your name" value={name} onChangeText={text => setName(text)} title="Name" />
+      <View
+        style={{
+          padding: 15,
+          borderRadius: 15,
+          backgroundColor: '#fff',
+          width: wp(90),
+          alignSelf: 'center',
+        }}>
+        <TextInputComp
+          placeholder="Enter first name"
+          value={name}
+          onChangeText={text => setName(text)}
+          title="First Name"
+        />
+        <TextInputComp
+          placeholder="Enter last name"
+          value={lastName}
+          onChangeText={text => setLastName(text)}
+          title="Last Name"
+        />
 
         <TextInputComp
           editable={false}
@@ -56,9 +87,16 @@ export default function PersonalInfoSection({
           title="Phone Number"
         />
 
-        <View style={{flexDirection: 'row', width: wp(84), justifyContent: 'space-between'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            width: wp(84),
+            justifyContent: 'space-between',
+          }}>
           <View>
-            <Text style={{fontWeight: '400', fontSize: 14, color: '#59499E'}}>Gender</Text>
+            <Text style={{fontWeight: '400', fontSize: 14, color: '#59499E'}}>
+              Gender
+            </Text>
             <View style={{width: wp(41)}}>
               <DropDownPicker
                 open={openModel}
@@ -80,7 +118,9 @@ export default function PersonalInfoSection({
 
           <View style={[styles.profileBtnInfo, styles.profileBtnInfoTwo]}>
             <View style={styles.formRow2}>
-              <Text style={{fontWeight: '400', fontSize: 14, color: '#59499E'}}>DOB</Text>
+              <Text style={{fontWeight: '400', fontSize: 14, color: '#59499E'}}>
+                DOB
+              </Text>
               <DatePicker
                 mode="date"
                 modal
@@ -105,16 +145,27 @@ export default function PersonalInfoSection({
                   alignItems: 'center',
                   paddingHorizontal: wp(2),
                 }}>
-                <Text>{displayDate ? displayDate.substr(0, 10) : 'NO DATE'}</Text>
+                <Text>
+                  {displayDate ? displayDate.substr(0, 10) : 'NO DATE'}
+                </Text>
                 <TouchableOpacity onPress={() => setOpen(true)}>
-                  <Image source={require('../../../assets/images/blackdrop.png')} style={{backgroundColor: '#E6E6E6'}} resizeMode="contain" />
+                  <Image
+                    source={require('../../../../assets/images/blackdrop.png')}
+                    style={{backgroundColor: '#E6E6E6'}}
+                    resizeMode="contain"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>
 
-        <TextInputComp placeholder="Enter id card number" value={nationalCard} onChangeText={e => setNationalCard(e)} title="ID card" />
+        <TextInputComp
+          placeholder="Enter id card number"
+          value={nationalCard}
+          onChangeText={e => setNationalCard(e)}
+          title="ID card"
+        />
 
         <IDCardUpload
           frontIdImage={frontIdImage}

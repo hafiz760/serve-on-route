@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text} from 'react-native';
-import {ToggleSwitch} from '../../../component/Form';
-import styles from './styles';
+import styles from '../styles';
+import {ToggleSwitch} from '../../../../component/Form';
 
 export default function PermissionTab({isEnabled, setIsEnabled}) {
   return (

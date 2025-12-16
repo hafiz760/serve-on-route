@@ -3,4 +3,7 @@ export const endPoints = {
   logIn: 'auth/login',
   signUp: 'auth/register',
   updateUser: 'users/update-user',
+  connectAccount: 'users/connect-account',
+  linkAccount: 'users/link-account',
+  parcel: 'parcel',
 };

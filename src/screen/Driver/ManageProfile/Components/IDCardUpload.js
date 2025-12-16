@@ -1,11 +1,10 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, Image} from 'react-native';
-import {Icon} from '../../../component/Basic';
+import {Icon} from '../../../../component/Basic';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import styles from './styles';
 
 export default function IDCardUpload({
   frontIdImage,
