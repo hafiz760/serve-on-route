@@ -479,7 +479,7 @@ function SelectVehicle({route}) {
     }
   }, [isFocused]);
 
-  useEffect(() => {
+  useEffect(() => { 
     const checkPaymentMethod = async () => {
       try {
         const data = await AsyncStorage.getItem('response');
@@ -509,7 +509,6 @@ function SelectVehicle({route}) {
         }
       } catch (err) {
         console.error('Error checking payment method:', err);
-        // If error occurs, assume no payment method to be safe
         setHasPaymentMethod(false);
       }
     };

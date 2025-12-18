@@ -13,12 +13,36 @@ import {
 } from '../../../services/apicalls/driver';
 import ProfileTab from './Components/ProfileTab';
 import PermissionTab from './Components/PermissionTab';
+import {fetchDriverById} from '../../../services/apicalls/driver';
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import {Image, TouchableOpacity} from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
+import {Icon} from '../../../component/Basic';
 
 export default function ManageProfile() {
   const isFetchingStripe = useRef(false);
   const [urlValue, setUrlValue] = useState();
   const [tabSelected, setTabSelected] = useState('profile');
   const [isEnabled, setIsEnabled] = useState(false);
+
+  // Profile States (Only what's needed for the Header)
+  const [profile, setProfile] = useState();
+  const [profileHttp, setProfileHttp] = useState('');
+
+  const UploadData = async setPath => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+      });
+      console.log('res data', res[0]);
+      setPath(res[0]);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+      } else {
+        throw err;
+      }
+    }
+  };
 
   useEffect(() => {
     if (isEnabled) {
@@ -82,12 +106,37 @@ export default function ManageProfile() {
     <>
       <Container>
         <DarkStatusBar />
-        <Header default leftType="back" title={''} />
-        <Content contentContainerStyle={theme.layoutDf}>
-          <View>
+        <Header
+          default
+          leftType="back"
+          title={'Profile'}
+          rightContent={
+            <TouchableOpacity
+              onPress={() => UploadData(setProfile)}
+              style={styles.headerAvatarContainer}>
+              <Image
+                source={
+                  profile?.uri
+                    ? {uri: profile.uri}
+                    : profileHttp
+                    ? {uri: profileHttp}
+                    : require('../../../assets/images/dummyProfile.jpg')
+                }
+                style={styles.headerAvatarImage}
+              />
+              <View style={styles.headerPencilContainer}>
+                <Icon
+                  name="pencil"
+                  type="EvilIcons"
+                  style={styles.headerPencilIcon}
+                />
+              </View>
+            </TouchableOpacity>
+          }
+        />
+        <Content>
+          <View style={{flex: 1}}>
             <View style={styles.profileHeader}>
-              <Text style={styles.profileHeaderTitle}>PROFILE</Text>
-              <Text style={styles.profileHeaderText}>MANAGE YOUR PROFILE</Text>
               <View style={styles.tabInfo}>
                 <Button
                   style={
@@ -123,7 +172,15 @@ export default function ManageProfile() {
                 </Button>
               </View>
             </View>
-            {tabSelected === 'profile' && <ProfileTab />}
+            {tabSelected === 'profile' && (
+              <ProfileTab
+                profile={profile}
+                setProfile={setProfile}
+                profileHttp={profileHttp}
+                setProfileHttp={setProfileHttp}
+                UploadData={UploadData}
+              />
+            )}
             {tabSelected === 'permission' && (
               <PermissionTab
                 isEnabled={isEnabled}

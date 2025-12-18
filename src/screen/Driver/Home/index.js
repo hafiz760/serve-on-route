@@ -64,31 +64,29 @@ export default function Home({route}) {
       // alert("Something went wrong while bidding...!");
     }
   };
-
   const [mainModel, setMainModel] = useState(false);
   const [incomingParcelNotifications, setIncomingParcelNotifications] =
     useState([]);
   const ModalNotification = useRef();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const fetchData = async () => {
     try {
       var data = await AsyncStorage.getItem('response');
       var datas = JSON.parse(data);
-      console.log('Fetching parcels for rider_id:', datas._id);
+      console.log('Fetching parcels for rider_id:', datas);
 
       const res = await getParcelsByRider(datas._id, datas.access_token);
       console.log('getParcelsByRider response:', res);
-
-      if (res?.success) {
-        const incompleteData = res.data.docs.filter(
-          item => item.status === 'in_progress',
-        );
-        setData(incompleteData);
-      } else {
-        console.log('Failed to fetch parcels:', res.message);
-      }
+      // if (res?.success) {
+      //   const incompleteData = res.data.docs.filter(
+      //     item => item.status === 'in_progress',
+      //   );
+      //   setData(incompleteData);
+      // } else {
+      //   console.log('Failed to fetch parcels:', res.message);
+      // }
     } catch (err) {
       console.log('error fetching data', err);
     } finally {

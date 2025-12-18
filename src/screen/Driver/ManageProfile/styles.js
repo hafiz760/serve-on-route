@@ -722,4 +722,31 @@ export default {
     color: '#59499E99',
     marginTop: 5,
   },
+  headerAvatarContainer: {
+    marginRight: 15,
+    position: 'relative',
+  },
+  headerAvatarImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: COLOR.LIGHT,
+  },
+  headerPencilContainer: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    backgroundColor: COLOR.LIGHT,
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  headerPencilIcon: {
+    fontSize: 14,
+    color: '#666',
+  },
 };

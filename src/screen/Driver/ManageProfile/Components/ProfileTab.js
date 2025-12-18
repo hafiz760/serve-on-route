@@ -27,9 +27,9 @@ import DocumentPicker from 'react-native-document-picker';
 import AppSpinner from '../../../../component/AppSpinner';
 import {Button} from '../../../../component/Form';
 
-export default function ProfileTab() {
-  const [profile, setProfile] = useState();
-  const [profileHttp, setProfileHttp] = useState('');
+export default function ProfileTab(props) {
+  const {profile, setProfile, profileHttp, setProfileHttp} = props;
+
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -39,8 +39,9 @@ export default function ProfileTab() {
   const [carname, SetCarName] = useState();
   const [carnumber, SetCarNumber] = useState();
   const [nationalCard, setNationalCard] = useState();
-  const [images, setImages] = useState();
   const [imageForShow, setImageForShow] = useState([]);
+
+  const [images, setImages] = useState();
   const [imagesSelfi, setImagesSelfi] = useState();
   const [imageForShowSelfi, setImageForShowSelfi] = useState([]);
   const [license, setLicense] = useState('');
@@ -59,6 +60,74 @@ export default function ProfileTab() {
   const [backIdImage, setBackIdImage] = useState(null);
   const [frontLicenseImage, setFrontLicenseImage] = useState(null);
   const [backLicenseImage, setBackLicenseImage] = useState(null);
+
+  const sanitizeValue = val => {
+    if (!val || typeof val !== 'string') return '';
+    const cleaned = val.trim().toLowerCase();
+    const invalids = ['string', 'undefined', 'null', 'n/a', 'na', 'none'];
+    return invalids.includes(cleaned) ? '' : val;
+  };
+
+  const getData = async () => {
+    try {
+      setLoading(true);
+      const data = await AsyncStorage.getItem('response');
+      const datas = JSON.parse(data);
+
+      const res = await fetchDriverById(datas._id, datas.access_token);
+
+      console.log(res, 'res GetData');
+
+      if (res.success) {
+        const userData = res.data;
+
+        setName(sanitizeValue(userData.first_name));
+        setLastName(sanitizeValue(userData.last_name));
+        SetCarNumber(userData?.vehicle_no || '');
+        setDrivingLiscence(userData.license_id || '');
+        setProfile(sanitizeValue(userData.cover_image));
+        setVehicalNumber(sanitizeValue(userData.vehicle_no));
+        setFrontIdImage(userData?.driving_license?.[0] || null);
+        setBackIdImage(userData?.driving_license?.[1] || null);
+        setFrontLicenseImage(userData?.ID_file?.[0] || null);
+        setBackLicenseImage(userData?.ID_file?.[1] || null);
+        SetCarName(sanitizeValue(userData.car_name));
+        setDisplayDate(sanitizeValue(userData.driving_license_expiry));
+
+        if (userData?.car_picture) {
+          setImageForShow([
+            {
+              uri: userData.car_picture,
+              type: 'image/jpeg',
+              name: 'car_image.jpg',
+            },
+          ]);
+        }
+
+        if (
+          userData?.driving_license_expiry &&
+          sanitizeValue(userData.driving_license_expiry)
+        ) {
+          setIsDateExist(true);
+        }
+
+        setPhoneNumber(sanitizeValue(userData.phone));
+        setProfileHttp(sanitizeValue(userData.avatar));
+        setEmail(sanitizeValue(userData.email));
+        setNationalCard(sanitizeValue(userData.ID));
+      } else {
+        console.log('Failed to fetch driver data:', res.message);
+      }
+    } catch (err) {
+      console.log('Get data account error', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   const removeFrontIdImage = () => setFrontIdImage(null);
   const removeBackIdImage = () => setBackIdImage(null);
@@ -143,21 +212,6 @@ export default function ProfileTab() {
       .catch(e => console.log(e));
   };
 
-  const UploadData = async setPath => {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-      });
-      console.log('res data', res[0]);
-      setPath(res[0]);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-      } else {
-        throw err;
-      }
-    }
-  };
-
   const removeImage = (idToRemove, index) => {
     const updatedImageData = imageForShow.filter(item => item !== idToRemove);
     console.log('0000', updatedImageData);
@@ -169,75 +223,6 @@ export default function ProfileTab() {
     );
     setImageForShowSelfi(updatedImageData);
   };
-
-  const sanitizeValue = val => {
-    if (!val || typeof val !== 'string') return '';
-    const cleaned = val.trim().toLowerCase();
-    const invalids = ['string', 'undefined', 'null', 'n/a', 'na', 'none'];
-    return invalids.includes(cleaned) ? '' : val;
-  };
-
-  const getData = async () => {
-    try {
-      setLoading(true);
-      const data = await AsyncStorage.getItem('response');
-      const datas = JSON.parse(data);
-
-      const res = await fetchDriverById(datas._id, datas.access_token);
-
-      console.log(res, 'res GetData');
-
-      if (res.success) {
-        const userData = res.data;
-
-        setName(sanitizeValue(userData.first_name));
-        setLastName(sanitizeValue(userData.last_name));
-        SetCarNumber(userData?.vehicle_no || '');
-        setDrivingLiscence(userData.license_id || '');
-        setProfile(sanitizeValue(userData.cover_image));
-        setVehicalNumber(sanitizeValue(userData.vehicle_no));
-        setFrontIdImage(userData?.driving_license?.[0] || null);
-        setBackIdImage(userData?.driving_license?.[1] || null);
-        setFrontLicenseImage(userData?.ID_file?.[0] || null);
-        setBackLicenseImage(userData?.ID_file?.[1] || null);
-        SetCarName(sanitizeValue(userData.car_name));
-        setLicense(userData?.driving_license?.[0] || null);
-        setDisplayDate(sanitizeValue(userData.driving_license_expiry));
-
-        if (userData?.car_picture) {
-          setImageForShow([
-            {
-              uri: userData.car_picture,
-              type: 'image/jpeg',
-              name: 'car_image.jpg',
-            },
-          ]);
-        }
-
-        if (
-          userData?.driving_license_expiry &&
-          sanitizeValue(userData.driving_license_expiry)
-        ) {
-          setIsDateExist(true);
-        }
-
-        setPhoneNumber(sanitizeValue(userData.phone));
-        setProfileHttp(sanitizeValue(userData.avatar));
-        setEmail(sanitizeValue(userData.email));
-        setNationalCard(sanitizeValue(userData.ID));
-      } else {
-        console.log('Failed to fetch driver data:', res.message);
-      }
-    } catch (err) {
-      console.log('Get data account error', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   const getPhotoFromCamera = () => {
     ImagePicker.openCamera({
@@ -451,43 +436,11 @@ export default function ProfileTab() {
       <AppSpinner size="large" color={COLOR.PRIMARY} />
     </View>
   ) : (
-    <SafeAreaView style={{width: '100%', height: '79%'}}>
-      <View style={{alignSelf: 'center', alignItems: 'center'}}>
-        <View style={styles.avatarImg}>
-          <Image
-            source={
-              profile?.uri || profileHttp
-                ? {uri: profile?.uri || profileHttp}
-                : require('../../../../assets/images/dummyProfile.jpg')
-            }
-            style={styles.profileImg}
-          />
-          <Button
-            style={styles.iconDetail}
-            onPress={() => {
-              UploadData(setProfile);
-            }}>
-            <Icon
-              name="pencil"
-              type="EvilIcons"
-              style={[{fontSize: 24, color: '#666'}]}
-            />
-          </Button>
-        </View>
-        <Text
-          style={{
-            color: '#59499E',
-            fontFamily: FAMILY.BOLD,
-            fontSize: SIZE.SIZE_18,
-          }}>
-          {name}
-        </Text>
-      </View>
-
+    <SafeAreaView style={{flex: 1}}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{flex: 1}}>
-        <ScrollView>
+        <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <PersonalInfoSection
             name={name}
             setName={setName}

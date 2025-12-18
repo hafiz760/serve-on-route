@@ -115,7 +115,6 @@ export default function PersonalInfoSection({
               />
             </View>
           </View>
-
           <View style={[styles.profileBtnInfo, styles.profileBtnInfoTwo]}>
             <View style={styles.formRow2}>
               <Text style={{fontWeight: '400', fontSize: 14, color: '#59499E'}}>

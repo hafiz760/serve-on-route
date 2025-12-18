@@ -208,12 +208,11 @@ export const linkStripeAccount = async (data, token) => {
 
 export const getParcelsByRider = async (riderId, token) => {
   try {
+    console.log(riderId, 'Rider ID');
     const requestOptions = getRequestOptions('GET', token);
     const queryString = `?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&rider_id=${riderId}`;
 
     const url = `${baseURL}${endPoints.parcel}${queryString}`;
-    console.log('getParcelsByRider URL:', url);
-
     const res = await fetch(url, requestOptions);
 
     const resText = await res.text();
