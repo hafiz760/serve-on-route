@@ -24,7 +24,7 @@ export default {
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.BLUE,
-    marginLeft: 15,
+    textAlign: 'center',
   },
   /** Tab */
   myTripTabItems: {

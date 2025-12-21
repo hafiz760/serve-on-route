@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -8,79 +8,79 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button} from '../../../component/Form';
-import {COLOR} from '../../../theme/typography';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { TextInput, Button } from '../../../component/Form';
+import { COLOR } from '../../../theme/typography';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../../component/Header';
 import Modal from 'react-native-modalbox';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {useSelector} from 'react-redux';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { useSelector } from 'react-redux';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import ImagePicker from 'react-native-image-crop-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import {useIsFocused} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate, navigateReset} from '../../../navigations';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate, navigateReset } from '../../../navigations';
 import DropdownPicker from '../../../component/DropdownPicker';
 import AppSpinner from '../../../component/AppSpinner';
-import {showMessage} from '../../../helper/showAlert';
+import { showMessage } from '../../../helper/showAlert';
 import axios from 'axios';
 
 const SLOT_TIMES = [
-  {label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1},
-  {label: '08:00 - 12:00', value: '08:00 - 12:00', slot: 3},
-  {label: '12:00 - 16:00', value: '12:00 - 16:00', slot: 4},
-  {label: '16:00 - 20:00', value: '16:00 - 20:00', slot: 5},
-  {label: '20:00 - 24:00', value: '20:00 - 24:00', slot: 6},
+  { label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1 },
+  { label: '08:00 - 12:00', value: '08:00 - 12:00', slot: 3 },
+  { label: '12:00 - 16:00', value: '12:00 - 16:00', slot: 4 },
+  { label: '16:00 - 20:00', value: '16:00 - 20:00', slot: 5 },
+  { label: '20:00 - 24:00', value: '20:00 - 24:00', slot: 6 },
 ];
 
 const ITEM_TYPES = [
-  {label: 'Solid', value: 'solid'},
-  {label: 'Metal', value: 'metal'},
-  {label: 'Wood', value: 'wood'},
-  {label: 'Fragile', value: 'fragile'},
-  {label: 'Other Items', value: 'otherItems'},
+  { label: 'Solid', value: 'solid' },
+  { label: 'Metal', value: 'metal' },
+  { label: 'Wood', value: 'wood' },
+  { label: 'Fragile', value: 'fragile' },
+  { label: 'Other Items', value: 'otherItems' },
 ];
 
 const WEIGHT_RANGE = [
-  {title: '0-5'},
-  {title: '5-10'},
-  {title: '10-15'},
-  {title: '15-20'},
-  {title: '20-25'},
-  {title: '25-30'},
-  {title: '35-40'},
-  {title: '40+'},
+  { title: '0-5' },
+  { title: '5-10' },
+  { title: '10-15' },
+  { title: '15-20' },
+  { title: '20-25' },
+  { title: '25-30' },
+  { title: '35-40' },
+  { title: '40+' },
 ];
 
 const DIMENSION_RANGE = [
-  {title: '0-1'},
-  {title: '2-3'},
-  {title: '4-5'},
-  {title: '6-7'},
-  {title: '8-9'},
-  {title: '9-10'},
-  {title: '11-12'},
-  {title: '13+'},
+  { title: '0-1' },
+  { title: '2-3' },
+  { title: '4-5' },
+  { title: '6-7' },
+  { title: '8-9' },
+  { title: '9-10' },
+  { title: '11-12' },
+  { title: '13+' },
 ];
 
-function SelectVehicle({route}) {
+function SelectVehicle({ route }) {
   const isFocused = useIsFocused();
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
   const modalNotificationRef = useRef();
   const [imageForShow, setImageForShow] = useState([]);
   const [date, setDate] = useState('');
   const [formatedDate, setFormatedDate] = useState('');
   const [fare, setFare] = useState('');
-  const [width, setWidth] = useState({title: '0-1'});
-  const [height, setHeight] = useState({title: '0-1'});
-  const [length, setLength] = useState({title: '0-1'});
-  const [weightRange, setWeightRange] = useState({title: '0-5'});
+  const [width, setWidth] = useState({ title: '0-1' });
+  const [height, setHeight] = useState({ title: '0-1' });
+  const [length, setLength] = useState({ title: '0-1' });
+  const [weightRange, setWeightRange] = useState({ title: '0-5' });
   const [itemsType, setItemsType] = useState('solid');
   const [slotTimings, setSlotTimings] = useState('00:00 - 04:00');
   const [selectSlot, setSelectSlot] = useState(1);
@@ -427,6 +427,7 @@ function SelectVehicle({route}) {
     slotTimings,
     imageForShow,
     weightRange,
+    hasPaymentMethod
   ]);
 
   useEffect(() => {
@@ -479,7 +480,7 @@ function SelectVehicle({route}) {
     }
   }, [isFocused]);
 
-  useEffect(() => { 
+  useEffect(() => {
     const checkPaymentMethod = async () => {
       try {
         const data = await AsyncStorage.getItem('response');
@@ -520,83 +521,83 @@ function SelectVehicle({route}) {
 
   const BidModal = useMemo(
     () =>
-      ({value}) =>
-        (
-          <Modal
-            ref={modalNotificationRef}
-            isOpen={true}
-            entry={'top'}
-            swipeToClose={false}
-            style={{
-              height: 180,
-              width: 380,
-              borderRadius: 10,
-              alignItems: 'center',
-            }}
-            backdropPressToClose={false}>
-            <View style={{margin: 10, borderRadius: 10}}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={{width: '20%', marginTop: 20}}>
-                  <Image
-                    source={
-                      value?.bidder?.avatar
-                        ? {uri: value?.bidder?.avatar}
-                        : require('../../../assets/images/driver.jpeg')
-                    }
-                    resizeMode="cover"
-                    style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 25,
-                      margin: 10,
-                    }}
-                  />
-                </View>
-                <View style={{paddingTop: 20, width: '70%'}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      margin: 5,
-                    }}>
-                    <Text style={styles.biddingCardText}>
-                      {value?.bidder?.first_name} {value?.bidder?.last_name}
-                    </Text>
-                    <Text style={styles.biddingCardText}>
-                      Fare: ${value?.bid_amount}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      margin: 5,
-                    }}>
-                    <Text style={styles.biddingCardText}>
-                      Rating: {value?.bidder?.rating}
-                    </Text>
-                  </View>
-                </View>
+      ({ value }) =>
+      (
+        <Modal
+          ref={modalNotificationRef}
+          isOpen={true}
+          entry={'top'}
+          swipeToClose={false}
+          style={{
+            height: 180,
+            width: 380,
+            borderRadius: 10,
+            alignItems: 'center',
+          }}
+          backdropPressToClose={false}>
+          <View style={{ margin: 10, borderRadius: 10 }}>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ width: '20%', marginTop: 20 }}>
+                <Image
+                  source={
+                    value?.bidder?.avatar
+                      ? { uri: value?.bidder?.avatar }
+                      : require('../../../assets/images/driver.jpeg')
+                  }
+                  resizeMode="cover"
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 25,
+                    margin: 10,
+                  }}
+                />
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <Button
-                  style={[styles.bookingDeclineBtn, {width: '40%'}]}
-                  onPress={() => handleRejection(value)}>
-                  <Text style={styles.bookingBtnText}>Decline</Text>
-                </Button>
-                <Button
-                  style={[styles.bookingBtn, {width: '40%'}]}
-                  onPress={() => acceptRide(value)}>
-                  <Text style={styles.bookingBtnText}>Accept</Text>
-                </Button>
+              <View style={{ paddingTop: 20, width: '70%' }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    margin: 5,
+                  }}>
+                  <Text style={styles.biddingCardText}>
+                    {value?.bidder?.first_name} {value?.bidder?.last_name}
+                  </Text>
+                  <Text style={styles.biddingCardText}>
+                    Fare: ${value?.bid_amount}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    margin: 5,
+                  }}>
+                  <Text style={styles.biddingCardText}>
+                    Rating: {value?.bidder?.rating}
+                  </Text>
+                </View>
               </View>
             </View>
-          </Modal>
-        ),
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <Button
+                style={[styles.bookingDeclineBtn, { width: '40%' }]}
+                onPress={() => handleRejection(value)}>
+                <Text style={styles.bookingBtnText}>Decline</Text>
+              </Button>
+              <Button
+                style={[styles.bookingBtn, { width: '40%' }]}
+                onPress={() => acceptRide(value)}>
+                <Text style={styles.bookingBtnText}>Accept</Text>
+              </Button>
+            </View>
+          </View>
+        </Modal>
+      ),
     [handleRejection, acceptRide],
   );
 
@@ -608,12 +609,12 @@ function SelectVehicle({route}) {
         backdropOpacity={0.3}
         swipeToClose={false}>
         {bids.map(val => (
-          <View style={{height: '28%'}} key={val?.bidder?._id}>
+          <View style={{ height: '28%' }} key={val?.bidder?._id}>
             <BidModal value={val} />
           </View>
         ))}
         <Button
-          style={[styles.bookingBtn, {backgroundColor: 'grey', marginTop: 40}]}
+          style={[styles.bookingBtn, { backgroundColor: 'grey', marginTop: 40 }]}
           onPress={() => setMainModel(false)}>
           <Text style={styles.bookingBtnText}>Cancel</Text>
         </Button>
@@ -646,19 +647,19 @@ function SelectVehicle({route}) {
           </Text>
 
           <Button
-            style={[styles.bookingBtn, {marginBottom: 10}]}
+            style={[styles.bookingBtn, { marginBottom: 10 }]}
             onPress={getPhotoFromCamera}>
             <Text style={styles.bookingBtnText}>OPEN CAMERA</Text>
           </Button>
 
           <Button
-            style={[styles.bookingBtn, {marginBottom: 10}]}
+            style={[styles.bookingBtn, { marginBottom: 10 }]}
             onPress={getPhotoFromGallery}>
             <Text style={styles.bookingBtnText}>CHOOSE FROM GALLERY</Text>
           </Button>
 
           <Button
-            style={[styles.bookingBtn, {backgroundColor: '#grey'}]}
+            style={[styles.bookingBtn, { backgroundColor: '#grey' }]}
             onPress={() => setImagePickerModal(false)}>
             <Text style={styles.bookingBtnText}>CANCEL</Text>
           </Button>
@@ -681,7 +682,7 @@ function SelectVehicle({route}) {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <View style={{alignItems: 'center', width: '100%'}}>
+        <View style={{ alignItems: 'center', width: '100%' }}>
           <Icon
             name="credit-card-off"
             type="MaterialCommunityIcons"
@@ -703,7 +704,7 @@ function SelectVehicle({route}) {
           </Text>
 
           <Button
-            style={[styles.bookingBtn, {width: '100%', marginVertical: 0}]}
+            style={[styles.bookingBtn, { width: '100%', marginVertical: 0 }]}
             onPress={() => {
               setNoPaymentMethodModal(false);
               navigateReset('CustomerAllPayments');
@@ -719,7 +720,7 @@ function SelectVehicle({route}) {
       <Content contentContainerStyle={theme.layoutDf}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+          style={{ flex: 1 }}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.selectVehicleContainer}>
               <View style={styles.selectVehicleContent}>
@@ -735,7 +736,7 @@ function SelectVehicle({route}) {
                       <Text style={styles.selectDateText}>
                         {date === '' ? 'Select Date' : date}
                       </Text>
-                      <View style={{marginEnd: 20}}>
+                      <View style={{ marginEnd: 20 }}>
                         <Icon
                           name="calendar-month"
                           type="MaterialCommunityIcons"
@@ -756,14 +757,14 @@ function SelectVehicle({route}) {
                   Please choose a time slot when a driver can pick up the
                   parcel.
                 </Text>
-                <View style={{height: 80, zIndex: 3}}>
+                <View style={{ height: 80, zIndex: 3 }}>
                   <DropDownPicker
                     open={openTimeModel}
                     items={SLOT_TIMES}
                     setOpen={setOpenTimeModel}
                     value={slotTimings}
                     onSelectItem={e => handleSlotSelect(e.value)}
-                    setItems={() => {}}
+                    setItems={() => { }}
                     style={{
                       paddingVertical: 19,
                       marginTop: 10,
@@ -813,33 +814,33 @@ function SelectVehicle({route}) {
                     onSelect={selectedItem => setLength(selectedItem)}
                     title={'Length(ft)'}
                     defaultButtonText={length.title}
-                    customButtonStyle={{width: 100}}
+                    customButtonStyle={{ width: 100 }}
                   />
                   <DropdownPicker
                     data={DIMENSION_RANGE}
                     onSelect={selectedItem => setHeight(selectedItem)}
                     title={'Height(ft)'}
                     defaultButtonText={height.title}
-                    customButtonStyle={{width: 100}}
+                    customButtonStyle={{ width: 100 }}
                   />
                   <DropdownPicker
                     data={DIMENSION_RANGE}
                     onSelect={selectedItem => setWidth(selectedItem)}
                     title={'Width(ft)'}
                     defaultButtonText={width.title}
-                    customButtonStyle={{width: 100}}
+                    customButtonStyle={{ width: 100 }}
                   />
                 </View>
 
                 <Text style={styles.timeTex2t}>Material Type</Text>
-                <View style={{height: 80, zIndex: 2}}>
+                <View style={{ height: 80, zIndex: 2 }}>
                   <DropDownPicker
                     open={openModel}
                     items={ITEM_TYPES}
                     setOpen={setOpenModel}
                     value={itemsType}
                     onSelectItem={e => setItemsType(e.value)}
-                    setItems={() => {}}
+                    setItems={() => { }}
                     style={{
                       paddingVertical: 19,
                       marginTop: 10,
@@ -866,7 +867,7 @@ function SelectVehicle({route}) {
                     <Icon
                       name="upload"
                       type="AntDesign"
-                      style={{marginEnd: 20}}
+                      style={{ marginEnd: 20 }}
                     />
                   </Button>
                 </View>
@@ -884,9 +885,9 @@ function SelectVehicle({route}) {
                       <TouchableOpacity
                         key={index}
                         onPress={() => deleteShowImage(val)}
-                        style={{marginRight: 10, marginBottom: 10}}>
+                        style={{ marginRight: 10, marginBottom: 10 }}>
                         <Image
-                          source={{uri: val?.uri}}
+                          source={{ uri: val?.uri }}
                           style={{
                             width: 75,
                             height: 75,
@@ -906,7 +907,7 @@ function SelectVehicle({route}) {
                           <Icon
                             name="close"
                             type="AntDesign"
-                            style={{fontSize: 14, color: 'white'}}
+                            style={{ fontSize: 14, color: 'white' }}
                           />
                         </View>
                       </TouchableOpacity>
@@ -923,7 +924,7 @@ function SelectVehicle({route}) {
         onPress={handleSubmit}
         disabled={isLoading}>
         {isLoading ? (
-          <View style={{paddingVertical: 5}}>
+          <View style={{ paddingVertical: 5 }}>
             <AppSpinner color={COLOR.PRIMARY} size="large" />
           </View>
         ) : (

@@ -1,7 +1,7 @@
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 
 const React = require('react-native');
-const {Platform} = React;
+const { Platform } = React;
 
 export default {
   bookingHeader: {
@@ -22,6 +22,7 @@ export default {
     fontSize: SIZE.SIZE_12,
     color: COLOR.BLUE,
     marginLeft: 15,
+    textAlign: 'center',
   },
   bookingContainer: {
     marginHorizontal: 20,
@@ -137,12 +138,10 @@ export default {
   },
   mailBtn: {
     flex: 5,
-    alignItems: 'flex-start',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 5,
-    paddingLeft: 15,
   },
   mailInvoiceBtn: {
     flex: 2,

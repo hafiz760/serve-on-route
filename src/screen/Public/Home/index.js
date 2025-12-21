@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,20 +9,20 @@ import {
   Alert,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {DarkStatusBar} from '../../../component/StatusBar';
-import {Button} from '../../../component/Form';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { DarkStatusBar } from '../../../component/StatusBar';
+import { Button } from '../../../component/Form';
 import styles from './styles';
-import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
+import MapView, { Marker, AnimatedRegion } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Geocoder from 'react-native-geocoding';
 import Header from '../../../component/Header';
-import {locationPermission} from '../../../helper/getCurrentLocation';
-import {useDispatch, useSelector} from 'react-redux';
-import {useIsFocused} from '@react-navigation/native';
-import {BASE_URL, GOOGLE_MAPS_KEY, URL_V} from '../../../utilities/helper';
-import {navigate} from '../../../navigations';
+import { locationPermission } from '../../../helper/getCurrentLocation';
+import { useDispatch, useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
+import { BASE_URL, GOOGLE_MAPS_KEY, URL_V } from '../../../utilities/helper';
+import { navigate } from '../../../navigations';
 
 const GOOGLE_MAPS_APIKEY = GOOGLE_MAPS_KEY;
 navigator.geolocation = require('@react-native-community/geolocation');
@@ -44,7 +44,7 @@ export default function Home(params) {
   const user = useSelector(state => state.session.user);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
 
   const mapRef = useRef(null);
   const markerRef = useRef(null);
@@ -169,7 +169,7 @@ export default function Home(params) {
     setIsLoading(true);
     Geolocation.getCurrentPosition(
       async position => {
-        const {latitude, longitude} = position.coords;
+        const { latitude, longitude } = position.coords;
 
         const address = await handleReverseGeocoding(latitude, longitude);
 
@@ -226,7 +226,7 @@ export default function Home(params) {
 
       setPickupCords(newPickupCords);
       pickupRef.current?.setAddressText(newLocationName);
-      mapRef.current?.setNativeProps({scrollEnabled: true});
+      mapRef.current?.setNativeProps({ scrollEnabled: true });
     },
     [handleReverseGeocoding],
   );
@@ -248,7 +248,7 @@ export default function Home(params) {
 
       setDroplocationCords(newDropCords);
       droplocationRef.current?.setAddressText(newLocationName);
-      mapRef.current?.setNativeProps({scrollEnabled: true});
+      mapRef.current?.setNativeProps({ scrollEnabled: true });
     },
     [handleReverseGeocoding],
   );
@@ -259,7 +259,7 @@ export default function Home(params) {
 
     // Set initial addresses if coming from navigation params
     if (params?.route?.params?.mydata) {
-      const {pickupCords: pickup, droplocationCords: drop} =
+      const { pickupCords: pickup, droplocationCords: drop } =
         params.route.params.mydata;
 
       if (pickup?.locationName) {
@@ -270,16 +270,22 @@ export default function Home(params) {
       }
     }
 
+    // ref values ko local vars me copy karo
+    const debounceTimer = debounceTimerRef.current;
+    const watchId = watchIdRef.current;
+
     // Cleanup on unmount
     return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
       }
-      if (watchIdRef.current) {
-        Geolocation.clearWatch(watchIdRef.current);
+      if (watchId) {
+        Geolocation.clearWatch(watchId);
       }
     };
-  }, []);
+    // sirf static dependencies: askForLocationPermission, params
+  }, [askForLocationPermission, params]);
+
 
   // Clear inputs when screen loses focus
   useEffect(() => {
@@ -308,10 +314,10 @@ export default function Home(params) {
                 returnKeyType: 'search',
               }}
               styles={{
-                textInput: {color: 'black'},
-                listView: {color: 'black'},
-                description: {color: 'black'},
-                predefinedPlacesDescription: {color: 'black'},
+                textInput: { color: 'black' },
+                listView: { color: 'black' },
+                description: { color: 'black' },
+                predefinedPlacesDescription: { color: 'black' },
               }}
               currentLocation
               currentLocationLabel="Current location"
@@ -348,17 +354,11 @@ export default function Home(params) {
                 language: 'en',
               }}
               minLength={2}
-              GooglePlacesDetailsQuery={{fields: 'geometry'}}
+              GooglePlacesDetailsQuery={{ fields: 'geometry' }}
               autoFocus={false}
               returnKeyType={'default'}
               fetchDetails={true}
               enablePoweredByContainer={false}
-              renderRightButton={() => {
-                return pickupRef?.current?.getAddressText() &&
-                  pickupCords?.latitude
-                  ? showClearInputButton(handleClearPickupInput)
-                  : null;
-              }}
             />
           </View>
 
@@ -373,10 +373,10 @@ export default function Home(params) {
                 returnKeyType: 'search',
               }}
               styles={{
-                textInput: {color: 'black'},
-                listView: {color: 'black'},
-                description: {color: 'black'},
-                predefinedPlacesDescription: {color: 'black'},
+                textInput: { color: 'black' },
+                listView: { color: 'black' },
+                description: { color: 'black' },
+                predefinedPlacesDescription: { color: 'black' },
               }}
               currentLocation
               currentLocationLabel="Current location"
@@ -404,7 +404,7 @@ export default function Home(params) {
                 language: 'en',
               }}
               minLength={2}
-              GooglePlacesDetailsQuery={{fields: 'geometry'}}
+              GooglePlacesDetailsQuery={{ fields: 'geometry' }}
               autoFocus={false}
               returnKeyType={'default'}
               fetchDetails={true}
@@ -415,18 +415,18 @@ export default function Home(params) {
           <View style={styles.mMap}>
             <MapView
               ref={mapRef}
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               initialRegion={defaultLocation}
               region={
                 Object.values(pickupCords).length > 0
                   ? {
-                      latitudeDelta: LATITUDE_DELTA,
-                      longitudeDelta: LONGITUDE_DELTA,
-                      ...pickupCords,
-                    }
+                    latitudeDelta: LATITUDE_DELTA,
+                    longitudeDelta: LONGITUDE_DELTA,
+                    ...pickupCords,
+                  }
                   : null
               }
-              onRegionChangeComplete={async (coords, {isGesture}) => {
+              onRegionChangeComplete={async (coords, { isGesture }) => {
                 if (isGesture && !pickupCords?.latitude) {
                   setTemporaryPickUpCords(coords);
                   handleRegionChangeComplete(coords);
@@ -441,12 +441,12 @@ export default function Home(params) {
                   draggable
                   tracksViewChanges={false}
                   onDragStart={() => {
-                    mapRef.current?.setNativeProps({scrollEnabled: false});
+                    mapRef.current?.setNativeProps({ scrollEnabled: false });
                   }}
                   onDragEnd={handlePickupMarkerDragEnd}>
                   <Image
                     source={require('../../../assets/images/Oval2x.png')}
-                    style={{width: 44, height: 44}}
+                    style={{ width: 44, height: 44 }}
                     resizeMode="contain"
                   />
                 </Marker>
@@ -457,12 +457,12 @@ export default function Home(params) {
                   draggable
                   tracksViewChanges={false}
                   onDragStart={() => {
-                    mapRef.current?.setNativeProps({scrollEnabled: false});
+                    mapRef.current?.setNativeProps({ scrollEnabled: false });
                   }}
                   onDragEnd={handleDropMarkerDragEnd}>
                   <Image
                     source={require('../../../assets/images/greenMarker2x.png')}
-                    style={{width: 30, height: 30}}
+                    style={{ width: 30, height: 30 }}
                     resizeMode="contain"
                   />
                 </Marker>
@@ -502,7 +502,7 @@ export default function Home(params) {
                   padding: 12,
                   elevation: 5,
                   shadowColor: '#000',
-                  shadowOffset: {width: 0, height: 2},
+                  shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.25,
                   shadowRadius: 3.84,
                   alignItems: 'center',
@@ -511,7 +511,7 @@ export default function Home(params) {
               }
               onPress={handleGetCurrentLocation}
               disabled={isLoading}>
-              <Text style={{fontSize: 22}}>{isLoading ? '⏳' : '📍'}</Text>
+              <Text style={{ fontSize: 22 }}>{isLoading ? '⏳' : '📍'}</Text>
             </TouchableOpacity>
 
             {/* Center Marker when no pickup selected */}
