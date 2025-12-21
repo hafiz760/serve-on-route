@@ -23,7 +23,6 @@ import {
 } from '../../../../services/apicalls/driver';
 import {showMessage} from '../../../../helper/showAlert';
 import ImagePicker from 'react-native-image-crop-picker';
-import DocumentPicker from 'react-native-document-picker';
 import AppSpinner from '../../../../component/AppSpinner';
 import {Button} from '../../../../component/Form';
 

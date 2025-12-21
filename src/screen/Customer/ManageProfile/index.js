@@ -14,15 +14,14 @@ import styles from './styles';
 import theme from '../../../theme/styles';
 import axios from 'axios';
 import Header from '../../../component/Header';
-import Support from '../../../component/Support';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DocumentPicker from 'react-native-document-picker';
 
 import {DarkStatusBar} from '../../../component/StatusBar';
 import {showMessage} from '../../../helper/showAlert';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate, navigateReset} from '../../../navigations';
+import {navigate} from '../../../navigations';
 import {
   getUserCurrentPosition,
   locationPermission,
@@ -35,23 +34,18 @@ export default function ManageProfile() {
   const [information, setInformation] = useState({});
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [gender, setGender] = useState();
   const [values, setValues] = useState();
   const [valuesHttp, setValuesHttp] = useState();
-  const [isOpen, setIsOpen] = useState(false);
-  const [CardInput, setCardInput] = useState({});
   const [tabSelected, setTabSelected] = useState('profile');
-  const [itemsType, setItemsType] = useState('Male');
+  const [genderType, setGenderType] = useState('Male');
   const [openModel, setOpenModel] = useState(false);
   const [items, setItems] = useState([
     {label: 'Male', value: 'Male'},
     {label: 'Female', value: 'Female'},
   ]);
   const [loading, setLoading] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [location, setLocation] = useState(null);
   useEffect(() => {
-    fetchData();
+    getProfileData();
     console.log('Test');
   }, []);
 
@@ -88,7 +82,7 @@ export default function ManageProfile() {
       showMessage('error', 'Last name is required');
       return;
     }
-    if (!itemsType) {
+    if (!genderType) {
       showMessage('error', 'Please select gender');
       return;
     }
@@ -101,7 +95,7 @@ export default function ManageProfile() {
       formData.append('first_name', firstName);
       formData.append('last_name', lastName);
       formData.append('avatar_file', values);
-      formData.append('gender', itemsType);
+      formData.append('gender', genderType);
       formData.append('cover_image', values);
 
       const requestOptions = {
@@ -112,13 +106,12 @@ export default function ManageProfile() {
         },
         body: formData,
       };
-
       const res = await fetch(
         `${BASE_URL}${URL_V}users/update-user`,
         requestOptions,
       );
       const result = await res.json();
-      fetchData();
+      getProfileData();
       showMessage('success', 'Profile updated successfully');
     } catch (err) {
       console.log('ERROR', err);
@@ -126,7 +119,7 @@ export default function ManageProfile() {
     }
   };
 
-  const fetchData = async () => {
+  const getProfileData = async () => {
     try {
       setLoading(true);
       const data = await AsyncStorage.getItem('response');
@@ -141,12 +134,10 @@ export default function ManageProfile() {
         },
       );
 
-      console.log('API RESPONSE:', res.data);
-
       setInformation(res.data.data);
       setFirstName(res.data.data.first_name);
       setLastName(res.data.data.last_name);
-      setGender(res.data.data.gender);
+      setGenderType(res.data.data.gender);
       setValuesHttp(res.data.data.avatar);
     } catch (err) {
       console.log('Error:', err.response?.data || err);
@@ -194,22 +185,6 @@ export default function ManageProfile() {
   //     },
   //   });
 
-  async function onSubmit() {
-    if (CardInput.valid == false || typeof CardInput.valid === 'undefined') {
-      alert('Invalid Credit Card');
-      return false;
-    } else {
-      await Support.showSuccess({
-        title: 'Success!',
-        message: 'Transaction success',
-        onHide: () => {
-          navigateReset('');
-        },
-        hideDelay: 2500,
-      });
-    }
-  }
-
   const UploadData = async setPath => {
     try {
       const res = await DocumentPicker.pick({
@@ -228,7 +203,9 @@ export default function ManageProfile() {
     return (
       <View style={styles.profileContainer}>
         {loading ? (
-          <AppSpinner color={COLOR.PRIMARY} size="large" />
+          <View style={styles.loaderContainerStyles}>
+            <AppSpinner size="large" color={COLOR.PRIMARY} />
+          </View>
         ) : (
           <View style={styles.profileContent}>
             <KeyboardAvoidingView
@@ -238,12 +215,13 @@ export default function ManageProfile() {
                 <View style={styles.profileImgInfo}>
                   <View style={styles.profileBgImg}>
                     <Image
-                      source={{
-                        uri:
-                          values?.uri ||
-                          valuesHttp ||
-                          'https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg',
-                      }}
+                      source={
+                        values?.uri
+                          ? {uri: values.uri}
+                          : valuesHttp
+                          ? {uri: valuesHttp}
+                          : require('../../../assets/images/dummyProfile.jpg')
+                      }
                       style={styles.profileImg}
                     />
                     <Button
@@ -292,8 +270,8 @@ export default function ManageProfile() {
                     open={openModel}
                     items={items}
                     setOpen={setOpenModel}
-                    value={itemsType}
-                    onSelectItem={e => setItemsType(e.value)}
+                    value={genderType}
+                    onSelectItem={e => setGenderType(e.value)}
                     setItems={setItems}
                     style={styles.dropDown}
                   />
@@ -356,90 +334,14 @@ export default function ManageProfile() {
       </View>
     );
   }
-  // function renderInsurance() {
-  //   return (
-  //     <Container>
-  //       <KeyboardAvoidingView
-  //         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-  //         style={{flex: 1}}>
-  //         <ScrollView showsVerticalScrollIndicator={false}>
-  //           <View style={styles.tabInfo}>
-  //             <Button
-  //               style={
-  //                 PaymentTabSelected === 'card'
-  //                   ? styles.tabActive1
-  //                   : styles.tabInactive
-  //               }
-  //               onPress={() => setPaymentTabSelected('card')}>
-  //               <Image
-  //                 source={require('../../../assets/images/payment-card.png')}
-  //                 style={
-  //                   PaymentTabSelected === 'card'
-  //                     ? styles.tabImgActive
-  //                     : styles.tabImgInactive
-  //                 }
-  //                 resizeMode="contain"
-  //               />
-  //             </Button>
-  //             <Button
-  //               style={
-  //                 PaymentTabSelected === 'paypal'
-  //                   ? styles.tabActive1
-  //                   : styles.tabInactive
-  //               }
-  //               onPress={() => setPaymentTabSelected('paypal')}>
-  //               <Image
-  //                 source={require('../../../assets/images/download.png')}
-  //                 style={
-  //                   PaymentTabSelected === 'paypal'
-  //                     ? styles.tabImgActive
-  //                     : styles.tabImgInactive
-  //                 }
-  //                 resizeMode="contain"
-  //               />
-  //             </Button>
-  //           </View>
-  //           {/* <View style={styles.paymentContainer}>
-  //             {PaymentTabSelected === 'card'
-  //               ? renderCard()
-  //               : PaymentTabSelected === 'paypal'
-  //               ? renderPayPal()
-  //               : null}
-  //           </View> */}
-  //         </ScrollView>
-  //       </KeyboardAvoidingView>
-  //       <View style={styles.payPalInfo}>
-  //         {/* <Image
-  //        style={styles.cardImg}
-  //        source={require("@asset/images/downloadicon.png")}
-  //      /> */}
-
-  //         <CreditCardInput
-  //           inputContainerStyle={styles.inputContainerStyle}
-  //           inputStyle={styles.inputStyle}
-  //           labelStyle={styles.labelStyle}
-  //           validColor="#fff"
-  //           placeholderColor="#ccc"
-  //           onChange={data => {
-  //             setCardInput(data);
-  //           }}
-  //         />
-  //       </View>
-  //       <Button style={styles.payBtn} onPress={onSubmit}>
-  //         <Text style={styles.payBtnText}>MAKE A PAYMENT</Text>
-  //       </Button>
-  //     </Container>
-  //   );
-  // }
 
   return (
     <Container>
       <DarkStatusBar />
-      <Header default leftType="back" title={''} />
+      <Header default leftType="back" title={'PROFILE'} />
       <Content contentContainerStyle={theme.layout}>
         <View>
           <View style={styles.profileHeader}>
-            <Text style={styles.profileHeaderTitle}>PROFILE</Text>
             <Text style={styles.profileHeaderText}>MANAGE YOUR PROFILE</Text>
             <View style={styles.tabInfo}>
               <Button
@@ -474,22 +376,6 @@ export default function ManageProfile() {
                   PERMISSION
                 </Text>
               </Button>
-              {/* <Button
-                style={
-                  tabSelected === 'insurance'
-                    ? styles.tabActive
-                    : styles.tabInactive
-                }
-                onPress={() => setTabSelected('insurance')}>
-                <Text
-                  style={
-                    tabSelected === 'insurance'
-                      ? styles.tabTextActive
-                      : styles.tabTextInactive
-                  }>
-                  PAYMENT
-                </Text>
-              </Button> */}
             </View>
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
@@ -497,9 +383,7 @@ export default function ManageProfile() {
               ? renderProfile()
               : tabSelected === 'permission'
               ? renderPermission()
-              : // : tabSelected === 'insurance'
-                // ? renderInsurance()
-                null}
+              : null}
           </ScrollView>
         </View>
       </Content>

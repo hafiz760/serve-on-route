@@ -44,7 +44,6 @@ export default {
   profileHeader: {
     backgroundColor: COLOR.PRIMARY,
     paddingHorizontal: 20,
-    paddingVertical: 20,
   },
   profileHeaderTitle: {
     fontFamily: FAMILY.BOLD,
@@ -56,12 +55,18 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.BLUE,
-    marginBottom: 10,
+    textAlign: 'center',
   },
   /* --Profile-- */
   profileContainer: {
     paddingVertical: 30,
     paddingHorizontal: 20,
+  },
+  loaderContainerStyles: {
+    width: '100%',
+    height: 500,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileContent: {
     backgroundColor: COLOR.LIGHT,

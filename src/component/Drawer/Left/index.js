@@ -10,9 +10,6 @@ import theme from '../../../theme/styles';
 import {removeSocketConnection} from '../../../store/reducers/socketReducer';
 import {logout} from '../../../store/reducers/session';
 
-const BASE_URL = 'https://api.serveonroute.com'; // Replace with your actual BASE_URL
-const URL_V = '/v1/';
-
 function MenuLeft() {
   const dispatch = useDispatch();
   const user = useSelector(state => state.session.user);
@@ -64,12 +61,12 @@ function MenuLeft() {
         key={menu.name}
         style={styles.item}
         underlayColor="transparent"
-        onPress={async () => {
+        onPress={() => {
           closeDrawer();
           if (menu.route === 'PublicIntro') {
-            await handleLogout();
+            handleLogout();
           } else if (menu.route === 'UserLogout') {
-            await handleLogout();
+            handleLogout();
           } else {
             navigate(menu.route, menu.params || {});
           }
@@ -87,9 +84,6 @@ function MenuLeft() {
       </TouchableOpacity>
     ));
   };
-
-  const img =
-    'https://mettlesoletest.s3.us-west-2.amazonaws.com/1706219450911-download%20%281%29.jpg';
 
   return (
     <View style={styles.drawer}>

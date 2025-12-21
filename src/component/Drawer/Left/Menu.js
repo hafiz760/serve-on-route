@@ -1,5 +1,3 @@
-// import Avatar from "../../../../assetss/images/avatar.png"
-
 export const Data1 = [
   // {
   //   name: 'Home',
