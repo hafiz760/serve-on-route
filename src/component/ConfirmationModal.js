@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
-import {COLOR, FAMILY, SIZE} from '../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../theme/typography';
+import AppSpinner from './AppSpinner';
 
 const ConfirmationModal = ({
   isVisible,
@@ -10,6 +11,7 @@ const ConfirmationModal = ({
   title,
   message,
   onModalHide,
+  isLoading
 }) => {
   return (
     <Modal
@@ -37,7 +39,11 @@ const ConfirmationModal = ({
           <TouchableOpacity
             onPress={onConfirm}
             style={[styles.button, styles.confirmButton]}>
-            <Text style={styles.confirmText}>Yes</Text>
+            {isLoading ? (
+              <AppSpinner color={COLOR.LIGHT} size="small" />
+            ) : (
+              <Text style={styles.confirmText}>Yes</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>

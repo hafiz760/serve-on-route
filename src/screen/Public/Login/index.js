@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -6,29 +6,29 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button} from '../../../component/Form';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { TextInput, Button } from '../../../component/Form';
 import styles from './styles';
 import AppSpinner from '../../../component/AppSpinner';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import {useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   login,
   updateUser,
   verfied,
   updateToken,
 } from '../../../store/reducers/session';
-import {initilizeSocket} from '../../../store/reducers/socketReducer';
-import {getFCMToken} from '../../../helper/pushnotification_helper';
-import {showMessage} from '../../../helper/showAlert';
-import {logIn} from '../../../services/apicalls/auth';
-import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate, navigateReset} from '../../../navigations';
+import { initilizeSocket } from '../../../store/reducers/socketReducer';
+import { getFCMToken } from '../../../helper/pushnotification_helper';
+import { showMessage } from '../../../helper/showAlert';
+import { logIn } from '../../../services/apicalls/auth';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate, navigateReset } from '../../../navigations';
 var qs = require('qs');
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -86,6 +86,7 @@ export default function SignUp() {
         .then(response => {
           console.log('CURRET LOGIN===>', response.data.status);
           if (response.data.status === 200) {
+            console.log('tokenAccess', response.data);
             if (
               tabSelected === 'Driver' &&
               response?.data.roles[0] != 'user' &&
@@ -94,10 +95,10 @@ export default function SignUp() {
               temp = 2;
               dispatch(updateToken(response.data.access_token));
               getInformation(response?.data);
-              dispatch(login({role: 'rider'})); 
+              dispatch(login({ role: 'rider' }));
               dispatch(updateUser(response.data));
               dispatch(initilizeSocket(response.data.access_token));
-              method(response, 'Driver'); 
+              method(response, 'Driver');
               showMessage("success", "Login Succefully");
             }
             if (
@@ -108,10 +109,10 @@ export default function SignUp() {
               dispatch(updateToken(response.data.access_token));
               getInformation(response?.data);
               dispatch(initilizeSocket(response.data.access_token));
-              dispatch(login({role: 'user'})); 
+              dispatch(login({ role: 'user' }));
               dispatch(updateUser(response.data));
               temp = 2;
-              method(response, 'User'); 
+              method(response, 'User');
               showMessage("success", "Login Succefully");
             }
             if (temp != 2) {
@@ -190,7 +191,7 @@ export default function SignUp() {
       <View style={styles.signUpBgContainer}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+          style={{ flex: 1 }}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <Content contentContainerStyle={theme.layoutDf}>
               <View style={styles.signUpForm}>
@@ -253,7 +254,7 @@ export default function SignUp() {
                     ref={phoneInput}
                     defaultValue={value}
                     defaultCode="PK"
-                    textInputStyle={{padding: 2}}
+                    textInputStyle={{ padding: 2 }}
                     containerStyle={{
                       width: '100%',
                       // height: 60,
@@ -284,7 +285,7 @@ export default function SignUp() {
                       style={[
                         theme.SIZE_18,
                         theme.PRIMARY,
-                        {right: '-88%', bottom: '50%'},
+                        { right: '-88%', bottom: '50%' },
                       ]}
                       onPress={() => {
                         setValid(val => !val);
@@ -292,7 +293,7 @@ export default function SignUp() {
                     />
                   </View>
 
-                  <View style={{marginBottom: 15, alignItems: 'center'}}>
+                  <View style={{ marginBottom: 15, alignItems: 'center' }}>
                     <Text
                       onPress={() => {
                         navigate('PublicForgotPassword');

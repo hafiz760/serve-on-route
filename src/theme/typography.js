@@ -20,8 +20,8 @@ export const COLOR = {
   SMOKELIGHT: 'rgba(0, 0, 0, 0.05)',
   DARK: 'rgba(42, 33, 77, 1)',
 
-  
-  DARKBLUE: 'rgba(89, 73, 158, 0.5)',
+
+  DARKBLUE: 'rgba(89, 73, 158, 0.8)',
   LIGHTVIOLET: 'rgba(42, 33, 77, 0.07)',
   DARKVIOLET: 'rgba(89, 73, 158, 0.8)',
   GREEN: 'rgba(92, 186, 71, 1)',

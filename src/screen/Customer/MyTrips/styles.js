@@ -271,7 +271,6 @@ export default {
   accordionTitle: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
-    color: COLOR.DARKBLUE,
   },
   accOrderInfo: {
     borderColor: COLOR.LIGHT,

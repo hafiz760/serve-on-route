@@ -1,16 +1,16 @@
 import React from 'react';
-import {View, ScrollView} from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {Button} from '../../../component/Form';
+import { View, ScrollView } from 'react-native';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { Button } from '../../../component/Form';
 import Notifications from './Notifications';
 
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import AppSpinner from '../../../component/AppSpinner';
-import {COLOR} from '../../../theme/typography';
-import {navigate} from '../../../navigations';
+import { COLOR } from '../../../theme/typography';
+import { navigate } from '../../../navigations';
 
 export default class extends React.Component {
   state = {
@@ -18,7 +18,7 @@ export default class extends React.Component {
   };
 
   showLoading = val => {
-    this.setState({loading: val});
+    this.setState({ loading: val });
   };
 
   render() {
@@ -42,7 +42,7 @@ export default class extends React.Component {
           </View>
         )}
         <Content
-          style={[theme.layout, this.state.loading ? {display: 'none'} : {}]}>
+          style={[theme.layout, this.state.loading ? { display: 'none' } : {}]}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.notificationContainer}>
               <View style={styles.notificationHeaderView}>

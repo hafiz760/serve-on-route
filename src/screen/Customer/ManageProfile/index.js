@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -8,8 +8,8 @@ import {
   Platform,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {Container, Content, Icon} from '../../../component/Basic';
-import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
+import { Container, Content, Icon } from '../../../component/Basic';
+import { TextInput, Button, ToggleSwitch } from '../../../component/Form';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import axios from 'axios';
@@ -17,20 +17,24 @@ import Header from '../../../component/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DocumentPicker from 'react-native-document-picker';
 
-import {DarkStatusBar} from '../../../component/StatusBar';
-import {showMessage} from '../../../helper/showAlert';
-import {useDispatch} from 'react-redux';
-import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate} from '../../../navigations';
+import { DarkStatusBar } from '../../../component/StatusBar';
+import { showMessage } from '../../../helper/showAlert';
+import { useDispatch } from 'react-redux';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate } from '../../../navigations';
 import {
   getUserCurrentPosition,
   locationPermission,
 } from '../../../helper/getCurrentLocation';
 import AppSpinner from '../../../component/AppSpinner';
-import {COLOR} from '../../../theme/typography';
+import { COLOR } from '../../../theme/typography';
 
 export default function ManageProfile() {
   const dispatch = useDispatch();
+  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [isMessageEnabled, setIsMessageEnabled] = useState(false);
+  const [isMediaEnabled, setIsMediaEnabled] = useState(false);
   const [information, setInformation] = useState({});
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -40,8 +44,8 @@ export default function ManageProfile() {
   const [genderType, setGenderType] = useState('Male');
   const [openModel, setOpenModel] = useState(false);
   const [items, setItems] = useState([
-    {label: 'Male', value: 'Male'},
-    {label: 'Female', value: 'Female'},
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
   ]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -49,29 +53,6 @@ export default function ManageProfile() {
     console.log('Test');
   }, []);
 
-  // const handleToggle = async () => {
-  //   if (!isEnabled) {
-  //     try {
-  //       setLoading(true);
-
-  //       const permission = await locationPermission();
-
-  //       if (permission === 'granted') {
-  //         const coords = await getUserCurrentPosition();
-  //         setLocation(coords);
-  //         setIsEnabled(true);
-  //       }
-  //     } catch (error) {
-  //       console.log('LOCATION ERROR:', error);
-  //       setIsEnabled(false);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   } else {
-  //     setIsEnabled(false);
-  //     setLocation(null);
-  //   }
-  // };
 
   const postData = async () => {
     if (!firstName?.trim()) {
@@ -210,17 +191,17 @@ export default function ManageProfile() {
           <View style={styles.profileContent}>
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              style={{flex: 1}}>
+              style={{ flex: 1 }}>
               <ScrollView>
                 <View style={styles.profileImgInfo}>
                   <View style={styles.profileBgImg}>
                     <Image
                       source={
                         values?.uri
-                          ? {uri: values.uri}
+                          ? { uri: values.uri }
                           : valuesHttp
-                          ? {uri: valuesHttp}
-                          : require('../../../assets/images/dummyProfile.jpg')
+                            ? { uri: valuesHttp }
+                            : require('../../../assets/images/dummyProfile.jpg')
                       }
                       style={styles.profileImg}
                     />
@@ -306,34 +287,44 @@ export default function ManageProfile() {
             <Text style={styles.permissionText}>LOCATION</Text>
             <View style={styles.switchInfo}>
               <Text style={styles.switchText}>Access your location</Text>
-              <ToggleSwitch />
+              <ToggleSwitch
+                value={isLocationEnabled}
+                setValue={setIsLocationEnabled}
+              />
             </View>
           </View>
+
           <View style={styles.profileInputDetail}>
             <Text style={styles.permissionText}>MESSAGE</Text>
             <View style={styles.switchInfo}>
               <Text style={styles.switchText}>Access your message</Text>
-              <ToggleSwitch />
+              <ToggleSwitch
+                value={isMessageEnabled}
+                setValue={setIsMessageEnabled}
+              />
             </View>
           </View>
+
           <View style={styles.profileInputDetail}>
             <Text style={styles.permissionText}>MEDIA & STORAGE</Text>
             <View style={styles.switchInfo}>
               <Text style={styles.switchText}>Access your Media & Storage</Text>
-              <ToggleSwitch />
+              <ToggleSwitch
+                value={isMediaEnabled}
+                setValue={setIsMediaEnabled}
+              />
             </View>
           </View>
-          <Button
-            style={styles.saveBtn}
-            onPress={() => {
-              navigate('CustomerSelectVehicle');
-            }}>
+
+          {/* <Button
+            style={styles.saveBtn}>
             <Text style={styles.saveBtnText}>SAVE</Text>
-          </Button>
+          </Button> */}
         </View>
       </View>
     );
   }
+
 
   return (
     <Container>
@@ -382,8 +373,8 @@ export default function ManageProfile() {
             {tabSelected === 'profile'
               ? renderProfile()
               : tabSelected === 'permission'
-              ? renderPermission()
-              : null}
+                ? renderPermission()
+                : null}
           </ScrollView>
         </View>
       </Content>

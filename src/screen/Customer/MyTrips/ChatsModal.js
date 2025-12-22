@@ -65,7 +65,7 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
           },
         }
       );
-        console.log(response);
+      console.log(response);
       return response;
     } catch (err) {
       console.log("ERROR FETCHING CHATS OF CONVERSATION ID", err.response.data);
@@ -76,7 +76,7 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
     console.log("sendMessage called");
     const selectedMemberId =
       currentLoggedInUserDetails._id.toString() ===
-      selectedParcel.customer_id?._id.toString()
+        selectedParcel.customer_id?._id.toString()
         ? selectedParcel.rider_id
         : selectedParcel.customer_id?._id;
     console.log("selectedMemberId", selectedMemberId);
@@ -160,12 +160,12 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
   useEffect(() => {
     intializeChatFunctionality();
 
-    socket? (socket.on("receive_message", (incomingMsg) => {
+    socket ? (socket.on("receive_message", (incomingMsg) => {
       console.log("NEW MESS for customer", incomingMsg);
       setMessages((prevMessages) => [...prevMessages, incomingMsg]);
-    })) :(console.log('There some issue in socket value'))
+    })) : (console.log('There some issue in socket value'))
   }, []);
-  
+
   // intializeChatFunctionality, socket
 
   // useEffect(() => {
@@ -192,98 +192,100 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
       onClosed={() => setSelectedParcel(null)}
       style={styles.modalRating}
     >
-      <View style={styles.modalRatingContainer}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
-        <Button
-          onPress={() => setSelectedParcel(null)}
-          style={styles.closeSortDesc}
-        >
-          <Icon
-            name="close"
-            type="MaterialIcons"
-            style={[theme.SIZE_20, theme.DARKVIOLET]}
-          />
-        </Button>
-        <View style={{ height: 300, width: "100%" }}>
-          {messages && messages.length > 0 ? (
-            <FlatList
-              data={messages}
-              keyExtractor={(message) => message._id.toString()}
-              renderItem={({ item, index, seperators }) => {
-                if (
-                  item?.sender?.toString() ===
-                  currentLoggedInUserDetails?._id?.toString()
-                ) {
-                  return (
-                    <View style={styles.wrapimg}>
-                      <View style={styles.reciverPic}>
-                        <Image
-                          source={{
-                            uri: "https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg",
-                          }}
-                          style={styles.profileImg}
-                        />
-                      </View>
-                      <View style={styles.reciver}>
-                        <Text style={styles.chatText}>{item.message}</Text>
-                      </View>
-                    </View>
-                  );
-                } else {
-                  return (
-                    <View style={styles.wrapimg}>
-                      <View style={styles.sender}>
-                        <Text style={styles.chatText}>{item.message}</Text>
-                      </View>
-                      <View style={styles.senderPic}>
-                        <Image
-                          source={{
-                            uri: "https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg",
-                          }}
-                          style={styles.profileImg}
-                        />
-                      </View>
-                    </View>
-                  );
-                }
-              }}
-              ref={listRef}
-              onLayout={() => listRef?.current.scrollToEnd({ animated: true })}
-              onContentSizeChange={() => {
-                if (messages.length) {
-                  listRef?.current?.scrollToEnd({ animated: true });
-                }
-              }}
-            />
-          ) : (
-            <Text>No Messages Found</Text>
-          )}
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <TextInput
-            placeholder="Type Here"
-            placeholderTextColor="rgba(0,0,0,0.7)"
-            style={styles.formInput3}
-            defaultValue={text}
-            onChangeText={(e) => setText(e)}
-          />
-          <TouchableOpacity onPress={sendMessage}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+
+        <View style={styles.modalRatingContainer}>
+          <Button
+            onPress={() => setSelectedParcel(null)}
+            style={styles.closeSortDesc}
+          >
             <Icon
-              name="send"
-              type="FontAwesome"
-              style={[theme.SIZE_30, theme.DARKVIOLET]}
+              name="close"
+              type="MaterialIcons"
+              style={[theme.SIZE_20, theme.DARKVIOLET]}
             />
-          </TouchableOpacity>
+          </Button>
+          <View style={{ height: 300, width: "100%" }}>
+            {messages && messages.length > 0 ? (
+              <FlatList
+                data={messages}
+                keyExtractor={(message) => message._id.toString()}
+                renderItem={({ item, index, seperators }) => {
+                  if (
+                    item?.sender?.toString() ===
+                    currentLoggedInUserDetails?._id?.toString()
+                  ) {
+                    return (
+                      <View style={styles.wrapimg}>
+                        <View style={styles.reciverPic}>
+                          <Image
+                            source={{
+                              uri: "https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg",
+                            }}
+                            style={styles.profileImg}
+                          />
+                        </View>
+                        <View style={styles.reciver}>
+                          <Text style={styles.chatText}>{item.message}</Text>
+                        </View>
+                      </View>
+                    );
+                  } else {
+                    return (
+                      <View style={styles.wrapimg}>
+                        <View style={styles.sender}>
+                          <Text style={styles.chatText}>{item.message}</Text>
+                        </View>
+                        <View style={styles.senderPic}>
+                          <Image
+                            source={{
+                              uri: "https://cdn.pixabay.com/photo/2016/01/10/22/07/beauty-1132617__340.jpg",
+                            }}
+                            style={styles.profileImg}
+                          />
+                        </View>
+                      </View>
+                    );
+                  }
+                }}
+                ref={listRef}
+                onLayout={() => listRef?.current.scrollToEnd({ animated: true })}
+                onContentSizeChange={() => {
+                  if (messages.length) {
+                    listRef?.current?.scrollToEnd({ animated: true });
+                  }
+                }}
+              />
+            ) : (
+              <Text>No Messages Found</Text>
+            )}
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <TextInput
+              placeholder="Type Here"
+              placeholderTextColor="rgba(0,0,0,0.7)"
+              style={styles.formInput3}
+              defaultValue={text}
+              onChangeText={(e) => setText(e)}
+            />
+            <TouchableOpacity onPress={sendMessage}>
+              <Icon
+                name="send"
+                type="FontAwesome"
+                style={[theme.SIZE_30, theme.DARKVIOLET]}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+      </KeyboardAvoidingView>
+
+    </Modal >
   );
 };
 

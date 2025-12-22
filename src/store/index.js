@@ -62,7 +62,9 @@ const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         // Ignore these redux-persist action types
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, 'socketState/initilizeSocket', 'socketState/removeSocketConnection'],
+        // Ignore socket instance in state
+        ignoredPaths: ['socket.socket'],
       },
     }),
 });

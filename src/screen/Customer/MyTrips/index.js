@@ -22,7 +22,6 @@ export default function MyTrip() {
   const [tabSelected, setTabSelected] = useState('all');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const fetchData = async () => {
     try {
       var userData = await AsyncStorage.getItem('response');
@@ -87,16 +86,45 @@ export default function MyTrip() {
   };
 
 
+  function cleanLocation(loc) {
+    if (!loc) return '';
+    try {
+      const parsed = JSON.parse(loc); // "\"Hafeez Center\"" -> Hafeez Center
+      return String(parsed);
+    } catch {
+      return String(loc);
+    }
+  }
+
+  function truncate(str, len = 22) {
+    if (!str) return '';
+    return str.length > len ? `${str.substr(0, len)}...` : str;
+  }
+
   function renderAll() {
     return (
       <View>
         <View style={styles.accordionLayout}>
           {data && data.length > 0 ? (
             data.reverse().map((val, index) => {
-              // console.log("val>>>",JSON.stringify(val,null,2));
+              const cost = val?.pay_amount
+                ? `${val?.pay_amount} USD`
+                : `${val?.fare} USD`;
+              const pickupLoc = truncate(cleanLocation(val?.from_location));
+              const dropLoc = truncate(cleanLocation(val?.to_location));
+              const shortId = (val?._id || '').substr(0, 8);
+              const tripTime = val?.time
+                ? moment(val.time).format('YYYY-MM-DD HH:mm')
+                : '';
+
+              const title = `#${shortId} • ${val?.status?.toUpperCase()} • ${cost}
+📍 ${pickupLoc}
+🏁 ${dropLoc}
+⏰ ${tripTime}`;
+
               return (
                 <Accordion
-                  title={`TRIPS ID: ${(val?._id).substr(0, 15)}`}
+                  title={title}
                   trip={val}
                   key={index}
                   renderContent={() => (
@@ -120,26 +148,34 @@ export default function MyTrip() {
 
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-
-                        <Text style={styles.bookingText}>{`${(val?.from_location).length > 30
-                          ? val?.from_location.substr(0, 30)
-                          : val?.from_location
-                          }`}</Text>
+                        <Text style={styles.bookingText}>
+                          {`${(val?.from_location).length > 30
+                            ? val?.from_location.substr(0, 30)
+                            : val?.from_location
+                            }`}
+                        </Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>DROP AT</Text>
-                        <Text style={styles.bookingText}>{`${(val?.to_location).length > 30
-                          ? val?.to_location.substr(0, 30)
-                          : val?.to_location
-                          }`}</Text>
-                      </View>
-
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>DRIVER NAME</Text>
                         <Text style={styles.bookingText}>
-                          {`${val?.rider_id?.first_name}`}
+                          {`${(val?.to_location).length > 30
+                            ? val?.to_location.substr(0, 30)
+                            : val?.to_location
+                            }`}
                         </Text>
                       </View>
+
+                      {
+                        val?.rider_id?.first_name && (
+                          <View style={styles.bookingInfo}>
+                            <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                            <Text style={styles.bookingText}>
+                              {`${val?.rider_id?.first_name}`}
+                            </Text>
+                          </View>
+                        )
+                      }
+
 
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>OTP </Text>
@@ -180,7 +216,6 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                ,
                                 { backgroundColor: COLOR.BLUE },
                               ]}
                               onPress={() => {
@@ -242,9 +277,24 @@ export default function MyTrip() {
             data.filter(d => d.status === 'in_progress')?.length > 0 ? (
             data.reverse().map((val, index) => {
               if (val.status == 'in_progress') {
+                const cost = val?.pay_amount
+                  ? `${val?.pay_amount} USD`
+                  : `${val?.fare} USD`;
+                const pickupLoc = truncate(cleanLocation(val?.from_location));
+                const dropLoc = truncate(cleanLocation(val?.to_location));
+                const shortId = (val?._id || '').substr(0, 8);
+                const tripTime = val?.time
+                  ? moment(val.time).format('YYYY-MM-DD HH:mm')
+                  : '';
+
+                const title = `#${shortId} • ${val?.status?.toUpperCase()} • ${cost}
+📍 ${pickupLoc}
+🏁 ${dropLoc}
+⏰ ${tripTime}`;
+
                 return (
                   <Accordion
-                    title={`TRIPS ID: ${(val?._id).substr(0, 15)}`}
+                    title={title}
                     trip={val}
                     key={index}
                     renderContent={() => (
@@ -267,26 +317,27 @@ export default function MyTrip() {
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-
-                          <Text
-                            style={
-                              styles.bookingText
-                            }>{`${val?.from_location}`}</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.from_location}`}
+                          </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>DROP AT</Text>
-                          <Text
-                            style={
-                              styles.bookingText
-                            }>{`${val?.to_location}`}</Text>
-                        </View>
-
-                        <View style={styles.bookingInfo}>
-                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
                           <Text style={styles.bookingText}>
-                            {`${val?.customer_id?.first_name}`}
+                            {`${val?.to_location}`}
                           </Text>
                         </View>
+
+                        {
+                          val?.rider_id?.first_name && (
+                            <View style={styles.bookingInfo}>
+                              <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                              <Text style={styles.bookingText}>
+                                {`${val?.rider_id?.first_name}`}
+                              </Text>
+                            </View>
+                          )
+                        }
 
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
@@ -319,7 +370,6 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              ,
                               { backgroundColor: COLOR.BLUE },
                             ]}
                             onPress={() => {
@@ -345,7 +395,10 @@ export default function MyTrip() {
                             ]}
                             onPress={() => handleNavigation(val)}>
                             <Text
-                              style={[styles.detailBtnText, { color: 'white' }]}>
+                              style={[
+                                styles.detailBtnText,
+                                { color: 'white' },
+                              ]}>
                               Tracking
                             </Text>
                           </Button>
@@ -375,9 +428,24 @@ export default function MyTrip() {
             data.filter(d => d.status === 'completed')?.length > 0 ? (
             data.reverse().map((val, index) => {
               if (val.status == 'completed') {
+                const cost = val?.pay_amount
+                  ? `${val?.pay_amount} USD`
+                  : `${val?.fare} USD`;
+                const pickupLoc = truncate(cleanLocation(val?.from_location));
+                const dropLoc = truncate(cleanLocation(val?.to_location));
+                const shortId = (val?._id || '').substr(0, 8);
+                const tripTime = val?.time
+                  ? moment(val.time).format('YYYY-MM-DD HH:mm')
+                  : '';
+
+                const title = `#${shortId} • ${val?.status?.toUpperCase()} • ${cost}
+📍 ${pickupLoc}
+🏁 ${dropLoc}
+⏰ ${tripTime}`;
+
                 return (
                   <Accordion
-                    title={`TRIPS ID: ${(val?._id).substr(0, 15)}`}
+                    title={title}
                     trip={val}
                     key={index}
                     renderContent={() => (
@@ -400,26 +468,27 @@ export default function MyTrip() {
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-
-                          <Text
-                            style={
-                              styles.bookingText
-                            }>{`${val?.from_location}`}</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.from_location}`}
+                          </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>DROP AT</Text>
-                          <Text
-                            style={
-                              styles.bookingText
-                            }>{`${val?.to_location}`}</Text>
-                        </View>
-
-                        <View style={styles.bookingInfo}>
-                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
                           <Text style={styles.bookingText}>
-                            {`${val?.customer_id?.first_name}`}
+                            {`${val?.to_location}`}
                           </Text>
                         </View>
+
+                        {
+                          val?.rider_id?.first_name && (
+                            <View style={styles.bookingInfo}>
+                              <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                              <Text style={styles.bookingText}>
+                                {`${val?.rider_id?.first_name}`}
+                              </Text>
+                            </View>
+                          )
+                        }
 
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
@@ -466,6 +535,7 @@ export default function MyTrip() {
       </View>
     );
   }
+
 
   return (
     <Container>

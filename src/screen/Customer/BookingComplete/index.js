@@ -23,6 +23,7 @@ import { navigateReset } from '../../../navigations';
 import AppSpinner from '../../../component/AppSpinner';
 import { COLOR } from '../../../theme/typography';
 import { Alert } from 'react-native';
+import ConfirmationModal from '../../../component/ConfirmationModal';
 
 export default function BookingComplete(props) {
   const val = props.route.params.data;
@@ -31,6 +32,8 @@ export default function BookingComplete(props) {
   const [images, setImages] = useState(null); // single file object
   const [isLoading, setIsLoading] = useState(false);
   const [description, setDescription] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
 
   console.log(val, 'driverValues');
 
@@ -96,26 +99,11 @@ export default function BookingComplete(props) {
     }
   };
 
-
-
-  const confirmCancelTrip = () => {
-    Alert.alert(
-      'Cancel Trip',
-      'Are you sure you want to cancel this trip?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          style: 'destructive',
-          onPress: () => cancelTrip(), // yahan actual API call
-        },
-      ],
-      { cancelable: true },
-    );
+  const handleConfirmDelete = async () => {
+    setIsModalVisible(false);
+    cancelTrip();
   };
+
 
   const cancelTrip = async () => {
     try {
@@ -419,14 +407,10 @@ export default function BookingComplete(props) {
             disabled={val?.status === 'cancelled'}
             onPress={() => {
               if (val?.status === 'cancelled') return;
-              confirmCancelTrip();
+              setIsModalVisible(true);
             }}
           >
-            {isLoading ? (
-              <AppSpinner color={COLOR.LIGHT} size="large" />
-            ) : (
-              <Text style={styles.tripText}>CANCEL</Text>
-            )}
+            <Text style={styles.tripText}>CANCEL</Text>
           </Button>
         )}
 
@@ -443,6 +427,13 @@ export default function BookingComplete(props) {
           <Text style={styles.tripText}>COMPLAIN</Text>
         </Button>
       </View>
+      <ConfirmationModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onConfirm={cancelTrip}
+        isLoading={isLoading}
+        message="Are you sure you want to Cancel the Trip?"
+      />
     </Container>
   );
 }
