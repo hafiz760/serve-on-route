@@ -45,6 +45,7 @@ const TrackingScreen = ({ route }) => {
   const [currentTripStatus, setCurrentTripStatus] = useState(
     route?.params?.data?.status
   );
+  console.log("currentTripStatus", currentTripStatus);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [tripStatusLoading, setTripStatusLoading] = useState(false);
@@ -87,7 +88,7 @@ const TrackingScreen = ({ route }) => {
   console.log("droplocationCords:", state.droplocationCords);
   console.log("currentTripStatus:", currentTripStatus);
   console.log("user:", user);
-  console.log("user roles:", user?.roles);
+  console.log("user roles:", user?.role[0]);
 
   const animate = useCallback((latitude, longitude) => {
     const newCoordinate = { latitude, longitude };
@@ -405,49 +406,62 @@ const TrackingScreen = ({ route }) => {
                <Text style={{color:"#fff"}}> Live Map</Text>
               </TouchableOpacity> */}
         {/* Button render condition relaxed for debug */}
-        {(currentTripStatus === "in_progress" || currentTripStatus === "started" || currentTripStatus === "pickup") && (
-          <View style={styles.outerContainerForDriver}>
-            <TouchableOpacity
-              onPress={() => {
-                if (!tripStatusLoading && currentTripStatus !== "done") {
-                  const identifyStatus =
-                    currentTripStatus === "in_progress"
-                      ? "started"
-                      : currentTripStatus === "started"
-                        ? "pickup"
-                        : currentTripStatus === "pickup"
-                          ? "done"
-                          : null;
 
-                  handleTripStatus(identifyStatus);
-                }
-              }}
-            >
-              <View style={styles.innerContainerForDriver}>
-                <View style={{ backgroundColor: COLOR.PRIMARY }}>
-                  {tripStatusLoading ? (
-                    <View style={styles.shareBtnText}>
-                      <AppSpinner />
-                    </View>
-                  ) : (
-                    <Text style={styles.shareBtnText}>
-                      {currentTripStatus === "in_progress"
-                        ? "START TRIP"
-                        : currentTripStatus === "started"
-                          ? "PICK UP"
-                          : currentTripStatus === "pickup"
-                            ? "DONE"
-                            : "TRIP COMPLETED!"}
-                    </Text>
-                  )}
-                </View>
+
+
+
+        {
+          user?.role[0] !== "user" && (
+            (currentTripStatus === "in_progress" || currentTripStatus === "started" || currentTripStatus === "pickup") && (
+              <View style={styles.outerContainerForDriver}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!tripStatusLoading && currentTripStatus !== "done") {
+                      const identifyStatus =
+                        currentTripStatus === "in_progress"
+                          ? "started"
+                          : currentTripStatus === "started"
+                            ? "pickup"
+                            : currentTripStatus === "pickup"
+                              ? "done"
+                              : null;
+
+                      handleTripStatus(identifyStatus);
+                    }
+                  }}
+                >
+                  {
+                    user?.role[0] !== "user" && (
+                      <View style={styles.innerContainerForDriver}>
+                        <View style={{ backgroundColor: COLOR.PRIMARY }}>
+                          {tripStatusLoading ? (
+                            <View style={styles.shareBtnText}>
+                              <AppSpinner />
+                            </View>
+                          ) : (
+                            <Text style={styles.shareBtnText}>
+                              {
+                                currentTripStatus === "in_progress"
+                                  ? "START TRIP"
+                                  : currentTripStatus === "started"
+                                    ? "PICK UP"
+                                    : currentTripStatus === "pickup"
+                                      ? "DONE"
+                                      : "TRIP COMPLETED!"}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    )
+                  }
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-          </View>
-        )}
+            )
+          )
+        }
+
       </View>
       <View>
-        {/* <Button title="Show Rating Modal" onPress={showRatingModal} /> */}
         <RatingModal isVisible={isRatingModalVisible} onClose={hideRatingModal} userID={route?.params?.data?.customer_id?._id} riderID={user?._id} />
       </View>
       <Modal

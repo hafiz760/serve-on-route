@@ -33,6 +33,7 @@ export default function MyTrip() {
             Authorization: `Bearer ${userJsonData.access_token}`,
           },
         });
+      console.log(res.data.docs)
       setData(res.data.docs);
       setLoading(false);
     } catch (error) {
