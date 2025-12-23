@@ -18,33 +18,60 @@ import ChatsModal from './ChatsModal';
 import AppSpinner from '../../../component/AppSpinner';
 import { BASE_URL, URL_V } from '../../../utilities/helper';
 import { navigate } from '../../../navigations';
+import PaginationControls from '../../../component/PaginationControls';
+
 export default function MyTrip() {
   const [tabSelected, setTabSelected] = useState('all');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const fetchData = async () => {
-    try {
-      var userData = await AsyncStorage.getItem('response');
-      var userJsonData = JSON.parse(userData);
-      const res = await axios.get(
-        `${BASE_URL}${URL_V}parcel?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&customer_id=${userJsonData._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${userJsonData.access_token}`,
-          },
-        });
-      console.log(res.data.docs)
-      setData(res.data.docs);
-      setLoading(false);
-    } catch (error) {
-      console.log(('error', error));
-      setLoading(false);
-    }
-  };
+
+  // backend pagination meta
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
 
   const [users, setUsers] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const { socket } = useSelector(state => state.socket);
+
+  const PAGE_LIMIT = 10;
+
+  const fetchData = async (pageToLoad = 1) => {
+    try {
+      if (pageToLoad === 1) {
+        setLoading(true);
+      } else {
+        setPageLoading(true);
+      }
+
+      const userData = await AsyncStorage.getItem('response');
+      const userJsonData = JSON.parse(userData);
+
+      const res = await axios.get(
+        `${BASE_URL}${URL_V}parcel?page=${pageToLoad}&limit=${PAGE_LIMIT}&populate=customer_id%20rider_id&sort=desc&customer_id=${userJsonData._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userJsonData.access_token}`,
+          },
+        },
+      );
+
+      const newDocs = res.data.docs || [];
+
+      setData(newDocs);
+      setPage(res.data.page || pageToLoad);
+      setTotalPages(res.data.totalPages || 1);
+      setHasNextPage(!!res.data.hasNextPage);
+      setHasPrevPage(!!res.data.hasPrevPage);
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setLoading(false);
+      setPageLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (socket) {
@@ -55,8 +82,18 @@ export default function MyTrip() {
   }, [socket]);
 
   useEffect(() => {
-    fetchData();
+    fetchData(1);
   }, []);
+
+  const handleNextPage = () => {
+    if (!hasNextPage || pageLoading) return;
+    fetchData(page + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (!hasPrevPage || pageLoading) return;
+    fetchData(page - 1);
+  };
 
   const handleNavigation = val => {
     const [from_location_latitude, from_location_longitude] =
@@ -86,11 +123,10 @@ export default function MyTrip() {
     });
   };
 
-
   function cleanLocation(loc) {
     if (!loc) return '';
     try {
-      const parsed = JSON.parse(loc); // "\"Hafeez Center\"" -> Hafeez Center
+      const parsed = JSON.parse(loc);
       return String(parsed);
     } catch {
       return String(loc);
@@ -107,7 +143,7 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data && data.length > 0 ? (
-            data.reverse().map((val, index) => {
+            [...data].reverse().map((val, index) => {
               const cost = val?.pay_amount
                 ? `${val?.pay_amount} USD`
                 : `${val?.fare} USD`;
@@ -166,17 +202,14 @@ export default function MyTrip() {
                         </Text>
                       </View>
 
-                      {
-                        val?.rider_id?.first_name && (
-                          <View style={styles.bookingInfo}>
-                            <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                            <Text style={styles.bookingText}>
-                              {`${val?.rider_id?.first_name}`}
-                            </Text>
-                          </View>
-                        )
-                      }
-
+                      {val?.rider_id?.first_name && (
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.rider_id?.first_name}`}
+                          </Text>
+                        </View>
+                      )}
 
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>OTP </Text>
@@ -220,7 +253,6 @@ export default function MyTrip() {
                                 { backgroundColor: COLOR.BLUE },
                               ]}
                               onPress={() => {
-                                console.log('CURRENT PAR===>', val);
                                 setSelectedParcel(val);
                               }}>
                               <Icon
@@ -276,7 +308,7 @@ export default function MyTrip() {
           {data &&
             data?.length > 0 &&
             data.filter(d => d.status === 'in_progress')?.length > 0 ? (
-            data.reverse().map((val, index) => {
+            [...data].reverse().map((val, index) => {
               if (val.status == 'in_progress') {
                 const cost = val?.pay_amount
                   ? `${val?.pay_amount} USD`
@@ -329,16 +361,14 @@ export default function MyTrip() {
                           </Text>
                         </View>
 
-                        {
-                          val?.rider_id?.first_name && (
-                            <View style={styles.bookingInfo}>
-                              <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                              <Text style={styles.bookingText}>
-                                {`${val?.rider_id?.first_name}`}
-                              </Text>
-                            </View>
-                          )
-                        }
+                        {val?.rider_id?.first_name && (
+                          <View style={styles.bookingInfo}>
+                            <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                            <Text style={styles.bookingText}>
+                              {`${val?.rider_id?.first_name}`}
+                            </Text>
+                          </View>
+                        )}
 
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
@@ -427,7 +457,7 @@ export default function MyTrip() {
           {data &&
             data?.length > 0 &&
             data.filter(d => d.status === 'completed')?.length > 0 ? (
-            data.reverse().map((val, index) => {
+            [...data].reverse().map((val, index) => {
               if (val.status == 'completed') {
                 const cost = val?.pay_amount
                   ? `${val?.pay_amount} USD`
@@ -480,16 +510,14 @@ export default function MyTrip() {
                           </Text>
                         </View>
 
-                        {
-                          val?.rider_id?.first_name && (
-                            <View style={styles.bookingInfo}>
-                              <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                              <Text style={styles.bookingText}>
-                                {`${val?.rider_id?.first_name}`}
-                              </Text>
-                            </View>
-                          )
-                        }
+                        {val?.rider_id?.first_name && (
+                          <View style={styles.bookingInfo}>
+                            <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                            <Text style={styles.bookingText}>
+                              {`${val?.rider_id?.first_name}`}
+                            </Text>
+                          </View>
+                        )}
 
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
@@ -536,7 +564,6 @@ export default function MyTrip() {
       </View>
     );
   }
-
 
   return (
     <Container>
@@ -611,6 +638,16 @@ export default function MyTrip() {
                     ? renderCompleted()
                     : null}
             </View>
+            <PaginationControls
+              page={page}
+              totalPages={totalPages}
+              hasNext={hasNextPage}
+              hasPrev={hasPrevPage}
+              loading={pageLoading}
+              onNext={handleNextPage}
+              onPrev={handlePrevPage}
+            />
+
           </ScrollView>
         </Content>
       )}
