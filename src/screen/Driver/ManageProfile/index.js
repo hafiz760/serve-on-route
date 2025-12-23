@@ -1,11 +1,11 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {View, Linking} from 'react-native';
-import {Container, Content, Text} from '../../../component/Basic';
-import {Button} from '../../../component/Form';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Linking } from 'react-native';
+import { Container, Content, Text } from '../../../component/Basic';
+import { Button } from '../../../component/Form';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   connectStripeAccount,
@@ -13,11 +13,11 @@ import {
 } from '../../../services/apicalls/driver';
 import ProfileTab from './Components/ProfileTab';
 import PermissionTab from './Components/PermissionTab';
-import {fetchDriverById} from '../../../services/apicalls/driver';
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
-import {Image, TouchableOpacity} from 'react-native';
+import { fetchDriverById } from '../../../services/apicalls/driver';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
+import { Image, TouchableOpacity } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import {Icon} from '../../../component/Basic';
+import { Icon } from '../../../component/Basic';
 
 export default function ManageProfile() {
   const isFetchingStripe = useRef(false);
@@ -28,6 +28,7 @@ export default function ManageProfile() {
   // Profile States (Only what's needed for the Header)
   const [profile, setProfile] = useState();
   const [profileHttp, setProfileHttp] = useState('');
+  const [accountLinked, setAccountLinked] = useState(false);
 
   const UploadData = async setPath => {
     try {
@@ -117,10 +118,10 @@ export default function ManageProfile() {
               <Image
                 source={
                   profile?.uri
-                    ? {uri: profile.uri}
+                    ? { uri: profile.uri }
                     : profileHttp
-                    ? {uri: profileHttp}
-                    : require('../../../assets/images/dummyProfile.jpg')
+                      ? { uri: profileHttp }
+                      : require('../../../assets/images/dummyProfile.jpg')
                 }
                 style={styles.headerAvatarImage}
               />
@@ -135,7 +136,7 @@ export default function ManageProfile() {
           }
         />
         <Content>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <View style={styles.profileHeader}>
               <View style={styles.tabInfo}>
                 <Button
@@ -179,12 +180,14 @@ export default function ManageProfile() {
                 profileHttp={profileHttp}
                 setProfileHttp={setProfileHttp}
                 UploadData={UploadData}
+                setAccountLinked={setAccountLinked}
               />
             )}
             {tabSelected === 'permission' && (
               <PermissionTab
                 isEnabled={isEnabled}
                 setIsEnabled={setIsEnabled}
+                accountLinked={accountLinked}
               />
             )}
           </View>

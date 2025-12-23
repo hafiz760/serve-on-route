@@ -1,16 +1,16 @@
 import React from 'react';
-import {BackHandler} from 'react-native';
-import {Provider} from 'react-redux';
-import {PersistGate} from 'redux-persist/integration/react';
+import { BackHandler } from 'react-native';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Support from '@component/Support';
-import {goBack} from '@navigation';
+import { goBack } from '@navigation';
 import Navigator from '@navigation/screen';
-import {store, persistor} from '@store';
+import { store, persistor } from '@store';
 import Toast from 'react-native-toast-message';
-import {StripeProvider} from '@stripe/stripe-react-native';
-import {requestUserPermission} from '../helper/pushnotification_helper';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { requestUserPermission } from '../helper/pushnotification_helper';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -39,7 +39,7 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', function () {});
+    BackHandler.removeEventListener('hardwareBackPress', function () { });
   }
 
   async initiate() {
@@ -55,11 +55,11 @@ export default class App extends React.Component {
   async storage() {
     let mun = (await AsyncStorage.getItem('role')) == 'Driver';
 
-    this.setState({bool: mun});
+    this.setState({ bool: mun });
   }
 
   onBeforeLift() {
-    this.setState({storeLoaded: true});
+    this.setState({ storeLoaded: true });
   }
 
   render() {
@@ -71,7 +71,7 @@ export default class App extends React.Component {
             persistor={persistor}
             onBeforeLift={this.onBeforeLift}>
             {this.state.loading ? null : (
-              <SafeAreaView style={{flex: 1}}>
+              <SafeAreaView style={{ flex: 1 }}>
                 <Navigator />
               </SafeAreaView>
             )}
