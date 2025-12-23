@@ -27,9 +27,6 @@ export default function MyTrip() {
   const fetchData = async () => {
     var myData = await AsyncStorage.getItem("response");
     var datas = JSON.parse(myData);
-    console.log("datassssssssssssssssssssssss", datas);
-    //  6412f0faf432ae2f820d4f6d
-
     const res = axios
       .get(
         `${BASE_URL}${URL_V}parcel?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&rider_id=${datas._id}`,
@@ -49,7 +46,7 @@ export default function MyTrip() {
         setLoading(false);
       });
   };
- 
+
   const [users, setUsers] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const dispatch = useDispatch();
@@ -97,7 +94,7 @@ export default function MyTrip() {
       });
     }
   }, [socket]);
-  
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -122,7 +119,7 @@ export default function MyTrip() {
                         <Text style={styles.bookingText}>
                           {val?.pay_amount
                             ? (`${val?.pay_amount} USD`)
-                            :(`${val?.fare} USD`)}
+                            : (`${val?.fare} USD`)}
                         </Text>
                       </View>
                       <View style={styles.bookingInfo}>
@@ -136,19 +133,17 @@ export default function MyTrip() {
                           PICK UP FROM
                         </Text>
 
-                        <Text style={styles.bookingText}>{`${
-                          (val?.from_location).length > 30
+                        <Text style={styles.bookingText}>{`${(val?.from_location).length > 30
                             ? val?.from_location.substr(0, 30)
                             : val?.from_location
-                        }`}</Text>
+                          }`}</Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>DROP AT</Text>
-                        <Text style={styles.bookingText}>{`${
-                          (val?.to_location).length > 30
+                        <Text style={styles.bookingText}>{`${(val?.to_location).length > 30
                             ? val?.to_location.substr(0, 30)
                             : val?.to_location
-                        }`}</Text>
+                          }`}</Text>
                       </View>
 
                       <View style={styles.bookingInfo}>
@@ -190,46 +185,46 @@ export default function MyTrip() {
                         </Button>
                         {val?.status == "completed" ? (
                           <></>
-                        ):(
+                        ) : (
                           <>
-                        <Button
-                          style={[
-                            styles.detailBtn,
-                            ,
-                            { backgroundColor: COLOR.BLUE },
-                          ]}
-                          onPress={() => {
-                            // console.log("CURRENT PAR===>", val);
-                            setSelectedParcel(val);
-                          }}
-                        >
-                          <Icon
-                            name="chat"
-                            type="MaterialIcons"
-                            style={[theme.SIZE_14, theme.LIGHT]}
-                          />
-                          <Text
-                            style={[
-                              styles.detailBtnText,
-                              { color: COLOR.LIGHT },
-                            ]}
-                          >
-                            CHAT
-                          </Text>
-                        </Button>
-                        <Button
-                          style={[
-                            styles.detailBtn,
-                            { backgroundColor: COLOR.GREEN },
-                          ]}
-                          onPress={() => handleNavigation(val)}
-                        >
-                          <Text
-                            style={[styles.detailBtnText, { color: "white" }]}
-                          >
-                            Start Ride
-                          </Text>
-                        </Button>
+                            <Button
+                              style={[
+                                styles.detailBtn,
+                                ,
+                                { backgroundColor: COLOR.BLUE },
+                              ]}
+                              onPress={() => {
+                                // console.log("CURRENT PAR===>", val);
+                                setSelectedParcel(val);
+                              }}
+                            >
+                              <Icon
+                                name="chat"
+                                type="MaterialIcons"
+                                style={[theme.SIZE_14, theme.LIGHT]}
+                              />
+                              <Text
+                                style={[
+                                  styles.detailBtnText,
+                                  { color: COLOR.LIGHT },
+                                ]}
+                              >
+                                CHAT
+                              </Text>
+                            </Button>
+                            <Button
+                              style={[
+                                styles.detailBtn,
+                                { backgroundColor: COLOR.GREEN },
+                              ]}
+                              onPress={() => handleNavigation(val)}
+                            >
+                              <Text
+                                style={[styles.detailBtnText, { color: "white" }]}
+                              >
+                                Start Ride
+                              </Text>
+                            </Button>
                           </>
                         )}
 
@@ -260,8 +255,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-          data?.length > 0 &&
-          data.filter((d) => d.status === "in_progress")?.length > 0 ? (
+            data?.length > 0 &&
+            data.filter((d) => d.status === "in_progress")?.length > 0 ? (
             data.map((val, index) => {
               if (val.status == "in_progress") {
                 return (
@@ -271,69 +266,69 @@ export default function MyTrip() {
                     key={index}
                     renderContent={() => (
                       <View style={styles.accordionContent}>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>TRIP COST</Text>
-                        <Text style={styles.bookingText}>
-                          {val?.pay_amount ? `${val?.pay_amount} USDT` : `${val?.fare} USD`}
-                        </Text>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>TRIP COST</Text>
+                          <Text style={styles.bookingText}>
+                            {val?.pay_amount ? `${val?.pay_amount} USDT` : `${val?.fare} USD`}
+                          </Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>TRIP</Text>
+                          <Text style={styles.bookingDetail}>{val?.time}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>PICK UP FROM</Text>
+                          <Text style={styles.bookingText}>{val?.from_location}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>DROP AT</Text>
+                          <Text style={styles.bookingText}>{val?.to_location}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                          <Text style={styles.bookingText}>{val?.customer_id?.first_name}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>STATUS</Text>
+                          <Button
+                            onPress={() => {
+                              navigate("CustomerBookingComplete");
+                            }}
+                          >
+                            <Text style={styles.openBtnText}>{val?.status}</Text>
+                          </Button>
+                        </View>
+                        <View style={styles.btnInfo}>
+                          <Button
+                            style={styles.detailBtn}
+                            onPress={() => {
+                              navigate("DriverBookingComplete", { data: val });
+                            }}
+                          >
+                            <Text style={styles.detailBtnText}>DETAILS</Text>
+                          </Button>
+                          <Button
+                            style={[styles.detailBtn, { backgroundColor: COLOR.BLUE }]}
+                            onPress={() => {
+                              setSelectedParcel(val);
+                            }}
+                          >
+                            <Icon
+                              name="chat"
+                              type="MaterialIcons"
+                              style={[theme.SIZE_14, theme.LIGHT]}
+                            />
+                            <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>CHAT</Text>
+                          </Button>
+                          <Button
+                            style={[styles.detailBtn, { backgroundColor: COLOR.GREEN }]}
+                            onPress={() => handleNavigation(val)}
+                          >
+                            <Text style={[styles.detailBtnText, { color: "white" }]}>Start Ride</Text>
+                          </Button>
+                        </View>
                       </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>TRIP</Text>
-                        <Text style={styles.bookingDetail}>{val?.time}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-                        <Text style={styles.bookingText}>{val?.from_location}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>DROP AT</Text>
-                        <Text style={styles.bookingText}>{val?.to_location}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                        <Text style={styles.bookingText}>{val?.customer_id?.first_name}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>STATUS</Text>
-                        <Button
-                          onPress={() => {
-                            navigate("CustomerBookingComplete");
-                          }}
-                        >
-                          <Text style={styles.openBtnText}>{val?.status}</Text>
-                        </Button>
-                      </View>
-                      <View style={styles.btnInfo}>
-                        <Button
-                          style={styles.detailBtn}
-                          onPress={() => {
-                            navigate("DriverBookingComplete", { data: val });
-                          }}
-                        >
-                          <Text style={styles.detailBtnText}>DETAILS</Text>
-                        </Button>
-                        <Button
-                          style={[styles.detailBtn, { backgroundColor: COLOR.BLUE }]}
-                          onPress={() => {
-                            setSelectedParcel(val);
-                          }}
-                        >
-                          <Icon
-                            name="chat"
-                            type="MaterialIcons"
-                            style={[theme.SIZE_14, theme.LIGHT]}
-                          />
-                          <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>CHAT</Text>
-                        </Button>
-                        <Button
-                          style={[styles.detailBtn, { backgroundColor: COLOR.GREEN }]}
-                          onPress={() => handleNavigation(val)}
-                        >
-                          <Text style={[styles.detailBtnText, { color: "white" }]}>Start Ride</Text>
-                        </Button>
-                      </View>
-                    </View>
-                    
+
                     )}
                   />
                 );
@@ -354,8 +349,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-          data?.length > 0 &&
-          data.filter((d) => d.status === "completed")?.length > 0 ? (
+            data?.length > 0 &&
+            data.filter((d) => d.status === "completed")?.length > 0 ? (
             data.map((val, index) => {
               if (val.status == "completed") {
                 return (
@@ -365,50 +360,50 @@ export default function MyTrip() {
                     key={index}
                     renderContent={() => (
                       <View style={styles.accordionContent}>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>TRIP COST</Text>
-                        <Text style={styles.bookingText}>
-                          {val?.pay_amount ? `${val?.pay_amount} USD` : `${val?.fare} USD`}
-                        </Text>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>TRIP COST</Text>
+                          <Text style={styles.bookingText}>
+                            {val?.pay_amount ? `${val?.pay_amount} USD` : `${val?.fare} USD`}
+                          </Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>TRIP</Text>
+                          <Text style={styles.bookingDetail}>{val?.time}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>PICK UP FROM</Text>
+                          <Text style={styles.bookingText}>{val?.from_location}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>DROP AT</Text>
+                          <Text style={styles.bookingText}>{val?.to_location}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
+                          <Text style={styles.bookingText}>{val?.customer_id?.first_name}</Text>
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>STATUS</Text>
+                          <Button
+                            onPress={() => {
+                              navigate("CustomerBookingComplete");
+                            }}
+                          >
+                            <Text style={styles.openBtnText}>{val?.status}</Text>
+                          </Button>
+                        </View>
+                        <View style={styles.btnInfo}>
+                          <Button
+                            style={styles.detailBtn}
+                            onPress={() => {
+                              navigate("DriverBookingComplete", { data: val });
+                            }}
+                          >
+                            <Text style={styles.detailBtnText}>DETAILS</Text>
+                          </Button>
+                        </View>
                       </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>TRIP</Text>
-                        <Text style={styles.bookingDetail}>{val?.time}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-                        <Text style={styles.bookingText}>{val?.from_location}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>DROP AT</Text>
-                        <Text style={styles.bookingText}>{val?.to_location}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                        <Text style={styles.bookingText}>{val?.customer_id?.first_name}</Text>
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>STATUS</Text>
-                        <Button
-                          onPress={() => {
-                            navigate("CustomerBookingComplete");
-                          }}
-                        >
-                          <Text style={styles.openBtnText}>{val?.status}</Text>
-                        </Button>
-                      </View>
-                      <View style={styles.btnInfo}>
-                        <Button
-                          style={styles.detailBtn}
-                          onPress={() => {
-                            navigate("DriverBookingComplete", { data: val });
-                          }}
-                        >
-                          <Text style={styles.detailBtnText}>DETAILS</Text>
-                        </Button>
-                      </View>
-                    </View>
-                    
+
                     )}
                   />
                 );
@@ -433,7 +428,7 @@ export default function MyTrip() {
       <View style={styles.myTripHeader}>
         <Text style={styles.myTripHeaderTitle}>MY TRIPS</Text>
         <Text style={styles.myTripHeaderText}>
-        LIST OF TRIPS
+          LIST OF TRIPS
         </Text>
         <View style={styles.myTripTabItems}>
           <Button
@@ -483,7 +478,7 @@ export default function MyTrip() {
                   : styles.tabInactiveText
               }
             >
-            COMPLETED
+              COMPLETED
             </Text>
           </Button>
         </View>
@@ -501,10 +496,10 @@ export default function MyTrip() {
               {tabSelected === "all"
                 ? renderAll()
                 : tabSelected === "open"
-                ? renderOpen()
-                : tabSelected === "completed"
-                ? renderCompleted()
-                : null}
+                  ? renderOpen()
+                  : tabSelected === "completed"
+                    ? renderCompleted()
+                    : null}
             </View>
           </ScrollView>
         </Content>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Image,
@@ -7,18 +7,18 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {TextInput, Button} from '../../../component/Form';
-import {Text, Icon} from '../../../component/Basic';
+import { TextInput, Button } from '../../../component/Form';
+import { Text, Icon } from '../../../component/Basic';
 import theme from '../../../theme/styles';
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 import styles from './styles';
-const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
+const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
   const [biddingValue, setBiddingValue] = useState(val?.fare);
   const [isBidFormShow, setBidFormShow] = useState(false);
   const [containerHeight, setContainerHeight] = useState(0);
-  // console.log("val",biddingValue);
+  console.log("val", val);
   const handleLayout = event => {
-    const {height} = event.nativeEvent.layout;
+    const { height } = event.nativeEvent.layout;
     setContainerHeight(height);
   };
 
@@ -40,10 +40,10 @@ const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
         shadowRadius: 4,
         elevation: 5,
       }}>
-      <View style={{flexDirection: 'row'}}>
-        <View style={{width: '20%', marginTop: 20}}>
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ width: '20%', marginTop: 20 }}>
           <Image
-            source={require('../../../assets/images/avatar.png')}
+            source={val?.customer_id?.avatar ? { uri: val?.customer_id?.avatar } : require('../../../assets/images/avatar.png')}
             resizeMode="cover"
             style={{
               width: 50,
@@ -53,7 +53,7 @@ const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
             }}
           />
         </View>
-        <View style={{paddingTop: 30, width: '70%'}}>
+        <View style={{ paddingTop: 30, width: '70%' }}>
           <View
             style={{
               flexDirection: 'row',
@@ -79,15 +79,15 @@ const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
             </Text>
           </View>
           <View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <Text style={styles.biddingCardText}>From location: </Text>
               <Text style={styles.biddingCardText}>{val?.from_location}</Text>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <Text style={styles.biddingCardText}>To location: </Text>
               <Text style={styles.biddingCardText}>{val?.to_location}</Text>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <Text style={styles.biddingCardText}>Receiving Slot: </Text>
               <Text style={styles.biddingCardText}>{val?.receiving_slot}</Text>
             </View>
@@ -101,7 +101,7 @@ const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
             }}>
             <Text style={styles.biddingCardText}>
               Delivery Time:{' '}
-              {`${val?.bidding_type}(${JSON.stringify(val?.time).substr(
+              {`${val?.bidding_type}(${JSON.stringify(val?.time)?.substr(
                 1,
                 10,
               )})`}
@@ -115,24 +115,22 @@ const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
           justifyContent: 'space-between',
         }}>
         <Button
-          style={[styles.bookingBtn, {width: '25%', backgroundColor: 'red'}]}
+          style={[styles.bookingBtn, { width: '25%', backgroundColor: 'red' }]}
           onPress={va => {
-            console.log('Muneeb click on Decline');
             CloseModelBaseOnId(val.id);
-            // setOpen(false);
           }}>
           <Text style={styles.bookingBtnText}>Decline</Text>
         </Button>
 
         <Button
-          style={[styles.bookingBtn, {width: '25%', marginLeft: -10}]}
+          style={[styles.bookingBtn, { width: '25%', marginLeft: -10 }]}
           onPress={() => {
             setBidFormShow(!isBidFormShow);
           }}>
-          <Text style={styles.bookingBtnText}>Make Own Offer</Text>
+          <Text style={styles.bookingBtnText}>Make Offer</Text>
         </Button>
         <Button
-          style={[styles.bookingBtn, {width: '25%', marginLeft: -10}]}
+          style={[styles.bookingBtn, { width: '25%', marginLeft: -10 }]}
           onPress={() => {
             handleBid(biddingValue, val);
           }}>

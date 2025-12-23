@@ -1,17 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, ScrollView, FlatList } from "react-native";
-import { useSelector } from "react-redux";
+import { View, ScrollView, FlatList, Alert } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+import { updateNotiId } from "../../../store/reducers/session";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { Button } from "../../../component/Form";
 import styles from "./styles";
 import axios from "axios";
 import Modal from "react-native-modalbox";
-
 import Accordion from "../../Driver/MyTrips/Accordion";
 import { DarkStatusBar } from "../../../component/StatusBar";
 import BiddingCard from "./BiddingCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import {BASE_URL,URL_V} from "@env"
 import { BASE_URL, URL_V } from "../../../utilities/helper";
 import Header from "../../../component/Header";
 
@@ -42,23 +41,11 @@ export default function Home({ route }) {
     };
     console.log("requestPayload", requestPayload);
     try {
-      // const responseOne = await axios.post(
-      //   "https://api.serveonroute.com/v1/bid",
-      //   requestPayload,
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${datas.access_token}`,
-      //     },
-      //   }
-      // );
-
-      // console.log("SUCCESSFULL RESPONSE ==>", responseOne.data);
       setMainModel(false);
       socket.emit("bidding", requestPayload);
-
-      alert("You successfully bid on this parcel");
+      Alert.alert("You successfully bid on this parcel");
     } catch (error) {
-      // alert("Something went wrong while bidding...!");
+      Alert.alert("Something went wrong while bidding...!");
     }
   };
 
@@ -68,36 +55,32 @@ export default function Home({ route }) {
   const ModalNotification = useRef();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  // console.log("data status",JSON.stringify(data,null,2));
+
   const fetchData = async () => {
-    var data = await AsyncStorage.getItem("response");
-    var datas = JSON.parse(data);
+    try {
+      const userData = await AsyncStorage.getItem("response");
+      const userJsonData = JSON.parse(userData);
 
-    //  6412f0faf432ae2f820d4f6d
-
-    const res = axios
-      .get(
-        `${BASE_URL}${URL_V}parcel?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&rider_id=${datas._id}`,
+      const res = await axios.get(
+        `${BASE_URL}${URL_V}parcel?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&rider_id=${userJsonData._id}`,
         {
           headers: {
-            Authorization: `Bearer ${datas.access_token}`,
+            Authorization: `Bearer ${userJsonData.access_token}`,
           },
         }
       )
-      .then((data) => {
-        const incompleteData = data.data.docs.filter(item => item.status === "in_progress");
-
-        // console.log("TRIPS>>>", JSON.stringify(incompleteData,null,2));
-        setData(incompleteData);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(("error", err.response));
-        setLoading(false);
-      });
+      console.log(res, 'res')
+      const incompleteData = res.data.docs.filter(item => item.status === "in_progress");
+      setData(incompleteData);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
   const getParcelById = async (parcelId) => {
-    console.log("getParcelById called");
+    console.log("getParcelById called", parcelId);
     var data = await AsyncStorage.getItem("response");
     var datas = JSON.parse(data);
 
@@ -112,11 +95,11 @@ export default function Home({ route }) {
       );
 
       console.log("RESPONSE ====>", responseOne);
-
-      // Check if parcel already exists in the list
+      console.log(incomingParcelNotifications, 'incomingParcelNotifications')
       const exists = incomingParcelNotifications.some(
-        (item) => item.id === responseOne.data.id // or item._id if your API returns _id
+        (item) => item.id === responseOne.data.id
       );
+      console.log(exists, 'exists')
 
       if (!exists) {
         setIncomingParcelNotifications([
@@ -132,61 +115,21 @@ export default function Home({ route }) {
       }
 
     } catch (err) {
-      alert("Something went wrong while fetching parcel");
+      Alert.alert("Something went wrong while fetching parcel");
       console.log(err?.response);
     }
   };
-  // const getParcelById = async (parcelId) => {
-  //   console.log("getParcelById called");
-  //   var data = await AsyncStorage.getItem("response");
-  //   var datas = JSON.parse(data);
 
-  //   try {
-  //     const responseOne = await axios.get(
-  //       `${BASE_URL}${URL_V}parcel/${parcelId}`,
-  //       // `https://api.serveonroute.com/v1/parcel`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${datas.access_token}`,
-  //         },
-  //       }
-  //     );
+  const dispatch = useDispatch();
 
-  //     console.log("RESONSE ====>", responseOne);
-
-  //     setIncomingParcelNotifications([
-  //       ...incomingParcelNotifications,
-  //       responseOne.data,
-  //     ]);
-  //     if (!mainModel) {
-  //       setMainModel(true);
-  //     }
-  //   } catch (err) {
-  //     alert("Something went wrong whil fetching parcel");
-  //     console.log(err.response);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   console.log("use effect call on home11111")
-  //   fetchData()
-  //   if (route?.params && route?.params?.data) {
-  //     const id = route?.params?.data?.split("Id: ")[1].split(" has")[0];
-  //     getParcelById(id);
-  //   }
-  //   console.log("INCOMDOMG PARCELS===>", incomingParcelNotifications);
-  // }, []);
-  // useEffect(() => {
-  //   console.log("use effect call on home11111");
-  //   getParcelById();
-  // }, []);
-  // console.log("INCOMDOMG PARCELS===>", incomingParcelNotifications);
   useEffect(() => {
     console.log("use effect call on home11111");
     fetchData();
     if (notiId) {
       const id = notiId.split("Id: ")[1].split(" has")[0];
+      console.log(id, 'id')
       getParcelById(id);
+      dispatch(updateNotiId(null));
     }
 
   }, [notiId]);
