@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-sparse-arrays */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Container, Content, Text, Icon } from '../../../component/Basic';
 import { Button } from '../../../component/Form';
@@ -18,6 +18,7 @@ import ChatsModal from './ChatsModal';
 import AppSpinner from '../../../component/AppSpinner';
 import { BASE_URL, URL_V } from '../../../utilities/helper';
 import { navigate } from '../../../navigations';
+import { useFocusEffect } from '@react-navigation/native';
 import PaginationControls from '../../../component/PaginationControls';
 
 export default function MyTrip() {
@@ -86,6 +87,12 @@ export default function MyTrip() {
   useEffect(() => {
     fetchData(1);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData(1);
+    }, []),
+  );
 
   const handleNextPage = () => {
     if (!hasNextPage || pageLoading) return;

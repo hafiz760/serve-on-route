@@ -21,7 +21,7 @@ export default function Intro({ navigation }) {
 
     if (user) {
       messaging().onNotificationOpenedApp((remoteMessage) => {
-        console.log("onNotificationOpenedApp",JSON.stringify(remoteMessage,null,2));
+        console.log("onNotificationOpenedApp", JSON.stringify(remoteMessage, null, 2));
         if (
           remoteMessage &&
           user &&
@@ -78,7 +78,7 @@ export default function Intro({ navigation }) {
           }
         });
       messaging().onMessage(async (remoteMessage) => {
-        console.log("FOREGOURND===>",JSON.stringify(remoteMessage,null,2));
+        console.log("FOREGOURND===>", JSON.stringify(remoteMessage, null, 2));
         if (
           remoteMessage &&
           user &&
@@ -91,7 +91,7 @@ export default function Intro({ navigation }) {
               data: remoteMessage.notification.body,
             },
           });
-          console.log("notification on foreground state....>>>", JSON.stringify(remoteMessage,null,2));
+          console.log("notification on foreground state....>>>", JSON.stringify(remoteMessage, null, 2));
         }
 
         if (

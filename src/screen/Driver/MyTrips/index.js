@@ -1,23 +1,24 @@
-import React, {useState, useEffect} from 'react';
-import {View, ScrollView, Image} from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {Button, Picker, TextInput} from '../../../component/Form';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, ScrollView, Image } from 'react-native';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { Button, Picker, TextInput } from '../../../component/Form';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Accordion from './Accordion';
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
-import {useSelector, useDispatch} from 'react-redux';
+import { DarkStatusBar } from '../../../component/StatusBar';
+import { useSelector, useDispatch } from 'react-redux';
 import RiderChatsModal from './RiderChatsModal';
 import AppSpinner from '../../../component/AppSpinner';
 import moment from 'moment';
 // import {BASE_URL,URL_V} from "@env"
-import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate} from '../../../navigations';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate } from '../../../navigations';
+import { useFocusEffect } from '@react-navigation/native';
 export default function MyTrip() {
   const [loading, setLoading] = useState(true);
   const [tabSelected, setTabSelected] = useState('all');
@@ -51,7 +52,7 @@ export default function MyTrip() {
   const [users, setUsers] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const dispatch = useDispatch();
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
 
   const handleNavigation = val => {
     const fromCor = val.from_location_cor
@@ -104,6 +105,12 @@ export default function MyTrip() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, []),
+  );
 
   function cleanLocation(loc) {
     if (!loc) return '';
@@ -179,21 +186,19 @@ export default function MyTrip() {
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>PICK UP FROM</Text>
                         <Text style={styles.bookingText}>
-                          {`${
-                            (val?.from_location).length > 30
+                          {`${(val?.from_location).length > 30
                               ? val?.from_location.substr(0, 30)
                               : val?.from_location
-                          }`}
+                            }`}
                         </Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>DROP AT</Text>
                         <Text style={styles.bookingText}>
-                          {`${
-                            (val?.to_location).length > 30
+                          {`${(val?.to_location).length > 30
                               ? val?.to_location.substr(0, 30)
                               : val?.to_location
-                          }`}
+                            }`}
                         </Text>
                       </View>
 
@@ -229,7 +234,7 @@ export default function MyTrip() {
                         <Button
                           style={styles.detailBtn}
                           onPress={() => {
-                            navigate('DriverBookingComplete', {data: val});
+                            navigate('DriverBookingComplete', { data: val });
                           }}>
                           <Icon
                             name="search"
@@ -245,7 +250,7 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                {backgroundColor: COLOR.BLUE},
+                                { backgroundColor: COLOR.BLUE },
                               ]}
                               onPress={() => {
                                 setSelectedParcel(val);
@@ -258,7 +263,7 @@ export default function MyTrip() {
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  {color: COLOR.LIGHT},
+                                  { color: COLOR.LIGHT },
                                 ]}>
                                 CHAT
                               </Text>
@@ -267,13 +272,13 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                {backgroundColor: COLOR.GREEN},
+                                { backgroundColor: COLOR.GREEN },
                               ]}
                               onPress={() => handleNavigation(val)}>
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  {color: 'white'},
+                                  { color: 'white' },
                                 ]}>
                                 Start Ride
                               </Text>
@@ -301,8 +306,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-          data?.length > 0 &&
-          data.filter(d => d.status === 'in_progress')?.length > 0 ? (
+            data?.length > 0 &&
+            data.filter(d => d.status === 'in_progress')?.length > 0 ? (
             [...data].reverse().map((val, index) => {
               if (val.status == 'in_progress') {
                 const cost = val?.pay_amount
@@ -413,7 +418,7 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              {backgroundColor: COLOR.BLUE},
+                              { backgroundColor: COLOR.BLUE },
                             ]}
                             onPress={() => {
                               setSelectedParcel(val);
@@ -426,7 +431,7 @@ export default function MyTrip() {
                             <Text
                               style={[
                                 styles.detailBtnText,
-                                {color: COLOR.LIGHT},
+                                { color: COLOR.LIGHT },
                               ]}>
                               CHAT
                             </Text>
@@ -434,11 +439,11 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              {backgroundColor: COLOR.GREEN},
+                              { backgroundColor: COLOR.GREEN },
                             ]}
                             onPress={() => handleNavigation(val)}>
                             <Text
-                              style={[styles.detailBtnText, {color: 'white'}]}>
+                              style={[styles.detailBtnText, { color: 'white' }]}>
                               Start Ride
                             </Text>
                           </Button>
@@ -464,8 +469,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-          data?.length > 0 &&
-          data.filter(d => d.status === 'completed')?.length > 0 ? (
+            data?.length > 0 &&
+            data.filter(d => d.status === 'completed')?.length > 0 ? (
             [...data].reverse().map((val, index) => {
               if (val.status == 'completed') {
                 const cost = val?.pay_amount
@@ -645,7 +650,7 @@ export default function MyTrip() {
         </View>
       </View>
       {loading ? (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <AppSpinner color={COLOR.PRIMARY} size="large" />
         </View>
       ) : (
@@ -655,10 +660,10 @@ export default function MyTrip() {
               {tabSelected === 'all'
                 ? renderAll()
                 : tabSelected === 'open'
-                ? renderOpen()
-                : tabSelected === 'completed'
-                ? renderCompleted()
-                : null}
+                  ? renderOpen()
+                  : tabSelected === 'completed'
+                    ? renderCompleted()
+                    : null}
             </View>
           </ScrollView>
         </Content>

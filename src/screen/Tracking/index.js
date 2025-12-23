@@ -440,6 +440,7 @@ const TrackingScreen = ({ route }) => {
                             </View>
                           ) : (
                             <Text style={styles.shareBtnText}>
+                              {console.log("current statussss", currentTripStatus)}
                               {
                                 currentTripStatus === "in_progress"
                                   ? "START TRIP"

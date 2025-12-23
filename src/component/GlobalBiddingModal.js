@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, DeviceEventEmitter } from "react-native";
 import { useSelector } from "react-redux";
 import Modal from "react-native-modalbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -41,6 +41,9 @@ const GlobalBiddingModal = () => {
             setMainModel(false);
             socket.emit("bidding", requestPayload);
             alert("You successfully bid on this parcel");
+
+            // Emit event to refresh Driver Home screen
+            DeviceEventEmitter.emit('refreshHome');
 
             // Remove the bid parcel from the list
             closeModelBaseOnId(selectedParcel.id);
