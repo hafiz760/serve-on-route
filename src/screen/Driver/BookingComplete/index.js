@@ -105,9 +105,8 @@ export default function BookingComplete(props) {
   return (
     <Container>
       <DarkStatusBar />
-      <Header leftType="back" />
+      <Header leftType="back" title="BOOKING" />
       <View style={styles.bookingHeader}>
-        <Text style={styles.bookingHeaderTitle}>BOOKING</Text>
         <Text style={styles.bookingHeaderText}>
           CHECKOUT YOUR BOOKING
         </Text>

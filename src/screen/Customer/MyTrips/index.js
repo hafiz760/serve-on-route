@@ -1,23 +1,23 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-sparse-arrays */
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView } from 'react-native';
-import { Container, Content, Text, Icon } from '../../../component/Basic';
-import { Button } from '../../../component/Form';
+import React, {useState, useEffect} from 'react';
+import {View, ScrollView} from 'react-native';
+import {Container, Content, Text, Icon} from '../../../component/Basic';
+import {Button} from '../../../component/Form';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Accordion from './Accordion';
-import { COLOR } from '../../../theme/typography';
+import {COLOR} from '../../../theme/typography';
 import moment from 'moment';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import { DarkStatusBar } from '../../../component/StatusBar';
-import { useSelector } from 'react-redux';
+import {DarkStatusBar} from '../../../component/StatusBar';
+import {useSelector} from 'react-redux';
 import ChatsModal from './ChatsModal';
 import AppSpinner from '../../../component/AppSpinner';
-import { BASE_URL, URL_V } from '../../../utilities/helper';
-import { navigate } from '../../../navigations';
+import {BASE_URL, URL_V} from '../../../utilities/helper';
+import {navigate} from '../../../navigations';
 import PaginationControls from '../../../component/PaginationControls';
 
 export default function MyTrip() {
@@ -34,7 +34,7 @@ export default function MyTrip() {
 
   const [users, setUsers] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
-  const { socket } = useSelector(state => state.socket);
+  const {socket} = useSelector(state => state.socket);
 
   const PAGE_LIMIT = 10;
 
@@ -49,15 +49,17 @@ export default function MyTrip() {
       const userData = await AsyncStorage.getItem('response');
       const userJsonData = JSON.parse(userData);
 
+      console.log(userJsonData, 'User Data');
+
       const res = await axios.get(
-        `${BASE_URL}${URL_V}parcel?page=${pageToLoad}&limit=${PAGE_LIMIT}&populate=customer_id%20rider_id&sort=desc&customer_id=${userJsonData._id}`,
+        `${BASE_URL}${URL_V}parcel?page=${pageToLoad}&limit=500&populate=customer_id%20rider_id&sort=desc&customer_id=${userJsonData._id}`,
         {
           headers: {
             Authorization: `Bearer ${userJsonData.access_token}`,
           },
         },
       );
-
+      console.log(res, 'My trIps Data');
       const newDocs = res.data.docs || [];
 
       setData(newDocs);
@@ -186,19 +188,21 @@ export default function MyTrip() {
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>PICK UP FROM</Text>
                         <Text style={styles.bookingText}>
-                          {`${(val?.from_location).length > 30
-                            ? val?.from_location.substr(0, 30)
-                            : val?.from_location
-                            }`}
+                          {`${
+                            (val?.from_location).length > 30
+                              ? val?.from_location.substr(0, 30)
+                              : val?.from_location
+                          }`}
                         </Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>DROP AT</Text>
                         <Text style={styles.bookingText}>
-                          {`${(val?.to_location).length > 30
-                            ? val?.to_location.substr(0, 30)
-                            : val?.to_location
-                            }`}
+                          {`${
+                            (val?.to_location).length > 30
+                              ? val?.to_location.substr(0, 30)
+                              : val?.to_location
+                          }`}
                         </Text>
                       </View>
 
@@ -234,7 +238,7 @@ export default function MyTrip() {
                         <Button
                           style={styles.detailBtn}
                           onPress={() => {
-                            navigate('CustomerBookingComplete', { data: val });
+                            navigate('CustomerBookingComplete', {data: val});
                           }}>
                           <Icon
                             name="search"
@@ -250,7 +254,7 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                { backgroundColor: COLOR.BLUE },
+                                {backgroundColor: COLOR.BLUE},
                               ]}
                               onPress={() => {
                                 setSelectedParcel(val);
@@ -263,7 +267,7 @@ export default function MyTrip() {
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  { color: COLOR.LIGHT },
+                                  {color: COLOR.LIGHT},
                                 ]}>
                                 CHAT
                               </Text>
@@ -272,13 +276,13 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                { backgroundColor: COLOR.GREEN },
+                                {backgroundColor: COLOR.GREEN},
                               ]}
                               onPress={() => handleNavigation(val)}>
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  { color: 'white' },
+                                  {color: 'white'},
                                 ]}>
                                 Tracking
                               </Text>
@@ -306,8 +310,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-            data?.length > 0 &&
-            data.filter(d => d.status === 'in_progress')?.length > 0 ? (
+          data?.length > 0 &&
+          data.filter(d => d.status === 'in_progress')?.length > 0 ? (
             [...data].reverse().map((val, index) => {
               if (val.status == 'in_progress') {
                 const cost = val?.pay_amount
@@ -401,7 +405,7 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              { backgroundColor: COLOR.BLUE },
+                              {backgroundColor: COLOR.BLUE},
                             ]}
                             onPress={() => {
                               setSelectedParcel(val);
@@ -414,7 +418,7 @@ export default function MyTrip() {
                             <Text
                               style={[
                                 styles.detailBtnText,
-                                { color: COLOR.LIGHT },
+                                {color: COLOR.LIGHT},
                               ]}>
                               CHAT
                             </Text>
@@ -422,14 +426,11 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              { backgroundColor: COLOR.GREEN },
+                              {backgroundColor: COLOR.GREEN},
                             ]}
                             onPress={() => handleNavigation(val)}>
                             <Text
-                              style={[
-                                styles.detailBtnText,
-                                { color: 'white' },
-                              ]}>
+                              style={[styles.detailBtnText, {color: 'white'}]}>
                               Tracking
                             </Text>
                           </Button>
@@ -455,8 +456,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-            data?.length > 0 &&
-            data.filter(d => d.status === 'completed')?.length > 0 ? (
+          data?.length > 0 &&
+          data.filter(d => d.status === 'completed')?.length > 0 ? (
             [...data].reverse().map((val, index) => {
               if (val.status == 'completed') {
                 const cost = val?.pay_amount
@@ -623,7 +624,7 @@ export default function MyTrip() {
         </View>
       </View>
       {loading ? (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <AppSpinner color={COLOR.PRIMARY} size="large" />
         </View>
       ) : (
@@ -633,12 +634,12 @@ export default function MyTrip() {
               {tabSelected === 'all'
                 ? renderAll()
                 : tabSelected === 'open'
-                  ? renderOpen()
-                  : tabSelected === 'completed'
-                    ? renderCompleted()
-                    : null}
+                ? renderOpen()
+                : tabSelected === 'completed'
+                ? renderCompleted()
+                : null}
             </View>
-            <PaginationControls
+            {/* <PaginationControls
               page={page}
               totalPages={totalPages}
               hasNext={hasNextPage}
@@ -646,8 +647,7 @@ export default function MyTrip() {
               loading={pageLoading}
               onNext={handleNextPage}
               onPrev={handlePrevPage}
-            />
-
+            /> */}
           </ScrollView>
         </Content>
       )}
