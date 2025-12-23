@@ -156,10 +156,21 @@ export default function MyTrip() {
                 ? moment(val.time).format('YYYY-MM-DD HH:mm')
                 : '';
 
-              const title = `#${shortId} • ${val?.status?.toUpperCase()} • ${cost}
-📍 ${pickupLoc}
-🏁 ${dropLoc}
-⏰ ${tripTime}`;
+              const title = (
+                <View style={styles.accordionTitle}>
+                  <View style={styles.accordionTitleRow}>
+                    <Text
+                      style={styles.accordionTitleText}>{`#${shortId}`}</Text>
+                    <Text style={styles.accordionTitleText}>{`${cost}`}</Text>
+                  </View>
+                  <Text
+                    style={styles.accordionTitleText}>{`📍 ${pickupLoc}`}</Text>
+                  <Text
+                    style={styles.accordionTitleText}>{`🏁 ${dropLoc}`}</Text>
+                  <Text
+                    style={styles.accordionTitleText}>{`⏰ ${tripTime}`}</Text>
+                </View>
+              );
 
               return (
                 <Accordion

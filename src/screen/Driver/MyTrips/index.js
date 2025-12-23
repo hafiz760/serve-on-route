@@ -1,31 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { View, ScrollView, Image } from "react-native";
-import { Container, Content, Text, Icon } from "../../../component/Basic";
-import { Button, Picker, TextInput } from "../../../component/Form";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Accordion from "./Accordion";
-import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
+import React, {useState, useEffect} from 'react';
+import {View, ScrollView, Image} from 'react-native';
+import {Container, Content, Text, Icon} from '../../../component/Basic';
+import {Button, Picker, TextInput} from '../../../component/Form';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Accordion from './Accordion';
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 
-import styles from "./styles";
-import theme from "../../../theme/styles";
-import Header from "../../../component/Header";
-import { DarkStatusBar } from "../../../component/StatusBar";
-import { useSelector, useDispatch } from "react-redux";
-import RiderChatsModal from "./RiderChatsModal";
-import AppSpinner from "../../../component/AppSpinner";
+import styles from './styles';
+import theme from '../../../theme/styles';
+import Header from '../../../component/Header';
+import {DarkStatusBar} from '../../../component/StatusBar';
+import {useSelector, useDispatch} from 'react-redux';
+import RiderChatsModal from './RiderChatsModal';
+import AppSpinner from '../../../component/AppSpinner';
+import moment from 'moment';
 // import {BASE_URL,URL_V} from "@env"
-import { BASE_URL, URL_V } from "../../../utilities/helper";
-import { navigate } from "../../../navigations";
+import {BASE_URL, URL_V} from '../../../utilities/helper';
+import {navigate} from '../../../navigations';
 export default function MyTrip() {
   const [loading, setLoading] = useState(true);
-  const [tabSelected, setTabSelected] = useState("all");
+  const [tabSelected, setTabSelected] = useState('all');
   const [isDisabled, setIsDisabled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState([]);
 
   const fetchData = async () => {
-    var myData = await AsyncStorage.getItem("response");
+    var myData = await AsyncStorage.getItem('response');
     var datas = JSON.parse(myData);
     const res = axios
       .get(
@@ -34,14 +35,14 @@ export default function MyTrip() {
           headers: {
             Authorization: `Bearer ${datas.access_token}`,
           },
-        }
+        },
       )
-      .then((data) => {
-        console.log("TRIPS", data.data.docs);
+      .then(data => {
+        console.log('TRIPS', data.data.docs);
         setData(data.data.docs);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         // console.log(("error", err.response));
         setLoading(false);
       });
@@ -50,19 +51,24 @@ export default function MyTrip() {
   const [users, setUsers] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const dispatch = useDispatch();
-  const { socket } = useSelector((state) => state.socket);
+  const {socket} = useSelector(state => state.socket);
 
-  const handleNavigation = (val) => {
-    const fromCor = val.from_location_cor ? val.from_location_cor.replace(/['"']+/g, '').trim() : '';
-    const toCor = val.to_location_cor ? val.to_location_cor.replace(/['"']+/g, '').trim() : '';
+  const handleNavigation = val => {
+    const fromCor = val.from_location_cor
+      ? val.from_location_cor.replace(/['"']+/g, '').trim()
+      : '';
+    const toCor = val.to_location_cor
+      ? val.to_location_cor.replace(/['"']+/g, '').trim()
+      : '';
 
     if (!fromCor || !toCor || !fromCor.includes(',') || !toCor.includes(',')) {
-      alert("Location data available nahi hai, ride start nahi ho sakti.");
+      alert('Location data available nahi hai, ride start nahi ho sakti.');
       return;
     }
 
-    const [from_location_latitude, from_location_longitude] = fromCor.split(",");
-    const [to_location_latitude, to_location_longitude] = toCor.split(",");
+    const [from_location_latitude, from_location_longitude] =
+      fromCor.split(',');
+    const [to_location_latitude, to_location_longitude] = toCor.split(',');
 
     const from_location = {
       latitude: +from_location_latitude.trim(),
@@ -80,7 +86,7 @@ export default function MyTrip() {
       to_location,
     };
 
-    navigate("CustomerDriverTracking", {
+    navigate('CustomerDriverTracking', {
       data: customObject,
     });
   };
@@ -88,7 +94,7 @@ export default function MyTrip() {
   useEffect(() => {
     if (socket) {
       // console.log("RJUNN");
-      socket.on("connectedUsers", (data) => {
+      socket.on('connectedUsers', data => {
         // console.log("RJUNN",data);
         setUsers(data);
       });
@@ -99,70 +105,122 @@ export default function MyTrip() {
     fetchData();
   }, []);
 
+  function cleanLocation(loc) {
+    if (!loc) return '';
+    try {
+      const parsed = JSON.parse(loc);
+      return String(parsed);
+    } catch {
+      return String(loc);
+    }
+  }
+
+  function truncate(str, len = 22) {
+    if (!str) return '';
+    return str.length > len ? `${str.substr(0, len)}...` : str;
+  }
+
   function renderAll() {
     return (
       <View>
         <View style={styles.accordionLayout}>
           {data && data.length > 0 ? (
-            data.map((val, index) => {
+            [...data].reverse().map((val, index) => {
+              const cost = val?.pay_amount
+                ? `${val?.pay_amount} USD`
+                : `${val?.fare} USD`;
+              const pickupLoc = truncate(cleanLocation(val?.from_location));
+              const dropLoc = truncate(cleanLocation(val?.to_location));
+              const shortId = val?._id || '';
+              const tripTime = val?.time
+                ? moment(val.time).format('YYYY-MM-DD HH:mm')
+                : '';
+
+              const title = (
+                <View style={styles.accordionTitle}>
+                  <View style={styles.accordionTitleRow}>
+                    <Text
+                      style={styles.accordionTitleText}>{`#${shortId}`}</Text>
+                    <Text style={styles.accordionTitleText}>{`${cost}`}</Text>
+                  </View>
+                  <Text
+                    style={styles.accordionTitleText}>{`📍 ${pickupLoc}`}</Text>
+                  <Text
+                    style={styles.accordionTitleText}>{`🏁 ${dropLoc}`}</Text>
+                  <Text
+                    style={styles.accordionTitleText}>{`⏰ ${tripTime}`}</Text>
+                </View>
+              );
+
               return (
                 <Accordion
-                  title={`TRIPS ID : ${index + 1}`}
-                  text="open"
+                  title={title}
+                  trip={val}
                   key={index}
                   renderContent={() => (
                     <View style={styles.accordionContent}>
                       <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>
-                          TRIP COST
-                        </Text>
+                        <Text style={styles.bookingTitle}>TRIP COST</Text>
                         <Text style={styles.bookingText}>
                           {val?.pay_amount
-                            ? (`${val?.pay_amount} USD`)
-                            : (`${val?.fare} USD`)}
+                            ? `${val?.pay_amount} USD`
+                            : `${val?.fare} USD`}
                         </Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>TRIP</Text>
                         <Text style={styles.bookingDetail}>
-                          {(val?.time.substr(0, 10))}
+                          {val?.time
+                            ? moment(val.time).format(' YYYY-MM-DD HH:mm')
+                            : ''}
                         </Text>
                       </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>
-                          PICK UP FROM
-                        </Text>
 
-                        <Text style={styles.bookingText}>{`${(val?.from_location).length > 30
-                            ? val?.from_location.substr(0, 30)
-                            : val?.from_location
-                          }`}</Text>
+                      <View style={styles.bookingInfo}>
+                        <Text style={styles.bookingTitle}>PICK UP FROM</Text>
+                        <Text style={styles.bookingText}>
+                          {`${
+                            (val?.from_location).length > 30
+                              ? val?.from_location.substr(0, 30)
+                              : val?.from_location
+                          }`}
+                        </Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>DROP AT</Text>
-                        <Text style={styles.bookingText}>{`${(val?.to_location).length > 30
-                            ? val?.to_location.substr(0, 30)
-                            : val?.to_location
-                          }`}</Text>
+                        <Text style={styles.bookingText}>
+                          {`${
+                            (val?.to_location).length > 30
+                              ? val?.to_location.substr(0, 30)
+                              : val?.to_location
+                          }`}
+                        </Text>
                       </View>
 
+                      {val?.customer_id?.first_name && (
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>CUSTOMER NAME</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.customer_id?.first_name}`}
+                          </Text>
+                        </View>
+                      )}
+
                       <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>
-                          CUSTOMER NAME
-                        </Text>
+                        <Text style={styles.bookingTitle}>OTP </Text>
                         <Text style={styles.bookingText}>
-                          {(`${val?.customer_id?.first_name}`)}
+                          {`${val?.receiving_otp}`}
                         </Text>
                       </View>
+
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>STATUS</Text>
                         <Button
                           onPress={() => {
                             // navigate("CustomerBookingComplete");
-                          }}
-                        >
+                          }}>
                           <Text style={styles.openBtnText}>
-                            {(`${val?.status}`)}
+                            {`${val?.status}`}
                           </Text>
                         </Button>
                       </View>
@@ -171,33 +229,27 @@ export default function MyTrip() {
                         <Button
                           style={styles.detailBtn}
                           onPress={() => {
-                            navigate("DriverBookingComplete", { data: val });
-                          }}
-                        >
+                            navigate('DriverBookingComplete', {data: val});
+                          }}>
                           <Icon
                             name="search"
                             type="Feather"
                             style={[theme.SIZE_14, theme.GREYDARK]}
                           />
-                          <Text style={styles.detailBtnText}>
-                            DETAILS
-                          </Text>
+                          <Text style={styles.detailBtnText}>DETAILS</Text>
                         </Button>
-                        {val?.status == "completed" ? (
+                        {val?.status == 'completed' ? (
                           <></>
                         ) : (
                           <>
                             <Button
                               style={[
                                 styles.detailBtn,
-                                ,
-                                { backgroundColor: COLOR.BLUE },
+                                {backgroundColor: COLOR.BLUE},
                               ]}
                               onPress={() => {
-                                // console.log("CURRENT PAR===>", val);
                                 setSelectedParcel(val);
-                              }}
-                            >
+                              }}>
                               <Icon
                                 name="chat"
                                 type="MaterialIcons"
@@ -206,34 +258,28 @@ export default function MyTrip() {
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  { color: COLOR.LIGHT },
-                                ]}
-                              >
+                                  {color: COLOR.LIGHT},
+                                ]}>
                                 CHAT
                               </Text>
                             </Button>
+
                             <Button
                               style={[
                                 styles.detailBtn,
-                                { backgroundColor: COLOR.GREEN },
+                                {backgroundColor: COLOR.GREEN},
                               ]}
-                              onPress={() => handleNavigation(val)}
-                            >
+                              onPress={() => handleNavigation(val)}>
                               <Text
-                                style={[styles.detailBtnText, { color: "white" }]}
-                              >
+                                style={[
+                                  styles.detailBtnText,
+                                  {color: 'white'},
+                                ]}>
                                 Start Ride
                               </Text>
                             </Button>
                           </>
                         )}
-
-                        {/* <Button
-                        style={styles.cancelBtn}
-                        onPress={() => alert("Ride Cancel")}
-                      >
-                        <Text style={styles.cancelBtnText}>Cancel</Text>
-                      </Button> */}
                       </View>
                     </View>
                   )}
@@ -255,80 +301,149 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-            data?.length > 0 &&
-            data.filter((d) => d.status === "in_progress")?.length > 0 ? (
-            data.map((val, index) => {
-              if (val.status == "in_progress") {
+          data?.length > 0 &&
+          data.filter(d => d.status === 'in_progress')?.length > 0 ? (
+            [...data].reverse().map((val, index) => {
+              if (val.status == 'in_progress') {
+                const cost = val?.pay_amount
+                  ? `${val?.pay_amount} USD`
+                  : `${val?.fare} USD`;
+                const pickupLoc = truncate(cleanLocation(val?.from_location));
+                const dropLoc = truncate(cleanLocation(val?.to_location));
+                const shortId = val?._id || '';
+                const tripTime = val?.time
+                  ? moment(val.time).format('YYYY-MM-DD HH:mm')
+                  : '';
+
+                const title = (
+                  <View style={styles.accordionTitle}>
+                    <View style={styles.accordionTitleRow}>
+                      <Text
+                        style={styles.accordionTitleText}>{`#${shortId}`}</Text>
+                      <Text style={styles.accordionTitleText}>{`${cost}`}</Text>
+                    </View>
+                    <Text
+                      style={
+                        styles.accordionTitleText
+                      }>{`📍 ${pickupLoc}`}</Text>
+                    <Text
+                      style={styles.accordionTitleText}>{`🏁 ${dropLoc}`}</Text>
+                    <Text
+                      style={
+                        styles.accordionTitleText
+                      }>{`⏰ ${tripTime}`}</Text>
+                  </View>
+                );
+
                 return (
                   <Accordion
-                    title={`TRIPS ID : ${index + 1}`}
-                    text="open"
+                    title={title}
+                    trip={val}
                     key={index}
                     renderContent={() => (
                       <View style={styles.accordionContent}>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>TRIP COST</Text>
                           <Text style={styles.bookingText}>
-                            {val?.pay_amount ? `${val?.pay_amount} USDT` : `${val?.fare} USD`}
+                            {val?.pay_amount
+                              ? `${val?.pay_amount} USD`
+                              : `${val?.fare} USD`}
                           </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>TRIP</Text>
-                          <Text style={styles.bookingDetail}>{val?.time}</Text>
+                          <Text style={styles.bookingDetail}>
+                            {val?.time
+                              ? moment(val.time).format(' YYYY-MM-DD HH:mm')
+                              : ''}
+                          </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-                          <Text style={styles.bookingText}>{val?.from_location}</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.from_location}`}
+                          </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>DROP AT</Text>
-                          <Text style={styles.bookingText}>{val?.to_location}</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.to_location}`}
+                          </Text>
                         </View>
-                        <View style={styles.bookingInfo}>
-                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                          <Text style={styles.bookingText}>{val?.customer_id?.first_name}</Text>
-                        </View>
+
+                        {val?.customer_id?.first_name && (
+                          <View style={styles.bookingInfo}>
+                            <Text style={styles.bookingTitle}>
+                              CUSTOMER NAME
+                            </Text>
+                            <Text style={styles.bookingText}>
+                              {`${val?.customer_id?.first_name}`}
+                            </Text>
+                          </View>
+                        )}
+
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
                           <Button
                             onPress={() => {
-                              navigate("CustomerBookingComplete");
-                            }}
-                          >
-                            <Text style={styles.openBtnText}>{val?.status}</Text>
+                              navigate('CustomerBookingComplete');
+                            }}>
+                            <Text style={styles.openBtnText}>
+                              {`${val?.status}`}
+                            </Text>
                           </Button>
                         </View>
+
                         <View style={styles.btnInfo}>
                           <Button
                             style={styles.detailBtn}
                             onPress={() => {
-                              navigate("DriverBookingComplete", { data: val });
-                            }}
-                          >
+                              navigate('DriverBookingComplete', {
+                                data: val,
+                              });
+                            }}>
+                            <Icon
+                              name="search"
+                              type="Feather"
+                              style={[theme.SIZE_14, theme.GREYDARK]}
+                            />
                             <Text style={styles.detailBtnText}>DETAILS</Text>
                           </Button>
+
                           <Button
-                            style={[styles.detailBtn, { backgroundColor: COLOR.BLUE }]}
+                            style={[
+                              styles.detailBtn,
+                              {backgroundColor: COLOR.BLUE},
+                            ]}
                             onPress={() => {
                               setSelectedParcel(val);
-                            }}
-                          >
+                            }}>
                             <Icon
                               name="chat"
                               type="MaterialIcons"
                               style={[theme.SIZE_14, theme.LIGHT]}
                             />
-                            <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>CHAT</Text>
+                            <Text
+                              style={[
+                                styles.detailBtnText,
+                                {color: COLOR.LIGHT},
+                              ]}>
+                              CHAT
+                            </Text>
                           </Button>
                           <Button
-                            style={[styles.detailBtn, { backgroundColor: COLOR.GREEN }]}
-                            onPress={() => handleNavigation(val)}
-                          >
-                            <Text style={[styles.detailBtnText, { color: "white" }]}>Start Ride</Text>
+                            style={[
+                              styles.detailBtn,
+                              {backgroundColor: COLOR.GREEN},
+                            ]}
+                            onPress={() => handleNavigation(val)}>
+                            <Text
+                              style={[styles.detailBtnText, {color: 'white'}]}>
+                              Start Ride
+                            </Text>
                           </Button>
                         </View>
                       </View>
-
                     )}
                   />
                 );
@@ -349,61 +464,116 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-            data?.length > 0 &&
-            data.filter((d) => d.status === "completed")?.length > 0 ? (
-            data.map((val, index) => {
-              if (val.status == "completed") {
+          data?.length > 0 &&
+          data.filter(d => d.status === 'completed')?.length > 0 ? (
+            [...data].reverse().map((val, index) => {
+              if (val.status == 'completed') {
+                const cost = val?.pay_amount
+                  ? `${val?.pay_amount} USD`
+                  : `${val?.fare} USD`;
+                const pickupLoc = truncate(cleanLocation(val?.from_location));
+                const dropLoc = truncate(cleanLocation(val?.to_location));
+                const shortId = val?._id || '';
+                const tripTime = val?.time
+                  ? moment(val.time).format('YYYY-MM-DD HH:mm')
+                  : '';
+
+                const title = (
+                  <View style={styles.accordionTitle}>
+                    <View style={styles.accordionTitleRow}>
+                      <Text
+                        style={styles.accordionTitleText}>{`#${shortId}`}</Text>
+                      <Text style={styles.accordionTitleText}>{`${cost}`}</Text>
+                    </View>
+                    <Text
+                      style={
+                        styles.accordionTitleText
+                      }>{`📍 ${pickupLoc}`}</Text>
+                    <Text
+                      style={styles.accordionTitleText}>{`🏁 ${dropLoc}`}</Text>
+                    <Text
+                      style={
+                        styles.accordionTitleText
+                      }>{`⏰ ${tripTime}`}</Text>
+                  </View>
+                );
+
                 return (
                   <Accordion
-                    title={`TRIPS ID : ${index + 1}`}
-                    text="open"
+                    title={title}
+                    trip={val}
                     key={index}
                     renderContent={() => (
                       <View style={styles.accordionContent}>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>TRIP COST</Text>
                           <Text style={styles.bookingText}>
-                            {val?.pay_amount ? `${val?.pay_amount} USD` : `${val?.fare} USD`}
+                            {val?.pay_amount
+                              ? `${val?.pay_amount} USD`
+                              : `${val?.fare} USD`}
                           </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>TRIP</Text>
-                          <Text style={styles.bookingDetail}>{val?.time}</Text>
+                          <Text style={styles.bookingDetail}>
+                            {val?.time
+                              ? moment(val.time).format(' YYYY-MM-DD HH:mm')
+                              : ''}
+                          </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>PICK UP FROM</Text>
-                          <Text style={styles.bookingText}>{val?.from_location}</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.from_location}`}
+                          </Text>
                         </View>
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>DROP AT</Text>
-                          <Text style={styles.bookingText}>{val?.to_location}</Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.to_location}`}
+                          </Text>
                         </View>
-                        <View style={styles.bookingInfo}>
-                          <Text style={styles.bookingTitle}>DRIVER NAME</Text>
-                          <Text style={styles.bookingText}>{val?.customer_id?.first_name}</Text>
-                        </View>
+
+                        {val?.customer_id?.first_name && (
+                          <View style={styles.bookingInfo}>
+                            <Text style={styles.bookingTitle}>
+                              CUSTOMER NAME
+                            </Text>
+                            <Text style={styles.bookingText}>
+                              {`${val?.customer_id?.first_name}`}
+                            </Text>
+                          </View>
+                        )}
+
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
                           <Button
                             onPress={() => {
-                              navigate("CustomerBookingComplete");
-                            }}
-                          >
-                            <Text style={styles.openBtnText}>{val?.status}</Text>
+                              navigate('CustomerBookingComplete');
+                            }}>
+                            <Text style={styles.openBtnText}>
+                              {`${val?.status}`}
+                            </Text>
                           </Button>
                         </View>
+
                         <View style={styles.btnInfo}>
                           <Button
                             style={styles.detailBtn}
                             onPress={() => {
-                              navigate("DriverBookingComplete", { data: val });
-                            }}
-                          >
+                              navigate('DriverBookingComplete', {
+                                data: val,
+                              });
+                            }}>
+                            <Icon
+                              name="search"
+                              type="Feather"
+                              style={[theme.SIZE_14, theme.GREYDARK]}
+                            />
                             <Text style={styles.detailBtnText}>DETAILS</Text>
                           </Button>
                         </View>
                       </View>
-
                     )}
                   />
                 );
@@ -424,82 +594,71 @@ export default function MyTrip() {
   return (
     <Container>
       <DarkStatusBar />
-      <Header leftType="back" />
+      <Header leftType="back" title="MY TRIPS" />
       <View style={styles.myTripHeader}>
-        <Text style={styles.myTripHeaderTitle}>MY TRIPS</Text>
-        <Text style={styles.myTripHeaderText}>
-          LIST OF TRIPS
-        </Text>
+        <Text style={styles.myTripHeaderText}>LIST OF TRIPS</Text>
         <View style={styles.myTripTabItems}>
           <Button
             style={
-              tabSelected === "all" ? styles.tabActive : styles.tabInactive
+              tabSelected === 'all' ? styles.tabActive : styles.tabInactive
             }
-            onPress={() => setTabSelected("all")}
-          >
+            onPress={() => setTabSelected('all')}>
             <Text
               style={
-                tabSelected === "all"
+                tabSelected === 'all'
                   ? styles.tabActiveText
                   : styles.tabInactiveText
-              }
-            >
+              }>
               ALL
             </Text>
           </Button>
           <Button
             style={
-              tabSelected === "open" ? styles.tabActive : styles.tabInactive
+              tabSelected === 'open' ? styles.tabActive : styles.tabInactive
             }
-            onPress={() => setTabSelected("open")}
-          >
+            onPress={() => setTabSelected('open')}>
             <Text
               style={
-                tabSelected === "open"
+                tabSelected === 'open'
                   ? styles.tabActiveText
                   : styles.tabInactiveText
-              }
-            >
+              }>
               OPEN
             </Text>
           </Button>
           <Button
             style={
-              tabSelected === "completed"
+              tabSelected === 'completed'
                 ? styles.tabActive
                 : styles.tabInactive
             }
-            onPress={() => setTabSelected("completed")}
-          >
+            onPress={() => setTabSelected('completed')}>
             <Text
               style={
-                tabSelected === "completed"
+                tabSelected === 'completed'
                   ? styles.tabActiveText
                   : styles.tabInactiveText
-              }
-            >
+              }>
               COMPLETED
             </Text>
           </Button>
         </View>
       </View>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <AppSpinner color={COLOR.PRIMARY} size="large" />
         </View>
       ) : (
         <Content contentContainerStyle={theme.layoutDf}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.myTripContainer}>
-              {tabSelected === "all"
+              {tabSelected === 'all'
                 ? renderAll()
-                : tabSelected === "open"
-                  ? renderOpen()
-                  : tabSelected === "completed"
-                    ? renderCompleted()
-                    : null}
+                : tabSelected === 'open'
+                ? renderOpen()
+                : tabSelected === 'completed'
+                ? renderCompleted()
+                : null}
             </View>
           </ScrollView>
         </Content>

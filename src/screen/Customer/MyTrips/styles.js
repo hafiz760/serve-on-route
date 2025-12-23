@@ -278,8 +278,19 @@ export default {
     paddingVertical: 15,
   },
   accordionTitle: {
+    flex: 1,
+    marginRight: 10,
+  },
+  accordionTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  accordionTitleText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
   },
   accOrderInfo: {
     borderColor: COLOR.LIGHT,
