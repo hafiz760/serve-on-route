@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -7,8 +7,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Text, Icon} from '../../../../component/Basic';
-import {COLOR, FAMILY, SIZE} from '../../../../theme/typography';
+import { Text, Icon } from '../../../../component/Basic';
+import { COLOR, FAMILY, SIZE } from '../../../../theme/typography';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -21,13 +21,13 @@ import {
   fetchDriverById,
   updateDriverProfile,
 } from '../../../../services/apicalls/driver';
-import {showMessage} from '../../../../helper/showAlert';
+import { showMessage } from '../../../../helper/showAlert';
 import ImagePicker from 'react-native-image-crop-picker';
 import AppSpinner from '../../../../component/AppSpinner';
-import {Button} from '../../../../component/Form';
+import { Button } from '../../../../component/Form';
 
 export default function ProfileTab(props) {
-  const {profile, setProfile, profileHttp, setProfileHttp} = props;
+  const { profile, setProfile, profileHttp, setProfileHttp, setAccountLinked } = props;
 
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -51,8 +51,8 @@ export default function ProfileTab(props) {
   const [loading, setLoading] = useState(true);
   const [openModel, setOpenModel] = useState(false);
   const [items, setItems] = useState([
-    {label: 'Male', value: 'Male'},
-    {label: 'Female', value: 'Female'},
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
   ]);
   const [itemsType, setItemsType] = useState('Male');
   const [frontIdImage, setFrontIdImage] = useState(null);
@@ -114,6 +114,11 @@ export default function ProfileTab(props) {
         setProfileHttp(sanitizeValue(userData.avatar));
         setEmail(sanitizeValue(userData.email));
         setNationalCard(sanitizeValue(userData.ID));
+
+        // Set account_linked status for PermissionTab
+        if (setAccountLinked) {
+          setAccountLinked(userData.account_linked === true);
+        }
       } else {
         console.log('Failed to fetch driver data:', res.message);
       }
@@ -435,11 +440,11 @@ export default function ProfileTab(props) {
       <AppSpinner size="large" color={COLOR.PRIMARY} />
     </View>
   ) : (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{flex: 1}}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <PersonalInfoSection
             name={name}
             setName={setName}
@@ -491,7 +496,7 @@ export default function ProfileTab(props) {
           />
 
           <Button
-            style={[styles.uploadbtn2, {marginBottom: hp(6), bottom: 0}]}
+            style={[styles.uploadbtn2, { marginBottom: hp(6), bottom: 0 }]}
             onPress={submit}>
             <Text style={styles.saveBtnText2}>SAVE</Text>
           </Button>

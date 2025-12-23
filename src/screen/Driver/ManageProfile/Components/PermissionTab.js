@@ -1,16 +1,27 @@
-import React from 'react';
-import {View, Text} from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
 import styles from '../styles';
-import {ToggleSwitch} from '../../../../component/Form';
+import { ToggleSwitch } from '../../../../component/Form';
 
-export default function PermissionTab({isEnabled, setIsEnabled}) {
+export default function PermissionTab({ isEnabled, setIsEnabled, accountLinked }) {
+  // Set toggle to ON and disable it if account is linked
+  useEffect(() => {
+    if (accountLinked) {
+      setIsEnabled(true);
+    }
+  }, [accountLinked]);
+
   return (
     <View style={styles.profileContainer}>
       <View style={styles.profileContent}>
-        <View style={[styles.profileInputDetail, {paddingBottom: -100}]}>
+        <View style={[styles.profileInputDetail, { paddingBottom: -100 }]}>
           <View style={styles.switchInfo}>
             <Text style={styles.switchText}>Connect your stripe account</Text>
-            <ToggleSwitch setValue={setIsEnabled} value={isEnabled} />
+            <ToggleSwitch
+              setValue={setIsEnabled}
+              value={accountLinked ? true : isEnabled}
+              disabled={accountLinked}
+            />
           </View>
         </View>
 

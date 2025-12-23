@@ -1,4 +1,4 @@
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 
 const React = require('react-native');
 
@@ -506,5 +506,132 @@ export default {
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_14,
     color: COLOR.GREYVIOLET,
+  },
+
+  // -- New BiddingCard Styles --
+  cardContainer: {
+    backgroundColor: COLOR.LIGHT,
+    borderRadius: 8,
+    marginVertical: 2,
+    marginHorizontal: 0,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  cardAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  cardHeaderInfo: {
+    flex: 1,
+  },
+  cardName: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_14,
+    color: COLOR.DARK,
+    marginBottom: 2,
+  },
+  cardCity: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.GREYVIOLET,
+  },
+  cardPrice: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_16,
+    color: COLOR.PRIMARY,
+  },
+  routeContainer: {
+    marginBottom: 5,
+  },
+  routeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  routeItem: {
+    flex: 1,
+  },
+  locationRow: {
+    marginBottom: 4,
+  },
+  locationLabel: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_9,
+    color: COLOR.GREYVIOLET,
+    marginBottom: 2,
+    textTransform: 'uppercase',
+  },
+  locationText: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
+  },
+  detailGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 6,
+    padding: 5,
+  },
+  detailItem: {
+    flex: 1,
+  },
+  detailLabel: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_9,
+    color: COLOR.GREYVIOLET,
+    marginBottom: 2,
+  },
+  detailValue: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.DARK,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 6,
+  },
+  actionBtn: {
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  declineBtn: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#FF4444',
+  },
+  declineBtnText: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_11,
+    color: '#FF4444',
+  },
+  offerBtn: {
+    backgroundColor: COLOR.BLUE,
+  },
+  acceptBtn: {
+    backgroundColor: COLOR.GREEN,
+  },
+  actionBtnText: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.LIGHT,
   },
 };

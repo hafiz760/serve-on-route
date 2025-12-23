@@ -10,6 +10,7 @@ import { goBack } from "../navigations";
 import { persistor, store } from "../store";
 import Support from "../component/Support";
 import 'react-native-get-random-values'
+import GlobalBiddingModal from "../component/GlobalBiddingModal";
 
 export default class App extends React.Component {
   constructor(props) {
@@ -38,7 +39,7 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", function () {});
+    BackHandler.removeEventListener("hardwareBackPress", function () { });
   }
 
   async initiate() {
@@ -72,12 +73,13 @@ export default class App extends React.Component {
           persistor={persistor}
           onBeforeLift={this.onBeforeLift}
         >
-          {this.state.loading ? null : 
-          
-          <Navigator/>}
+          {this.state.loading ? null :
+
+            <Navigator />}
         </PersistGate>
         <Toast visibilityTime={1800} />
-        <Support/>
+        <Support />
+        <GlobalBiddingModal />
       </Provider>
     );
   }
