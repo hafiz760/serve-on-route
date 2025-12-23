@@ -1,7 +1,7 @@
-import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 
 const React = require('react-native');
-const { Platform } = React;
+const {Platform} = React;
 
 export default {
   bookingHeader: {
@@ -125,9 +125,9 @@ export default {
     paddingLeft: 15,
   },
   driverImg: {
-    width: 64,
-    height: 64,
-    borderRadius: 5,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
     marginRight: 15,
     marginTop: 10,
   },
@@ -175,11 +175,15 @@ export default {
   },
   modalRating: {
     width: '90%',
-    height: 320,
+    height: '38%',
     borderRadius: 10,
   },
   modalRatingContainer: {
     marginHorizontal: 15,
+    position: 'relative',
+    height: '38%',
+  },
+  modalComplainContainer: {
     position: 'relative',
     height: 200,
   },
@@ -187,8 +191,18 @@ export default {
     alignItems: 'flex-end',
     marginVertical: 10,
   },
+  formRow: {
+    marginVertical: 10,
+  },
+  formText: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
+    marginBottom: 10,
+  },
   formInput3: {
-    width: '90%',
+    width: '100%',
+    height: 50,
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.DARK,
@@ -196,6 +210,7 @@ export default {
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 10,
+    textAlignVertical: 'top',
   },
   accOrderInfo: {
     borderColor: COLOR.LIGHT,
