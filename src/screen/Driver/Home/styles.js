@@ -28,6 +28,21 @@ export default {
     marginHorizontal: 20,
     paddingLeft: 20,
   },
+  accordionTitle: {
+    flex: 1,
+    marginRight: 10,
+  },
+  accordionTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  accordionTitleText: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
+  },
   formInput: {
     flex: 1,
     fontFamily: FAMILY.BOLD,
@@ -325,11 +340,6 @@ export default {
     borderRadius: 5,
     paddingHorizontal: 15,
     paddingVertical: 15,
-  },
-  accordionTitle: {
-    fontFamily: FAMILY.BOLD,
-    fontSize: SIZE.SIZE_12,
-    color: COLOR.DARKBLUE,
   },
   accOrderInfo: {
     borderColor: COLOR.LIGHT,

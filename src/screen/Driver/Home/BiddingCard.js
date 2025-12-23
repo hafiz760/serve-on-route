@@ -49,6 +49,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
         <Text style={styles.cardPrice}>$ {val?.fare}</Text>
       </View>
 
+
       {/* Route Section */}
       <View style={styles.routeContainer}>
         <View style={styles.routeRow}>
@@ -75,6 +76,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
             {formatDate(val?.time)}
           </Text>
         </View>
+
       </View>
 
       {/* Action Buttons */}

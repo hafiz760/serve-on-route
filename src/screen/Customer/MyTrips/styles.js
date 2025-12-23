@@ -1,7 +1,7 @@
-import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
+import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
 
-const React = require("react-native");
-const { Platform } = React;
+const React = require('react-native');
+const {Platform} = React;
 
 export default {
   myTripHeader: {
@@ -28,15 +28,15 @@ export default {
   },
   /** Tab */
   myTripTabItems: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginVertical: 15,
   },
   tabActive: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLOR.BLUE,
     borderRadius: 5,
     paddingHorizontal: 6,
@@ -45,9 +45,9 @@ export default {
   },
   tabInactive: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 5,
     paddingHorizontal: 6,
     paddingVertical: 12,
@@ -61,7 +61,7 @@ export default {
   tabInactiveText: {
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
-    color: "rgba(255,255,255,0.5)",
+    color: 'rgba(255,255,255,0.5)',
   },
 
   /* -- Accordion -- */
@@ -70,9 +70,9 @@ export default {
     borderRadius: 5,
   },
   accordionTab: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -81,7 +81,7 @@ export default {
   accordionTabText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
-    color: "#333",
+    color: '#333',
   },
 
   /** Content */
@@ -93,7 +93,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: 12,
     color: COLOR.LIGHT,
-    alignSelf: "center",
+    alignSelf: 'center',
     backgroundColor: COLOR.BLUE,
     borderRadius: 15,
     paddingHorizontal: 15,
@@ -103,16 +103,16 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    alignSelf: "center",
+    alignSelf: 'center',
     backgroundColor: COLOR.GREEN,
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 3,
   },
   bookingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: COLOR.SMOKELIGHT,
     paddingHorizontal: 20,
@@ -124,8 +124,8 @@ export default {
     color: COLOR.DARKBLUE,
   },
   bookingDetailInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   bookingDetail: {
     fontFamily: FAMILY.BOLD,
@@ -143,15 +143,15 @@ export default {
     paddingLeft: 5,
   },
   btnInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     margin: 15,
   },
   detailBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
     backgroundColor: COLOR.SMOKELIGHT,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -174,8 +174,8 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
-    backgroundColor: "rgba(249,64,65,1)",
+    textAlign: 'center',
+    backgroundColor: 'rgba(249,64,65,1)',
     borderRadius: 5,
     paddingHorizontal: 15,
     paddingVertical: 15,
@@ -184,7 +184,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
     backgroundColor: COLOR.PRIMARY,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -192,27 +192,36 @@ export default {
   },
   /** * -- ModalLayout -- ***/
   modalRating: {
-    width: "90%",
-    height: 400,
-    borderRadius: 10,
+    width: '90%',
+    height: 500,
+    borderRadius: 20,
+    backgroundColor: COLOR.LIGHT,
   },
   modalRatingContainer: {
-    marginHorizontal: 15,
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingBottom: 20,
   },
   closeSortDesc: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
     marginVertical: 10,
+  },
+  loaderContainerStyles: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   starImg: {
     width: 80,
     height: 80,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   modalRatingTitle: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_20,
     color: COLOR.DARKLIGHT,
-    alignSelf: "center",
+    alignSelf: 'center',
     paddingTop: 10,
     paddingBottom: 5,
   },
@@ -220,19 +229,19 @@ export default {
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.GREYVIOLET,
-    alignSelf: "center",
-    textAlign: "center",
+    alignSelf: 'center',
+    textAlign: 'center',
     lineHeight: 20,
   },
   modalRatingInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
     marginVertical: 20,
   },
   modalStarIcon: {
     fontSize: SIZE.SIZE_30,
-    color: "rgba(255, 178, 41, 1)",
+    color: 'rgba(255, 178, 41, 1)',
     paddingHorizontal: 5,
     paddingVertical: 5,
   },
@@ -246,7 +255,7 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    textAlign: "center",
+    textAlign: 'center',
   },
   /** * -- Accordion -- ***/
   accordionContent: {
@@ -256,21 +265,32 @@ export default {
     marginTop: 5,
   },
   accordion: {
-    width: "100%",
+    width: '100%',
     marginBottom: 5,
   },
   accordionBtn: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: COLOR.LIGHT,
     borderRadius: 5,
     paddingHorizontal: 15,
     paddingVertical: 15,
   },
   accordionTitle: {
+    flex: 1,
+    marginRight: 10,
+  },
+  accordionTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  accordionTitleText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
   },
   accOrderInfo: {
     borderColor: COLOR.LIGHT,
@@ -291,14 +311,14 @@ export default {
     paddingHorizontal: 20,
   },
   accordionInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   accordionActiveText: {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    backgroundColor: "rgba(53,190,224,1)",
+    backgroundColor: 'rgba(53,190,224,1)',
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 5,
@@ -307,35 +327,74 @@ export default {
     fontFamily: FAMILY.BOLD,
     fontSize: SIZE.SIZE_12,
     color: COLOR.LIGHT,
-    backgroundColor: "rgba(92,186,71,1)",
+    backgroundColor: 'rgba(92,186,71,1)',
     borderRadius: 15,
     paddingHorizontal: 15,
     paddingVertical: 5,
   },
+  wrapimg: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginVertical: 8,
+  },
   sender: {
-    alignItems: "flex-end",
-    backgroundColor: COLOR.GREY,
-
-    marginTop: 5,
-    paddingBottom: 5,
-    paddingTop: 5,
-    paddingRight: 7,
-    marginLeft: 70,
-    fontSize: SIZE.SIZE_12,
-    borderRadius: 6,
+    backgroundColor: COLOR.PRIMARY,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 15,
+    borderBottomRightRadius: 2,
+    maxWidth: '75%',
   },
   reciver: {
-    backgroundColor: COLOR.GREYVIOLET,
-    marginTop: 5,
-    paddingBottom: 5,
-    borderRadius: 6,
-    paddingTop: 5,
-    paddingLeft: 7,
-    marginRight: 70,
+    backgroundColor: '#F0F0FB',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 15,
+    borderBottomLeftRadius: 2,
+    maxWidth: '75%',
+  },
+  chatText: {
+    fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
+    color: '#333',
+  },
+  chatTextSender: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.LIGHT,
+  },
+  profileImg: {
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+  },
+  senderPic: {
+    marginLeft: 8,
+  },
+  reciverPic: {
+    marginRight: 8,
+  },
+  chatInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F3F3',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginTop: 15,
+    height: 50,
+  },
+  chatInput: {
+    flex: 1,
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_14,
+    color: COLOR.DARK,
+    paddingVertical: 0,
+  },
+  sendBtn: {
+    marginLeft: 10,
   },
   formInput3: {
-    width: "90%",
+    width: '90%',
     fontFamily: FAMILY.REGULAR,
     fontSize: SIZE.SIZE_12,
     color: COLOR.DARK,
@@ -345,13 +404,13 @@ export default {
     paddingVertical: 10,
   },
   noTripsFoundContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   noTripsFoundText: {
-    color: "#000",
+    color: '#000',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 };

@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import DrawerLeft from "../component/Drawer/Left";
 import messaging from "@react-native-firebase/messaging";
 import { updateNotiId } from "../store/reducers/session.js";
+import { initilizeSocket } from "../store/reducers/socketReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -80,7 +82,35 @@ const NavRoot = ({ navigation }) => {
 const Navigator = () => {
   const data = useSelector((state) => state);
   const { user } = useSelector((state) => state.session);
+  const { socket } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
+
+  // Re-initialize socket on app startup if user is logged in but socket is null
+  useEffect(() => {
+    const reinitializeSocket = async () => {
+      try {
+        // Check if user is logged in but socket is not initialized
+        if (user && !socket) {
+          console.log("User is logged in but socket is null, re-initializing...");
+
+          // Get access token from AsyncStorage
+          const storedData = await AsyncStorage.getItem("response");
+          if (storedData) {
+            const userData = JSON.parse(storedData);
+            if (userData.access_token) {
+              console.log("Re-initializing socket with stored access token");
+              dispatch(initilizeSocket(userData.access_token));
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error re-initializing socket:", error);
+      }
+    };
+
+    reinitializeSocket();
+  }, [user, socket, dispatch]);
+
   useEffect(() => {
     if (!user) return; // Only attach listeners if user is present
 

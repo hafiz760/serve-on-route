@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   ScrollView,
@@ -7,22 +7,22 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Container, Content, Text, Icon } from '../../../component/Basic';
-import { TextInput, Button } from '../../../component/Form';
+import {Container, Content, Text, Icon} from '../../../component/Basic';
+import {TextInput, Button} from '../../../component/Form';
 import Modal from 'react-native-modalbox';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../../component/Header';
-import { showMessage } from '../../../helper/showAlert';
-import { DarkStatusBar } from '../../../component/StatusBar';
+import {showMessage} from '../../../helper/showAlert';
+import {DarkStatusBar} from '../../../component/StatusBar';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
-import { BASE_URL, URL_V } from '../../../utilities/helper';
-import { navigateReset } from '../../../navigations';
+import {BASE_URL, URL_V} from '../../../utilities/helper';
+import {navigateReset} from '../../../navigations';
 import AppSpinner from '../../../component/AppSpinner';
-import { COLOR } from '../../../theme/typography';
-import { Alert } from 'react-native';
+import {COLOR} from '../../../theme/typography';
+import {Alert} from 'react-native';
 import ConfirmationModal from '../../../component/ConfirmationModal';
 
 export default function BookingComplete(props) {
@@ -33,9 +33,6 @@ export default function BookingComplete(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [description, setDescription] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-
-  console.log(val, 'driverValues');
 
   const getPhotoFromGallery = async () => {
     try {
@@ -63,7 +60,7 @@ export default function BookingComplete(props) {
 
       const userData = await AsyncStorage.getItem('response');
       const userJsonData = JSON.parse(userData);
-      console.log(val?.rider_id?._id, 'riderId')
+      console.log(val?.rider_id?._id, 'riderId');
 
       const formData = new FormData();
       if (images) {
@@ -78,15 +75,11 @@ export default function BookingComplete(props) {
       formData.append('description', description);
       console.log('FormData', formData);
 
-      const res = await axios.post(
-        `${BASE_URL}${URL_V}complaints`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${userJsonData.access_token}`,
-          },
+      const res = await axios.post(`${BASE_URL}${URL_V}complaints`, formData, {
+        headers: {
+          Authorization: `Bearer ${userJsonData.access_token}`,
         },
-      );
+      });
 
       showMessage('success', 'Complain Created Successfully!');
       console.log('RESULT', res.data);
@@ -104,7 +97,6 @@ export default function BookingComplete(props) {
     cancelTrip();
   };
 
-
   const cancelTrip = async () => {
     try {
       setIsLoading(true);
@@ -113,7 +105,7 @@ export default function BookingComplete(props) {
 
       const resp = await axios.post(
         `${BASE_URL}${URL_V}parcel/cancel`,
-        { parcel: val?._id },
+        {parcel: val?._id},
         {
           headers: {
             Authorization: `Bearer ${datas.access_token}`,
@@ -131,8 +123,6 @@ export default function BookingComplete(props) {
     }
   };
 
-
-
   const hasRider = !!val?.rider_id?._id;
 
   return (
@@ -145,7 +135,7 @@ export default function BookingComplete(props) {
       <Content contentContainerStyle={theme.layoutDf}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}>
+          style={{flex: 1}}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.bookingContainer}>
               <View style={styles.bookingContent}>
@@ -170,19 +160,19 @@ export default function BookingComplete(props) {
                   <Text style={styles.bookingText}>
                     {val?.time
                       ? `${new Date(val.time).getFullYear()}-${(
-                        new Date(val.time).getMonth() + 1
-                      )
-                        .toString()
-                        .padStart(2, '0')}-${new Date(val.time)
+                          new Date(val.time).getMonth() + 1
+                        )
+                          .toString()
+                          .padStart(2, '0')}-${new Date(val.time)
                           .getDate()
                           .toString()
                           .padStart(2, '0')} ${new Date(val.time)
-                            .getHours()
-                            .toString()
-                            .padStart(2, '0')}:${new Date(val.time)
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, '0')}`
+                          .getHours()
+                          .toString()
+                          .padStart(2, '0')}:${new Date(val.time)
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, '0')}`
                       : ''}
                   </Text>
                 </View>
@@ -222,13 +212,13 @@ export default function BookingComplete(props) {
                         {'Driver informations'}
                       </Text>
                     </View>
-                    <Button onPress={() => { }}>
+                    <Button onPress={() => {}}>
                       <Image
-                        source={{
-                          uri:
-                            val?.rider_id?.avatar ||
-                            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=60',
-                        }}
+                        source={
+                          val?.rider_id?.avatar
+                            ? {uri: val?.rider_id?.avatar}
+                            : require('../../../assets/images/dummyProfile.jpg')
+                        }
                         style={styles.driverImg}
                       />
                     </Button>
@@ -246,7 +236,7 @@ export default function BookingComplete(props) {
                         {`${val?.rider_id?.vehicle_no}`}
                       </Text>
                     </View>
-                    <View style={styles.bookingItem}>
+                    {/* <View style={styles.bookingItem}>
                       <Text style={styles.bookingTitle}>RATING</Text>
                       <View style={styles.ratingInfo}>
                         {[1, 2, 3, 4, 5].map((item, index) => (
@@ -262,7 +252,7 @@ export default function BookingComplete(props) {
                           />
                         ))}
                       </View>
-                    </View>
+                    </View> */}
                   </View>
                 </View>
               )}
@@ -286,13 +276,12 @@ export default function BookingComplete(props) {
             justifyContent: 'flex-start',
           },
         ]}>
-        <View style={[styles.modalRatingContainer, { flex: 0 }]}>
+        <View style={[styles.modalComplainContainer, {flex: 0}]}>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 10,
             }}>
             <Text
               style={{
@@ -303,7 +292,7 @@ export default function BookingComplete(props) {
               Submit Complain
             </Text>
             <Button
-              style={[styles.closeSortDesc, { paddingHorizontal: 0 }]}
+              style={[styles.closeSortDesc, {paddingHorizontal: 0}]}
               onPress={() => setIsOpen(false)}>
               <Icon
                 name="close"
@@ -313,7 +302,7 @@ export default function BookingComplete(props) {
             </Button>
           </View>
 
-          <View style={[styles.formRow, { marginTop: 10 }]}>
+          <View style={[styles.formRow, {marginTop: 10}]}>
             <Text style={styles.formText}>DESCRIPTION</Text>
             <TextInput
               placeholder="Please write your comments"
@@ -324,22 +313,21 @@ export default function BookingComplete(props) {
               value={description}
               onChangeText={setDescription}
               style={[
-                styles.formInput,
+                styles.formInput3,
                 {
                   backgroundColor: '#F3F3F3',
+                  color: '#333',
                   borderRadius: 10,
-                  paddingTop: 10,
                 },
               ]}
             />
           </View>
 
           {/* File preview */}
-          <View style={{ marginTop: 15 }}>
+          <View style={{marginTop: 15}}>
             <Text style={styles.formText}>ATTACHMENT</Text>
             <View
               style={{
-                marginTop: 8,
                 minHeight: 40,
                 borderRadius: 10,
                 borderWidth: 1,
@@ -354,23 +342,27 @@ export default function BookingComplete(props) {
                   <Icon
                     name="file"
                     type="FontAwesome"
-                    style={{ fontSize: 18, marginRight: 8, color: COLOR.DARKVIOLET }}
+                    style={{
+                      fontSize: 18,
+                      marginRight: 8,
+                      color: COLOR.DARKVIOLET,
+                    }}
                   />
-                  <View style={{ flex: 1 }}>
+                  <View style={{flex: 1}}>
                     <Text
                       numberOfLines={1}
-                      style={{ fontSize: 14, color: '#333' }}>
+                      style={{fontSize: 14, color: '#333'}}>
                       {images.name || 'Selected file'}
                     </Text>
                     {images.size != null && (
-                      <Text style={{ fontSize: 12, color: '#777' }}>
+                      <Text style={{fontSize: 12, color: '#777'}}>
                         {(images.size / (1024 * 1024)).toFixed(2)} MB
                       </Text>
                     )}
                   </View>
                 </>
               ) : (
-                <Text style={{ fontSize: 14, color: '#999' }}>
+                <Text style={{fontSize: 14, color: '#999'}}>
                   No file attached
                 </Text>
               )}
@@ -383,12 +375,12 @@ export default function BookingComplete(props) {
               justifyContent: 'space-between',
               marginTop: 25,
             }}>
-            <View style={{ width: '47%', height: 48 }}>
+            <View style={{width: '47%', height: 48}}>
               <Button style={styles.mailBtn} onPress={getPhotoFromGallery}>
                 <Text style={styles.tripText}>ATTACH FILE HERE</Text>
               </Button>
             </View>
-            <View style={{ width: '47%', height: 48 }}>
+            <View style={{width: '47%', height: 48}}>
               <Button style={styles.mailBtn} onPress={postComplain}>
                 <Text style={styles.tripText}>SEND</Text>
               </Button>
@@ -402,14 +394,13 @@ export default function BookingComplete(props) {
           <Button
             style={[
               styles.mailBtn,
-              { backgroundColor: val?.status === 'cancelled' ? '#ccc' : 'red' },
+              {backgroundColor: val?.status === 'cancelled' ? '#ccc' : 'red'},
             ]}
             disabled={val?.status === 'cancelled'}
             onPress={() => {
               if (val?.status === 'cancelled') return;
               setIsModalVisible(true);
-            }}
-          >
+            }}>
             <Text style={styles.tripText}>CANCEL</Text>
           </Button>
         )}
@@ -417,7 +408,7 @@ export default function BookingComplete(props) {
         <Button
           style={[
             styles.mailInvoiceBtn,
-            !hasRider && { backgroundColor: '#ccc' }, // optional disabled style
+            !hasRider && {backgroundColor: '#ccc'}, // optional disabled style
           ]}
           disabled={!hasRider}
           onPress={() => {
