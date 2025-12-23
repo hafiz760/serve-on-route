@@ -7,136 +7,100 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { TextInput, Button } from '../../../component/Form';
+import { TextInput } from '../../../component/Form';
 import { Text, Icon } from '../../../component/Basic';
 import theme from '../../../theme/styles';
-import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
+import { COLOR } from '../../../theme/typography';
 import styles from './styles';
+
 const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
   const [biddingValue, setBiddingValue] = useState(val?.fare);
   const [isBidFormShow, setBidFormShow] = useState(false);
-  const [containerHeight, setContainerHeight] = useState(0);
-  console.log("val", val);
-  const handleLayout = event => {
-    const { height } = event.nativeEvent.layout;
-    setContainerHeight(height);
+
+  // Helper to format date safely
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    // If it's already a clean date string, return it
+    if (typeof dateString === 'string' && dateString.length === 10) return dateString;
+    try {
+      // Handle potential JSON stringified format from original code
+      const cleanStr = dateString.replace(/['"]+/g, '');
+      return cleanStr.substring(0, 10);
+    } catch (e) {
+      return dateString;
+    }
   };
 
   return (
-    <View
-      onLayout={handleLayout}
-      style={{
-        width: '90%',
-        paddingBottom: 20,
-        margin: 20,
-        borderRadius: 10,
-        backgroundColor: COLOR.LIGHT,
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-      }}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ width: '20%', marginTop: 20 }}>
-          <Image
-            source={val?.customer_id?.avatar ? { uri: val?.customer_id?.avatar } : require('../../../assets/images/avatar.png')}
-            resizeMode="cover"
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 25,
-              margin: 10,
-            }}
-          />
+    <View style={styles.cardContainer}>
+      {/* Header Section */}
+      <View style={styles.cardHeader}>
+        <Image
+          source={require('../../../assets/images/avatar.png')}
+          resizeMode="cover"
+          style={styles.cardAvatar}
+        />
+        <View style={styles.cardHeaderInfo}>
+          <Text style={styles.cardName}>
+            {val?.customer_id?.first_name} {val?.customer_id?.last_name}
+          </Text>
+          <Text style={styles.cardCity}>City: {val?.customer_id?.city}</Text>
         </View>
-        <View style={{ paddingTop: 30, width: '70%' }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              margin: 5,
-              fontSize: 20,
-            }}>
-            <Text style={styles.biddingCardText}>
-              {val?.customer_id?.first_name} {val?.customer_id?.last_name}
-            </Text>
+        <Text style={styles.cardPrice}>$ {val?.fare}</Text>
+      </View>
 
-            <Text style={styles.biddingCardText}>$ {val?.fare}</Text>
+
+      {/* Route Section */}
+      <View style={styles.routeContainer}>
+        <View style={styles.routeRow}>
+          <View style={styles.routeItem}>
+            <Text style={styles.locationLabel}>FROM</Text>
+            <Text style={styles.locationText}>{val?.from_location}</Text>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              margin: 5,
-              fontSize: 20,
-            }}>
-            <Text style={styles.biddingCardText}>
-              City: {val?.customer_id?.city}
-            </Text>
-          </View>
-          <View>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.biddingCardText}>From location: </Text>
-              <Text style={styles.biddingCardText}>{val?.from_location}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.biddingCardText}>To location: </Text>
-              <Text style={styles.biddingCardText}>{val?.to_location}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.biddingCardText}>Receiving Slot: </Text>
-              <Text style={styles.biddingCardText}>{val?.receiving_slot}</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              // margin: 5,
-              fontSize: 20,
-            }}>
-            <Text style={styles.biddingCardText}>
-              Delivery Time:{' '}
-              {`${val?.bidding_type}(${JSON.stringify(val?.time)?.substr(
-                1,
-                10,
-              )})`}
-            </Text>
+          <View style={styles.routeItem}>
+            <Text style={styles.locationLabel}>TO</Text>
+            <Text style={styles.locationText}>{val?.to_location}</Text>
           </View>
         </View>
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
-        <Button
-          style={[styles.bookingBtn, { width: '25%', backgroundColor: 'red' }]}
-          onPress={va => {
-            CloseModelBaseOnId(val.id);
-          }}>
-          <Text style={styles.bookingBtnText}>Decline</Text>
-        </Button>
 
-        <Button
-          style={[styles.bookingBtn, { width: '25%', marginLeft: -10 }]}
-          onPress={() => {
-            setBidFormShow(!isBidFormShow);
-          }}>
-          <Text style={styles.bookingBtnText}>Make Offer</Text>
-        </Button>
-        <Button
-          style={[styles.bookingBtn, { width: '25%', marginLeft: -10 }]}
-          onPress={() => {
-            handleBid(biddingValue, val);
-          }}>
-          <Text style={styles.bookingBtnText}>Accept</Text>
-        </Button>
+      {/* Details Grid */}
+      <View style={styles.detailGrid}>
+        <View style={styles.detailItem}>
+          <Text style={styles.detailLabel}>Receiving Slot</Text>
+          <Text style={styles.detailValue}>{val?.receiving_slot}</Text>
+        </View>
+        <View style={styles.detailItem}>
+          <Text style={styles.detailLabel}>Delivery Time</Text>
+          <Text style={styles.detailValue}>
+            {formatDate(val?.time)}
+          </Text>
+        </View>
+
       </View>
+
+      {/* Action Buttons */}
+      <View style={styles.actionRow}>
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.declineBtn]}
+          onPress={() => CloseModelBaseOnId(val.id)}>
+          <Text style={styles.declineBtnText}>Decline</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.offerBtn]}
+          onPress={() => setBidFormShow(!isBidFormShow)}>
+          <Text style={styles.actionBtnText}>Make Offer</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.acceptBtn]}
+          onPress={() => handleBid(biddingValue, val)}>
+          <Text style={styles.actionBtnText}>Accept</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bid Form */}
       {isBidFormShow && (
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -144,37 +108,41 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              paddingBottom: 10,
+              marginTop: 15,
+              backgroundColor: '#F8F9FA',
+              borderRadius: 8,
+              padding: 5,
             }}>
             <TextInput
-              placeholder="Enter The Bidding"
-              placeholderTextColor="black"
+              placeholder="Enter Your Offer"
+              placeholderTextColor={COLOR.GREYVIOLET}
+              keyboardType="numeric"
               style={{
-                width: 250,
-                marginTop: 10,
-                borderRadius: 10,
-                paddingLeft: 10,
-                marginLeft: 20,
-                zindex: 1,
-                backgroundColor: 'white',
-                color: 'black',
+                flex: 1,
+                height: 45,
+                paddingHorizontal: 15,
+                color: COLOR.DARK,
+                fontFamily: 'Roboto-Bold', // Assuming font family availability
               }}
-              onChangeText={e => {
-                setBiddingValue(e);
-              }}
-              onSubmitEditing={e => {
-                handleBid(biddingValue, val);
-              }}
+              onChangeText={setBiddingValue}
+              onSubmitEditing={() => handleBid(biddingValue, val)}
+              value={String(biddingValue)}
             />
             <TouchableOpacity
               onPress={() => {
                 handleBid(biddingValue, val);
                 Keyboard.dismiss();
+              }}
+              style={{
+                padding: 10,
+                backgroundColor: COLOR.PRIMARY,
+                borderRadius: 6,
+                marginRight: 5,
               }}>
               <Icon
                 name="send"
                 type="FontAwesome"
-                style={[styles.btnIcon, theme.SIZE_25]}
+                style={{ color: 'white', fontSize: 16 }}
               />
             </TouchableOpacity>
           </View>
