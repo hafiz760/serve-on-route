@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -7,31 +7,34 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button} from '../../../component/Form';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { TextInput, Button } from '../../../component/Form';
 import Modal from 'react-native-modalbox';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import axios from 'axios';
-import {showMessage} from '../../../helper/showAlert';
-import {useSelector} from 'react-redux';
+import { showMessage } from '../../../helper/showAlert';
+import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DocumentPicker from 'react-native-document-picker';
 import moment from 'moment';
 // import {BASE_URL,URL_V} from "@env"
-import {BASE_URL, URL_V} from '../../../utilities/helper';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
 
 export default function BookingComplete(props) {
   // console.log("Value", props.route.params.data);
   const val = props.route.params.data;
+  console.log(val)
   // console.log("🚀:", val.createdAt);
   const [isOpen, setIsOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [images, setImages] = useState([]);
-  const {user} = useSelector(state => state.session);
+  const { user } = useSelector(state => state.session);
   const [description, setDescription] = useState('');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
 
   const timeStrings = val.createdAt;
   const momentObject = moment(timeStrings);
@@ -116,7 +119,7 @@ export default function BookingComplete(props) {
       <Content contentContainerStyle={theme.layoutDf}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+          style={{ flex: 1 }}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.bookingContainer}>
               <View style={styles.bookingContent}>
@@ -168,6 +171,31 @@ export default function BookingComplete(props) {
                   <Text style={styles.bookingTextDark}>Weight</Text>
                   <Text style={styles.bookingTextDark}>{val?.weight}</Text>
                 </View>
+                <View
+                  style={[
+                    styles.bookingItem,
+                    { flexDirection: 'column', alignItems: 'flex-start' },
+                  ]}>
+                  <Text style={styles.bookingTitle}>Parcel Images</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {val?.images && val.images.length > 0 ? (
+                      val.images.map((img, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => {
+                            setSelectedImage(img);
+                            setIsPreviewOpen(true);
+                          }}>
+                          <Image source={{ uri: img }} style={styles.parcelImg} />
+                        </TouchableOpacity>
+                      ))
+                    ) : (
+                      <Text style={[styles.bookingTextDark, { marginTop: 10 }]}>
+                        No parcel image
+                      </Text>
+                    )}
+                  </View>
+                </View>
               </View>
               <View style={styles.driverDetail}>
                 <View style={styles.driverInfo}>
@@ -181,7 +209,7 @@ export default function BookingComplete(props) {
                     <Image
                       source={
                         val?.customer_id?.avatar
-                          ? {uri: val?.customer_id?.avatar}
+                          ? { uri: val?.customer_id?.avatar }
                           : require('../../../assets/images/dummyProfile.jpg')
                       }
                       style={styles.customerImg}
@@ -248,7 +276,7 @@ export default function BookingComplete(props) {
         <View style={styles.modalRatingContainer}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{flex: 1}}>
+            style={{ flex: 1 }}>
             <Button style={styles.closeSortDesc}>
               <Icon
                 name="close"
@@ -269,7 +297,7 @@ export default function BookingComplete(props) {
                 onChangeText={e => {
                   setDescription(e);
                 }}
-                style={[styles.formInput, {backgroundColor: '#ededed'}]}
+                style={[styles.formInput, { backgroundColor: '#ededed' }]}
               />
             </View>
             <View
@@ -279,7 +307,7 @@ export default function BookingComplete(props) {
                 justifyContent: 'space-between',
                 marginTop: 60,
               }}>
-              <View style={{width: '47%', height: 50}}>
+              <View style={{ width: '47%', height: 50 }}>
                 <Button
                   style={styles.mailBtn}
                   onPress={() => {
@@ -288,7 +316,7 @@ export default function BookingComplete(props) {
                   <Text style={styles.tripText}>ATTACH FILE HERE</Text>
                 </Button>
               </View>
-              <View style={{width: '47%', height: 50}}>
+              <View style={{ width: '47%', height: 50 }}>
                 <Button
                   style={styles.mailBtn}
                   onPress={() => {
@@ -304,7 +332,7 @@ export default function BookingComplete(props) {
       </Modal>
       <View style={[styles.mailBtnInfo]}>
         <Button
-          style={[styles.mailBtn, {backgroundColor: 'red'}]}
+          style={[styles.mailBtn, { backgroundColor: 'red' }]}
           onPress={() => {
             // navigate("CustomerWriteUs");
             cancelTrip();
@@ -324,6 +352,28 @@ export default function BookingComplete(props) {
           <Text style={styles.tripText}>COMPLAIN</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        position={'center'}
+        isOpen={isPreviewOpen}
+        onClosed={() => setIsPreviewOpen(false)}
+        style={styles.modalPreview}>
+        <View style={styles.modalPreviewContainer}>
+          <TouchableOpacity
+            style={styles.closePreview}
+            onPress={() => setIsPreviewOpen(false)}>
+            <Icon
+              name="close"
+              type="MaterialIcons"
+              style={[theme.SIZE_30, theme.LIGHT]}
+            />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: selectedImage }}
+            style={styles.bigImage}
+            resizeMode="contain"
+          />
+        </View>
+      </Modal>
     </Container>
   );
 }

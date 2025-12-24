@@ -1,7 +1,7 @@
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 
 const React = require('react-native');
-const {Platform} = React;
+const { Platform } = React;
 
 export default {
   bookingHeader: {
@@ -131,6 +131,13 @@ export default {
     marginRight: 15,
     marginTop: 10,
   },
+  parcelImg: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    marginRight: 15,
+    marginTop: 10,
+  },
   mailBtnInfo: {
     flexDirection: 'row',
     marginVertical: 10,
@@ -243,5 +250,25 @@ export default {
   accordion: {
     width: '100%',
     marginBottom: 5,
+  },
+  modalPreview: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.9)',
+  },
+  modalPreviewContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closePreview: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 40 : 20,
+    right: 20,
+    zIndex: 1,
+  },
+  bigImage: {
+    width: '90%',
+    height: '80%',
   },
 };

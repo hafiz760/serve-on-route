@@ -25,6 +25,7 @@ export default function MyTrip() {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState([]);
+  console.log('TRIPS', data);
 
   const fetchData = async () => {
     var myData = await AsyncStorage.getItem('response');
@@ -187,8 +188,8 @@ export default function MyTrip() {
                         <Text style={styles.bookingTitle}>PICK UP FROM</Text>
                         <Text style={styles.bookingText}>
                           {`${(val?.from_location).length > 30
-                              ? val?.from_location.substr(0, 30)
-                              : val?.from_location
+                            ? val?.from_location.substr(0, 30)
+                            : val?.from_location
                             }`}
                         </Text>
                       </View>
@@ -196,8 +197,8 @@ export default function MyTrip() {
                         <Text style={styles.bookingTitle}>DROP AT</Text>
                         <Text style={styles.bookingText}>
                           {`${(val?.to_location).length > 30
-                              ? val?.to_location.substr(0, 30)
-                              : val?.to_location
+                            ? val?.to_location.substr(0, 30)
+                            : val?.to_location
                             }`}
                         </Text>
                       </View>
@@ -210,14 +211,6 @@ export default function MyTrip() {
                           </Text>
                         </View>
                       )}
-
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingTitle}>OTP </Text>
-                        <Text style={styles.bookingText}>
-                          {`${val?.receiving_otp}`}
-                        </Text>
-                      </View>
-
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>STATUS</Text>
                         <Button

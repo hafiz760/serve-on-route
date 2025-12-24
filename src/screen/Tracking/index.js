@@ -482,6 +482,7 @@ const TrackingScreen = ({ route }) => {
               value={number}
               placeholder="00000"
               keyboardType="numeric"
+              maxLength={5}
             />
             <Pressable onPress={() => handleDoneTripStatus()}>
               <Text style={styles.shareBtnText2}>
@@ -594,6 +595,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    width: '50%',
+    alignSelf: 'center',
 
   },
   button: {
