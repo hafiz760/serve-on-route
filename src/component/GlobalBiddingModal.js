@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, DeviceEventEmitter } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateNotiId } from "../store/reducers/session";
 import Modal from "react-native-modalbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -11,7 +12,6 @@ const GlobalBiddingModal = () => {
     const notiId = useSelector((state) => state.session.notiId);
     const { socket } = useSelector((state) => state.socket);
     const { user } = useSelector((state) => state.session);
-
 
     console.log("GlobalBiddingModal: mounted");
     console.log("GlobalBiddingModal: notiId", notiId);
@@ -76,6 +76,7 @@ const GlobalBiddingModal = () => {
 
             if (!exists) {
                 setIncomingParcelNotifications((prev) => [...prev, responseOne.data]);
+                // Only open modal if we have valid parcel data
                 setMainModel(true);
             }
         } catch (err) {
@@ -83,16 +84,36 @@ const GlobalBiddingModal = () => {
         }
     };
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         console.log("GlobalBiddingModal: useEffect triggered with notiId", notiId);
-        if (notiId) {
-            if (user?.roles?.includes("rider")) {
-                const id = notiId.split("Id: ")[1].split(" has")[0];
-                console.log("GlobalBiddingModal: extracted id", id);
-                getParcelById(id);
+
+        if (notiId && user) {
+            // 1. Only process bidding logic for riders/drivers
+            // 2. Only process if it follows the parcel notification format
+            const isRider = user?.role?.includes("rider") || user?.roles?.includes("rider");
+
+            if (isRider && notiId.includes("Id: ") && notiId.includes(" has")) {
+                try {
+                    const parts = notiId.split("Id: ");
+                    if (parts.length > 1) {
+                        const id = parts[1].split(" has")[0];
+                        if (id) {
+                            console.log("GlobalBiddingModal: extracted id", id);
+                            getParcelById(id);
+                        }
+                    }
+                } catch (e) {
+                    console.log("GlobalBiddingModal: Error parsing notiId", e);
+                }
             }
+
+            // Always clear notiId from store after processing 
+            // This prevents loops and stops non-bidding notifications (like OTPs) from lingering
+            dispatch(updateNotiId(null));
         }
-    }, [notiId]);
+    }, [notiId, user]);
 
     return (
         <Modal

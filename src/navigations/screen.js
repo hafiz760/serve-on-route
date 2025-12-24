@@ -10,7 +10,6 @@ import messaging from "@react-native-firebase/messaging";
 import { updateNotiId } from "../store/reducers/session.js";
 import { initilizeSocket } from "../store/reducers/socketReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showMessage } from "../helper/showAlert.js";
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -119,7 +118,6 @@ const Navigator = () => {
 
     // When the app is opened from the background by tapping the notification
     const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
-      debugger
       console.log("onNotificationOpenedApp", JSON.stringify(remoteMessage, null, 2));
       if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.roles?.includes("rider")) {
         dispatch(updateNotiId(remoteMessage.notification?.body));
@@ -139,7 +137,6 @@ const Navigator = () => {
       .getInitialNotification()
       .then(remoteMessage => {
         if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.roles?.includes("rider")) {
-          console.log('remoteMessage.notification?.body', remoteMessage.notification?.body);
           dispatch(updateNotiId(remoteMessage.notification?.body));
           console.log("Notification opened from quit state: rider");
           navigationRef.navigate("DrawerNav", {
@@ -168,7 +165,7 @@ const Navigator = () => {
         });
       } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.roles?.includes("user")) {
         console.log("Foreground user notification");
-        showMessage("success", remoteMessage.notification?.body);
+        // showMessage("success", remoteMessage.notification?.body);
       }
     });
 

@@ -18,8 +18,6 @@ import { useFocusEffect } from '@react-navigation/native';
 
 export default function Home({ route }) {
   console.log('route', route);
-  const notiId = useSelector(state => state.session.notiId);
-  console.log('notiId', notiId);
   const { socket } = useSelector(state => state.socket);
 
   const closeModelBaseOnId = id => {
@@ -50,8 +48,6 @@ export default function Home({ route }) {
     }
   };
 
-  const [incomingParcelNotifications, setIncomingParcelNotifications] =
-    useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,43 +76,7 @@ export default function Home({ route }) {
       setLoading(false);
     }
   };
-  const getParcelById = async parcelId => {
-    console.log('getParcelById called', parcelId);
-    var data = await AsyncStorage.getItem('response');
-    var datas = JSON.parse(data);
 
-    try {
-      const responseOne = await axios.get(
-        `${BASE_URL}${URL_V}parcel/${parcelId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
-        },
-      );
-
-      console.log('RESPONSE ====>', responseOne);
-      console.log(incomingParcelNotifications, 'incomingParcelNotifications');
-      const exists = incomingParcelNotifications.some(
-        item => item.id === responseOne.data.id,
-      );
-      console.log(exists, 'exists');
-
-      if (!exists) {
-        setIncomingParcelNotifications([
-          ...incomingParcelNotifications,
-          responseOne.data,
-        ]);
-      } else {
-        console.log('Parcel already exists, not adding again');
-      }
-
-      // Modal is now handled globally, no need to set local state
-    } catch (err) {
-      Alert.alert('Something went wrong while fetching parcel');
-      console.log(err?.response);
-    }
-  };
 
   useFocusEffect(
     useCallback(() => {
@@ -138,15 +98,8 @@ export default function Home({ route }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('use effect call on home11111');
     fetchData();
-    if (notiId) {
-      const id = notiId.split('Id: ')[1].split(' has')[0];
-      console.log(id, 'id');
-      getParcelById(id);
-      dispatch(updateNotiId(null));
-    }
-  }, [notiId]);
+  }, []);
 
   function cleanLocation(loc) {
     if (!loc) return '';
