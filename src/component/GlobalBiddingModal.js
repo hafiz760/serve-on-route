@@ -10,6 +10,8 @@ import { BASE_URL, URL_V } from "../utilities/helper";
 const GlobalBiddingModal = () => {
     const notiId = useSelector((state) => state.session.notiId);
     const { socket } = useSelector((state) => state.socket);
+    const { user } = useSelector((state) => state.session);
+
 
     console.log("GlobalBiddingModal: mounted");
     console.log("GlobalBiddingModal: notiId", notiId);
@@ -74,7 +76,6 @@ const GlobalBiddingModal = () => {
 
             if (!exists) {
                 setIncomingParcelNotifications((prev) => [...prev, responseOne.data]);
-                // Only open modal if we have valid parcel data
                 setMainModel(true);
             }
         } catch (err) {
@@ -85,9 +86,11 @@ const GlobalBiddingModal = () => {
     useEffect(() => {
         console.log("GlobalBiddingModal: useEffect triggered with notiId", notiId);
         if (notiId) {
-            const id = notiId.split("Id: ")[1].split(" has")[0];
-            console.log("GlobalBiddingModal: extracted id", id);
-            getParcelById(id);
+            if (user?.roles?.includes("rider")) {
+                const id = notiId.split("Id: ")[1].split(" has")[0];
+                console.log("GlobalBiddingModal: extracted id", id);
+                getParcelById(id);
+            }
         }
     }, [notiId]);
 
