@@ -134,7 +134,8 @@ export default function PersonalInfoSection({
                   setOpen(false);
                 }}
               />
-              <View
+              <TouchableOpacity
+                onPress={() => setOpen(true)}
                 style={{
                   height: hp(7),
                   borderRadius: 10,
@@ -147,14 +148,12 @@ export default function PersonalInfoSection({
                 <Text>
                   {displayDate ? displayDate.substr(0, 10) : 'NO DATE'}
                 </Text>
-                <TouchableOpacity onPress={() => setOpen(true)}>
-                  <Image
-                    source={require('../../../../assets/images/blackdrop.png')}
-                    style={{backgroundColor: '#E6E6E6'}}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-              </View>
+                <Image
+                  source={require('../../../../assets/images/blackdrop.png')}
+                  style={{backgroundColor: '#E6E6E6'}}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </View>

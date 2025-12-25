@@ -1,7 +1,7 @@
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 
 const React = require('react-native');
-const {Platform} = React;
+const { Platform } = React;
 
 export default {
   bookingHeader: {
@@ -131,6 +131,13 @@ export default {
     marginRight: 15,
     marginTop: 10,
   },
+  parcelImg: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    marginRight: 15,
+    marginTop: 10,
+  },
   mailBtnInfo: {
     flexDirection: 'row',
     marginVertical: 10,
@@ -185,13 +192,171 @@ export default {
   },
   modalRating: {
     width: '90%',
-    height: 320,
-    borderRadius: 10,
+    height: 400,
+    borderRadius: 20,
+    backgroundColor: COLOR.LIGHT,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
   },
   modalRatingContainer: {
-    marginHorizontal: 15,
-    position: 'relative',
-    height: 200,
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8E8E8',
+  },
+  modalHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  modalIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFF3E0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  modalHeaderIcon: {
+    fontSize: 24,
+    color: '#FF9800',
+  },
+  modalHeaderTextContainer: {
+    flex: 1,
+  },
+  modalTitle: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_16,
+    color: COLOR.DARK,
+    marginBottom: 2,
+  },
+  modalSubtitle: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.SMOKEVIOLET,
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeIcon: {
+    fontSize: 20,
+    color: COLOR.GREYVIOLET,
+  },
+  formSection: {
+    flex: 1,
+    marginBottom: 15,
+  },
+  formLabel: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
+    marginBottom: 10,
+  },
+  formTextArea: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.DARK,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    minHeight: 140,
+    textAlignVertical: 'top',
+  },
+  attachmentPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E3F2FD',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 10,
+  },
+  attachmentIcon: {
+    fontSize: 18,
+    color: COLOR.BLUE,
+    marginRight: 8,
+  },
+  attachmentText: {
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.BLUE,
+    flex: 1,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  attachButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  attachButtonText: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.GREYVIOLET,
+    marginLeft: 6,
+  },
+  buttonIcon: {
+    fontSize: 18,
+    color: COLOR.GREYVIOLET,
+  },
+  sendButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLOR.PRIMARY,
+    borderRadius: 12,
+    paddingVertical: 14,
+    shadowColor: COLOR.PRIMARY,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  sendButtonText: {
+    fontFamily: FAMILY.BOLD,
+    fontSize: SIZE.SIZE_12,
+    color: COLOR.LIGHT,
+    marginRight: 6,
+  },
+  sendButtonIcon: {
+    fontSize: 16,
+    color: COLOR.LIGHT,
   },
   closeSortDesc: {
     alignItems: 'flex-end',
@@ -243,5 +408,25 @@ export default {
   accordion: {
     width: '100%',
     marginBottom: 5,
+  },
+  modalPreview: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.9)',
+  },
+  modalPreviewContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closePreview: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 40 : 20,
+    right: 20,
+    zIndex: 1,
+  },
+  bigImage: {
+    width: '90%',
+    height: '80%',
   },
 };

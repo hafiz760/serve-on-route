@@ -6,6 +6,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import {Container, Content, Text, Icon} from '../../../component/Basic';
 import {TextInput, Button} from '../../../component/Form';
@@ -267,125 +268,90 @@ export default function BookingComplete(props) {
         isDisabled={isDisabled}
         backdrop={true}
         backdropOpacity={0.5}
-        style={[
-          styles.modalRating,
-          {
-            borderRadius: 16,
-            paddingHorizontal: 20,
-            paddingVertical: 20,
-            justifyContent: 'flex-start',
-          },
-        ]}>
-        <View style={[styles.modalComplainContainer, {flex: 0}]}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: '600',
-                color: COLOR.DARKVIOLET,
-              }}>
-              Submit Complain
-            </Text>
-            <Button
-              style={[styles.closeSortDesc, {paddingHorizontal: 0}]}
-              onPress={() => setIsOpen(false)}>
-              <Icon
-                name="close"
-                type="MaterialIcons"
-                style={[theme.SIZE_20, theme.DARKVIOLET]}
-              />
-            </Button>
-          </View>
-
-          <View style={[styles.formRow, {marginTop: 10}]}>
-            <Text style={styles.formText}>DESCRIPTION</Text>
-            <TextInput
-              placeholder="Please write your comments"
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-              value={description}
-              onChangeText={setDescription}
-              style={[
-                styles.formInput3,
-                {
-                  backgroundColor: '#F3F3F3',
-                  color: '#333',
-                  borderRadius: 10,
-                },
-              ]}
-            />
-          </View>
-
-          {/* File preview */}
-          <View style={{marginTop: 15}}>
-            <Text style={styles.formText}>ATTACHMENT</Text>
-            <View
-              style={{
-                minHeight: 40,
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#ddd',
-                paddingHorizontal: 10,
-                paddingVertical: 8,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              {images ? (
-                <>
+        style={styles.modalRating}>
+        <View style={styles.modalRatingContainer}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{flex: 1}}>
+            
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderContent}>
+                <View style={styles.modalIconContainer}>
                   <Icon
-                    name="file"
-                    type="FontAwesome"
-                    style={{
-                      fontSize: 18,
-                      marginRight: 8,
-                      color: COLOR.DARKVIOLET,
-                    }}
+                    name="report-problem"
+                    type="MaterialIcons"
+                    style={styles.modalHeaderIcon}
                   />
-                  <View style={{flex: 1}}>
-                    <Text
-                      numberOfLines={1}
-                      style={{fontSize: 14, color: '#333'}}>
-                      {images.name || 'Selected file'}
-                    </Text>
-                    {images.size != null && (
-                      <Text style={{fontSize: 12, color: '#777'}}>
-                        {(images.size / (1024 * 1024)).toFixed(2)} MB
-                      </Text>
-                    )}
-                  </View>
-                </>
-              ) : (
-                <Text style={{fontSize: 14, color: '#999'}}>
-                  No file attached
-                </Text>
+                </View>
+                <View style={styles.modalHeaderTextContainer}>
+                  <Text style={styles.modalTitle}>File a Complaint</Text>
+                  <Text style={styles.modalSubtitle}>Help us improve our service</Text>
+                </View>
+              </View>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setIsOpen(false)}>
+                <Icon
+                  name="close"
+                  type="MaterialIcons"
+                  style={styles.closeIcon}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Description Section */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Description *</Text>
+              <TextInput
+                placeholder="Please describe your complaint in detail..."
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={7}
+                textAlignVertical="top"
+                value={description}
+                onChangeText={setDescription}
+                style={styles.formTextArea}
+              />
+              {images?.name && (
+                <View style={styles.attachmentPreview}>
+                  <Icon
+                    name="attachment"
+                    type="MaterialIcons"
+                    style={styles.attachmentIcon}
+                  />
+                  <Text style={styles.attachmentText} numberOfLines={1}>
+                    {images.name}
+                  </Text>
+                </View>
               )}
             </View>
-          </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 25,
-            }}>
-            <View style={{width: '47%', height: 48}}>
-              <Button style={styles.mailBtn} onPress={getPhotoFromGallery}>
-                <Text style={styles.tripText}>ATTACH FILE HERE</Text>
-              </Button>
+            {/* Action Buttons */}
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.attachButton}
+                onPress={getPhotoFromGallery}>
+                <Icon
+                  name="attach-file"
+                  type="MaterialIcons"
+                  style={styles.buttonIcon}
+                />
+                <Text style={styles.attachButtonText}>Attach File</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={postComplain}>
+                <Text style={styles.sendButtonText}>Submit</Text>
+                <Icon
+                  name="send"
+                  type="MaterialIcons"
+                  style={styles.sendButtonIcon}
+                />
+              </TouchableOpacity>
             </View>
-            <View style={{width: '47%', height: 48}}>
-              <Button style={styles.mailBtn} onPress={postComplain}>
-                <Text style={styles.tripText}>SEND</Text>
-              </Button>
-            </View>
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 

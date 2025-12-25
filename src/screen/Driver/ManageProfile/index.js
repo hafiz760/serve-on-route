@@ -84,6 +84,7 @@ export default function ManageProfile() {
         return_url: 'https://serveonroute.com/return',
         type: 'account_onboarding',
       };
+      console.log('payload', payload);
       const response = await linkStripeAccount(
         payload,
         parsedData?.access_token,

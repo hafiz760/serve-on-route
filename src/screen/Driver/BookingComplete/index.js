@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -7,31 +7,35 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button} from '../../../component/Form';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { TextInput, Button } from '../../../component/Form';
 import Modal from 'react-native-modalbox';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import axios from 'axios';
-import {showMessage} from '../../../helper/showAlert';
-import {useSelector} from 'react-redux';
+import { showMessage } from '../../../helper/showAlert';
+import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DocumentPicker from 'react-native-document-picker';
 import moment from 'moment';
 // import {BASE_URL,URL_V} from "@env"
-import {BASE_URL, URL_V} from '../../../utilities/helper';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
 
 export default function BookingComplete(props) {
   // console.log("Value", props.route.params.data);
   const val = props.route.params.data;
+  console.log(val)
   // console.log("🚀:", val.createdAt);
   const [isOpen, setIsOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [images, setImages] = useState([]);
-  const {user} = useSelector(state => state.session);
+  const { user } = useSelector(state => state.session);
   const [description, setDescription] = useState('');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [parcelStatus, setParcelStatus] = useState(val?.status);
 
   const timeStrings = val.createdAt;
   const momentObject = moment(timeStrings);
@@ -116,7 +120,7 @@ export default function BookingComplete(props) {
       <Content contentContainerStyle={theme.layoutDf}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+          style={{ flex: 1 }}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.bookingContainer}>
               <View style={styles.bookingContent}>
@@ -168,6 +172,31 @@ export default function BookingComplete(props) {
                   <Text style={styles.bookingTextDark}>Weight</Text>
                   <Text style={styles.bookingTextDark}>{val?.weight}</Text>
                 </View>
+                <View
+                  style={[
+                    styles.bookingItem,
+                    { flexDirection: 'column', alignItems: 'flex-start' },
+                  ]}>
+                  <Text style={styles.bookingTitle}>Parcel Images</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {val?.images && val.images.length > 0 ? (
+                      val.images.map((img, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => {
+                            setSelectedImage(img);
+                            setIsPreviewOpen(true);
+                          }}>
+                          <Image source={{ uri: img }} style={styles.parcelImg} />
+                        </TouchableOpacity>
+                      ))
+                    ) : (
+                      <Text style={[styles.bookingTextDark, { marginTop: 10 }]}>
+                        No parcel image
+                      </Text>
+                    )}
+                  </View>
+                </View>
               </View>
               <View style={styles.driverDetail}>
                 <View style={styles.driverInfo}>
@@ -181,7 +210,7 @@ export default function BookingComplete(props) {
                     <Image
                       source={
                         val?.customer_id?.avatar
-                          ? {uri: val?.customer_id?.avatar}
+                          ? { uri: val?.customer_id?.avatar }
                           : require('../../../assets/images/dummyProfile.jpg')
                       }
                       style={styles.customerImg}
@@ -202,36 +231,6 @@ export default function BookingComplete(props) {
                       {(val?._id).substr(0, 15)}
                     </Text>
                   </View>
-                  {/* <View style={styles.bookingItem}>
-                    <Text style={styles.bookingTitle}>RATING</Text>
-                    <View style={styles.ratingInfo}>
-                      <Icon
-                        name="star"
-                        type="FontAwesome"
-                        style={styles.ratingIconSelected}
-                      />
-                      <Icon
-                        name="star"
-                        type="FontAwesome"
-                        style={styles.ratingIconSelected}
-                      />
-                      <Icon
-                        name="star"
-                        type="FontAwesome"
-                        style={styles.ratingIconSelected}
-                      />
-                      <Icon
-                        name="star"
-                        type="FontAwesome"
-                        style={styles.ratingIconSelected}
-                      />
-                      <Icon
-                        name="star"
-                        type="FontAwesome"
-                        style={styles.ratingIcon}
-                      />
-                    </View>
-                  </View> */}
                 </View>
               </View>
             </View>
@@ -248,82 +247,145 @@ export default function BookingComplete(props) {
         <View style={styles.modalRatingContainer}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{flex: 1}}>
-            <Button style={styles.closeSortDesc}>
-              <Icon
-                name="close"
-                type="MaterialIcons"
-                style={[theme.SIZE_20, theme.DARKVIOLET]}
-              />
-            </Button>
+            style={{ flex: 1 }}>
+            
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderContent}>
+                <View style={styles.modalIconContainer}>
+                  <Icon
+                    name="report-problem"
+                    type="MaterialIcons"
+                    style={styles.modalHeaderIcon}
+                  />
+                </View>
+                <View style={styles.modalHeaderTextContainer}>
+                  <Text style={styles.modalTitle}>File a Complaint</Text>
+                  <Text style={styles.modalSubtitle}>Help us improve our service</Text>
+                </View>
+              </View>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setIsOpen(false)}>
+                <Icon
+                  name="close"
+                  type="MaterialIcons"
+                  style={styles.closeIcon}
+                />
+              </TouchableOpacity>
+            </View>
 
-            <View style={styles.formRow}>
-              <Text style={styles.formText}>DESCRIPTION</Text>
+            {/* Description Section */}
+            <View style={styles.formSection}>
+              <Text style={styles.formLabel}>Description *</Text>
               <TextInput
-                placeholder="Please write your comments"
-                placeholderTextColor="#ccc"
+                placeholder="Please describe your complaint in detail..."
+                placeholderTextColor="#999"
                 multiline
                 numberOfLines={7}
                 textAlignVertical={'top'}
-                // placeholder='Please write your comments'
                 onChangeText={e => {
                   setDescription(e);
                 }}
-                style={[styles.formInput, {backgroundColor: '#ededed'}]}
+                style={styles.formTextArea}
               />
+              {images?.name && (
+                <View style={styles.attachmentPreview}>
+                  <Icon
+                    name="attachment"
+                    type="MaterialIcons"
+                    style={styles.attachmentIcon}
+                  />
+                  <Text style={styles.attachmentText} numberOfLines={1}>
+                    {images.name}
+                  </Text>
+                </View>
+              )}
             </View>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: 60,
-              }}>
-              <View style={{width: '47%', height: 50}}>
-                <Button
-                  style={styles.mailBtn}
-                  onPress={() => {
-                    getPhotoFromGallery();
-                  }}>
-                  <Text style={styles.tripText}>ATTACH FILE HERE</Text>
-                </Button>
-              </View>
-              <View style={{width: '47%', height: 50}}>
-                <Button
-                  style={styles.mailBtn}
-                  onPress={() => {
-                    postComplain();
-                    setIsOpen(false);
-                  }}>
-                  <Text style={styles.tripText}>SEND</Text>
-                </Button>
-              </View>
+
+            {/* Action Buttons */}
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.attachButton}
+                onPress={() => {
+                  getPhotoFromGallery();
+                }}>
+                <Icon
+                  name="attach-file"
+                  type="MaterialIcons"
+                  style={styles.buttonIcon}
+                />
+                <Text style={styles.attachButtonText}>Attach File</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={() => {
+                  postComplain();
+                  setIsOpen(false);
+                }}>
+                <Text style={styles.sendButtonText}>Submit</Text>
+                <Icon
+                  name="send"
+                  type="MaterialIcons"
+                  style={styles.sendButtonIcon}
+                />
+              </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
         </View>
       </Modal>
+      
       <View style={[styles.mailBtnInfo]}>
-        <Button
-          style={[styles.mailBtn, {backgroundColor: 'red'}]}
-          onPress={() => {
-            // navigate("CustomerWriteUs");
-            cancelTrip();
-          }}>
-          <Text style={styles.tripText}>CANCEL</Text>
-        </Button>
         <TouchableOpacity
           style={[
-            totalHourss <= '72'
+            styles.mailBtn,
+            { backgroundColor: 'red' },
+            parcelStatus !== 'in_progress' && { opacity: 0.5 }
+          ]}
+          disabled={parcelStatus !== 'in_progress'}
+          onPress={() => {
+            if (parcelStatus === 'in_progress') {
+              cancelTrip();
+            }
+          }}>
+          <Text style={styles.tripText}>CANCEL</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            totalHourss <= '72' || parcelStatus === 'completed'
               ? styles.mailInvoiceBtn
               : styles.mailInvoiceBtnn,
           ]}
           onPress={() => {
             setIsOpen(true);
           }}
-          disabled={totalHourss <= '72' ? false : true}>
+          disabled={totalHourss <= '72' || parcelStatus === 'completed' ? false : true}>
           <Text style={styles.tripText}>COMPLAIN</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        position={'center'}
+        isOpen={isPreviewOpen}
+        onClosed={() => setIsPreviewOpen(false)}
+        style={styles.modalPreview}>
+        <View style={styles.modalPreviewContainer}>
+          <TouchableOpacity
+            style={styles.closePreview}
+            onPress={() => setIsPreviewOpen(false)}>
+            <Icon
+              name="close"
+              type="MaterialIcons"
+              style={[theme.SIZE_30, theme.LIGHT]}
+            />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: selectedImage }}
+            style={styles.bigImage}
+            resizeMode="contain"
+          />
+        </View>
+      </Modal>
     </Container>
   );
 }

@@ -1,29 +1,27 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {View, ScrollView, FlatList, Alert} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import {updateNotiId} from '../../../store/reducers/session';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {Button} from '../../../component/Form';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, ScrollView, FlatList, Alert, DeviceEventEmitter } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateNotiId } from '../../../store/reducers/session';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { Button } from '../../../component/Form';
 import styles from './styles';
 import axios from 'axios';
-import Modal from 'react-native-modalbox';
+
 import Accordion from '../../Driver/MyTrips/Accordion';
-import {DarkStatusBar} from '../../../component/StatusBar';
+import { DarkStatusBar } from '../../../component/StatusBar';
 import BiddingCard from './BiddingCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {BASE_URL, URL_V} from '../../../utilities/helper';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
 import Header from '../../../component/Header';
 import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
-export default function Home({route}) {
+export default function Home({ route }) {
   console.log('route', route);
-  const notiId = useSelector(state => state.session.notiId);
-  console.log('notiId', notiId);
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
+
   const closeModelBaseOnId = id => {
-    if (incomingParcelNotifications.length == 1) {
-      setMainModel(false);
-    }
+    // Modal is now handled globally
     setIncomingParcelNotifications(previous => {
       return previous.filter(value => {
         return value.id != id;
@@ -42,7 +40,7 @@ export default function Home({route}) {
     };
     console.log('requestPayload', requestPayload);
     try {
-      setMainModel(false);
+      // Modal is now handled globally
       socket.emit('bidding', requestPayload);
       Alert.alert('You successfully bid on this parcel');
     } catch (error) {
@@ -50,10 +48,6 @@ export default function Home({route}) {
     }
   };
 
-  const [mainModel, setMainModel] = useState(false);
-  const [incomingParcelNotifications, setIncomingParcelNotifications] =
-    useState([]);
-  const ModalNotification = useRef();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -82,58 +76,30 @@ export default function Home({route}) {
       setLoading(false);
     }
   };
-  const getParcelById = async parcelId => {
-    console.log('getParcelById called', parcelId);
-    var data = await AsyncStorage.getItem('response');
-    var datas = JSON.parse(data);
 
-    try {
-      const responseOne = await axios.get(
-        `${BASE_URL}${URL_V}parcel/${parcelId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-          },
-        },
-      );
 
-      console.log('RESPONSE ====>', responseOne);
-      console.log(incomingParcelNotifications, 'incomingParcelNotifications');
-      const exists = incomingParcelNotifications.some(
-        item => item.id === responseOne.data.id,
-      );
-      console.log(exists, 'exists');
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, []),
+  );
 
-      if (!exists) {
-        setIncomingParcelNotifications([
-          ...incomingParcelNotifications,
-          responseOne.data,
-        ]);
-      } else {
-        console.log('Parcel already exists, not adding again');
-      }
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener('refreshHome', () => {
+      console.log('Driver Home: refreshHome event received');
+      fetchData();
+    });
 
-      if (!mainModel) {
-        setMainModel(true);
-      }
-    } catch (err) {
-      Alert.alert('Something went wrong while fetching parcel');
-      console.log(err?.response);
-    }
-  };
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('use effect call on home11111');
     fetchData();
-    if (notiId) {
-      const id = notiId.split('Id: ')[1].split(' has')[0];
-      console.log(id, 'id');
-      getParcelById(id);
-      dispatch(updateNotiId(null));
-    }
-  }, [notiId]);
+  }, []);
 
   function cleanLocation(loc) {
     if (!loc) return '';
@@ -150,33 +116,8 @@ export default function Home({route}) {
     return str.length > len ? `${str.substr(0, len)}...` : str;
   }
 
-  const MainModel = () => {
-    return (
-      <Modal
-        ref={ModalNotification}
-        isOpen={true}
-        entry={'top'}
-        swipeToClose={false}
-        style={{
-          borderRadius: 10,
-          // alignItems: "center",
-          minHeight: '100%',
-        }}
-        backdropPressToClose={false}>
-        {incomingParcelNotifications.map(val => {
-          return (
-            <BiddingCard
-              val={val}
-              key={val?._id}
-              CloseModelBaseOnId={closeModelBaseOnId}
-              handleBid={handleBid}
-            />
-          );
-        })}
-      </Modal>
-    );
-  };
-  const renderOpen = ({item: val, index}) => {
+
+  const renderOpen = ({ item: val, index }) => {
     if (val.status == 'in_progress') {
       const cost = val?.pay_amount
         ? `${val?.pay_amount} USD`
@@ -266,26 +207,7 @@ export default function Home({route}) {
 
   return (
     <Container>
-      <Modal
-        isOpen={mainModel}
-        entry={'top'}
-        backdropOpacity={0.3}
-        swipeToClose={false}>
-        <View
-          style={{
-            flex: 1,
-          }}>
-          <MainModel />
-        </View>
 
-        <Button
-          style={[styles.bookingBtn, {backgroundColor: 'grey'}]}
-          onPress={() => {
-            setMainModel(false);
-          }}>
-          <Text style={styles.bookingBtnText}>Cancel</Text>
-        </Button>
-      </Modal>
       <DarkStatusBar />
 
       <Header leftType="menu" title={'Dashboard'} />
@@ -302,7 +224,7 @@ export default function Home({route}) {
               },
             ]}
           />
-          <View style={{width: '90%', alignSelf: 'center', paddingTop: 15}}>
+          <View style={{ width: '90%', alignSelf: 'center', paddingTop: 15 }}>
             <FlatList
               data={data}
               showsHorizontalScrollIndicator={false}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View ,TextInput,TouchableOpacity, KeyboardAvoidingView, Platform} from "react-native";
+import { View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
 import { Text, Icon } from "../../../../component/Basic";
 import { Button } from "../../../../component/Form";
 import styles from "../styles";
@@ -18,7 +18,7 @@ import axios from "axios";
 import { BASE_URL, URL_V } from "../../../../utilities/helper";
 
 export default function Item({ value }) {
-  const  {socket }= useSelector((state) => state.socket);
+  const { socket } = useSelector((state) => state.socket);
   const [isModalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState();
   const [parcelId, setParcelId] = useState("");
@@ -53,7 +53,7 @@ export default function Item({ value }) {
   };
   async function getId(body) {
     const text = body;
-    const regex = /Parcel with Id: ([a-f0-9]+) /i;
+    // const regex = /Parcel with Id: ([a-f0-9]+) /i;
     const match = text.match(regex);
     if (match) {
       const id = match[1];
@@ -115,7 +115,7 @@ export default function Item({ value }) {
       toggleModal()
     } catch (error) {
       toggleModal()
-      console.log("error",error);
+      console.log("error", error);
       alert("Something went wrong while bidding...!");
     }
   };
@@ -125,11 +125,11 @@ export default function Item({ value }) {
         <View style={styles.notificationInfo}>
           <View>
             <Text style={styles.notificationTitle}>
-            
+
               {value?.item?.title}
             </Text>
             <View style={{ flexDirection: "row", width: 200 }}>
-           
+
             </View>
           </View>
           <Text style={styles.notificationText}>
@@ -151,126 +151,126 @@ export default function Item({ value }) {
             onPress={() => getId(value?.item?.body)}
           >
             <Text>Details</Text>
-         
+
           </Button>
         </View>
         <Modal isVisible={isModalVisible}>
           <View
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
           >
-            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1, justifyContent: 'center'}}>
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 10,
-                padding: 20,
-                width: wp("80"),
-              }}
-            >
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, justifyContent: 'center' }}>
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  backgroundColor: "#fff",
+                  borderRadius: 10,
+                  padding: 20,
+                  width: wp("80"),
                 }}
               >
-                <View>
-                  <Text style={styles.biddingCardText}>
-                    {data?.customer_id?.first_name}{" "}
-                    {data?.customer_id?.last_name}
-                  </Text>
-                </View>
-                <View>
-                  {/* <Text >Fare</Text> */}
-                  <Text style={styles.biddingCardText}>${data?.fare}</Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: "row", marginVertical: hp("2") }}>
-                <View>
-                  <Text>{data?.from_location}</Text>
-                </View>
-                <Text style={styles.biddingCardText}>TO</Text>
-                <View>
-                  <Text>{data?.to_location}</Text>
-                </View>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Button
-                  style={[
-                    styles.bookingBtn,
-                    { width: "25%", backgroundColor: "red" },
-                  ]}
-                  onPress={toggleModal}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  <Text style={styles.bookingBtnText}>Close</Text>
-                </Button>
+                  <View>
+                    <Text style={styles.biddingCardText}>
+                      {data?.customer_id?.first_name}{" "}
+                      {data?.customer_id?.last_name}
+                    </Text>
+                  </View>
+                  <View>
+                    {/* <Text >Fare</Text> */}
+                    <Text style={styles.biddingCardText}>${data?.fare}</Text>
+                  </View>
+                </View>
+                <View style={{ flexDirection: "row", marginVertical: hp("2") }}>
+                  <View>
+                    <Text>{data?.from_location}</Text>
+                  </View>
+                  <Text style={styles.biddingCardText}>TO</Text>
+                  <View>
+                    <Text>{data?.to_location}</Text>
+                  </View>
+                </View>
 
-                {data?.status=="pending"?
-              <Button
-              style={[styles.bookingBtn, { width: "25%", marginLeft: -10 }]}
-              onPress={() => {
-                setBidFormShow(!isBidFormShow);
-              }}
-            >
-              <Text style={styles.bookingBtnText}>
-                Make Own Offer
-              </Text>
-            </Button>
-            :null  
-              }
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Button
+                    style={[
+                      styles.bookingBtn,
+                      { width: "25%", backgroundColor: "red" },
+                    ]}
+                    onPress={toggleModal}
+                  >
+                    <Text style={styles.bookingBtnText}>Close</Text>
+                  </Button>
+
+                  {data?.status == "pending" ?
+                    <Button
+                      style={[styles.bookingBtn, { width: "25%", marginLeft: -10 }]}
+                      onPress={() => {
+                        setBidFormShow(!isBidFormShow);
+                      }}
+                    >
+                      <Text style={styles.bookingBtnText}>
+                        Make Own Offer
+                      </Text>
+                    </Button>
+                    : null
+                  }
+                </View>
+                {isBidFormShow && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingBottom: 10,
+                      with: wp("80")
+                    }}
+                  >
+                    <TextInput
+                      placeholder="Enter The Bidding"
+                      placeholderTextColor="black"
+                      style={{
+                        width: wp("55"),
+                        marginTop: 10,
+                        borderRadius: 10,
+                        paddingLeft: 10,
+                        marginLeft: 20,
+                        zindex: 1,
+                        backgroundColor: "lightgrey",
+                        color: "black",
+                      }}
+                      onChangeText={(e) => {
+                        setBiddingValue(e);
+                      }}
+                      onSubmitEditing={(e) => {
+                        handleBid();
+                      }}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleBid();
+                        // Keyboard.dismiss();
+                      }}
+                    >
+                      <Icon
+                        name="send"
+                        type="FontAwesome"
+                        style={[styles.btnIcon, theme.SIZE_25]}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-              {isBidFormShow && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingBottom: 10,
-            with:wp("80")
-          }}
-        >
-          <TextInput
-            placeholder="Enter The Bidding"
-            placeholderTextColor="black"
-            style={{
-              width: wp("55"),
-              marginTop: 10,
-              borderRadius: 10,
-              paddingLeft: 10,
-              marginLeft: 20,
-              zindex: 1,
-              backgroundColor: "lightgrey",
-              color: "black",
-            }}
-            onChangeText={(e) => {
-              setBiddingValue(e);
-            }}
-            onSubmitEditing={(e) => {
-              handleBid();
-            }}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              handleBid();
-              // Keyboard.dismiss();
-            }}
-          >
-            <Icon
-              name="send"
-              type="FontAwesome"
-              style={[styles.btnIcon, theme.SIZE_25]}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-            </View>
             </KeyboardAvoidingView>
           </View>
-         
+
         </Modal>
       </View>
     </>

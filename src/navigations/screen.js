@@ -118,55 +118,125 @@ const Navigator = () => {
 
     // When the app is opened from the background by tapping the notification
     const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log("onNotificationOpenedApp", JSON.stringify(remoteMessage, null, 2));
-      if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.roles?.includes("rider")) {
+      console.log("=== onNotificationOpenedApp (Background) ===");
+      console.log("Full notification:", JSON.stringify(remoteMessage, null, 2));
+      console.log("Notification type:", remoteMessage?.data?.notificationType);
+      console.log("User role:", user?.role);
+      console.log("Notification body:", remoteMessage.notification?.body);
+      
+      // Check if this is an OTP notification for a rider - if so, skip it
+      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') || 
+                                remoteMessage.notification?.body?.toLowerCase().includes('verification');
+      const isRider = user?.role?.includes("rider");
+      
+      if (isOTPNotification && isRider) {
+        console.log("🚫 Skipping OTP notification for rider (background)");
+        console.log("=== onNotificationOpenedApp complete ===");
+        return; // Don't process OTP notifications for riders
+      }
+      
+      if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.role?.includes("rider")) {
+        console.log("✅ parcel_notify for rider - updating notiId");
         dispatch(updateNotiId(remoteMessage.notification?.body));
         console.log("Notification opened from background: rider");
         navigationRef.navigate("DrawerNav", {
           screen: "PublicHome",
           params: { data: remoteMessage.notification?.body },
         });
-      } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.roles?.includes("user")) {
+      } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.role?.includes("user")) {
         console.log("Notification opened from background: user");
         navigationRef.navigate("DrawerNav", { screen: "PublicHome" });
+      } else {
+        console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
       }
+      console.log("=== onNotificationOpenedApp complete ===");
     });
 
     // When the app is opened from a quit state
     messaging()
       .getInitialNotification()
       .then(remoteMessage => {
-        if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.roles?.includes("rider")) {
-          dispatch(updateNotiId(remoteMessage.notification?.body));
-          console.log("Notification opened from quit state: rider");
-          navigationRef.navigate("DrawerNav", {
-            screen: "PublicHome",
-            params: { data: remoteMessage.notification?.body },
-          });
+        console.log("=== getInitialNotification (Quit State) ===");
+        if (remoteMessage) {
+          console.log("Full notification:", JSON.stringify(remoteMessage, null, 2));
+          console.log("Notification type:", remoteMessage?.data?.notificationType);
+          console.log("User role:", user?.role);
+          console.log("Notification body:", remoteMessage.notification?.body);
+          
+          // Check if this is an OTP notification for a rider - if so, skip it
+          const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') || 
+                                    remoteMessage.notification?.body?.toLowerCase().includes('verification');
+          const isRider = user?.role?.includes("rider");
+          
+          if (isOTPNotification && isRider) {
+            console.log("🚫 Skipping OTP notification for rider (quit state)");
+            console.log("=== getInitialNotification complete ===");
+            return; // Don't process OTP notifications for riders
+          }
+          
+          if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.role?.includes("rider")) {
+            console.log("✅ parcel_notify for rider - updating notiId");
+            dispatch(updateNotiId(remoteMessage.notification?.body));
+            console.log("Notification opened from quit state: rider");
+            navigationRef.navigate("DrawerNav", {
+              screen: "PublicHome",
+              params: { data: remoteMessage.notification?.body },
+            });
+          } else {
+            console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
+          }
+        } else {
+          console.log("No initial notification");
         }
+        console.log("=== getInitialNotification complete ===");
       });
 
     // Foreground notifications
     const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+      console.log("=== onMessage (Foreground) ===");
       console.log("FOREGROUND notification", JSON.stringify(remoteMessage, null, 2));
-      dispatch(updateNotiId(remoteMessage.notification?.body));
-      console.log("aftre set");
+      console.log("Notification type:", remoteMessage?.data?.notificationType);
+      console.log("User role:", user?.role);
+      console.log("Notification body:", remoteMessage.notification?.body);
+      
+      // Check if this is an OTP notification for a rider - if so, skip it
+      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') || 
+                                remoteMessage.notification?.body?.toLowerCase().includes('verification');
+      const isRider = user?.role?.includes("rider");
+      
+      if (isOTPNotification && isRider) {
+        console.log("🚫 Skipping OTP notification for rider");
+        console.log("=== onMessage complete ===");
+        return; // Don't process OTP notifications for riders
+      }
+      
       if (
         remoteMessage &&
-        user?.roles?.includes("rider") &&
+        user?.role?.includes("rider") &&
         remoteMessage?.data?.notificationType === "parcel_notify"
       ) {
+        console.log("✅ parcel_notify for rider in foreground - updating notiId");
+        dispatch(updateNotiId(remoteMessage.notification?.body));
+        console.log("After notiId update");
 
         navigationRef.navigate("DrawerNav", {
           screen: "PublicHome",
           params: {
-            data: remoteMessage.notification?.body, // <= this!
+            data: remoteMessage.notification?.body,
           },
         });
-      } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.roles?.includes("user")) {
+      } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.role?.includes("user")) {
         console.log("Foreground user notification");
+        dispatch(updateNotiId(remoteMessage.notification?.body));
         // showMessage("success", remoteMessage.notification?.body);
+      } else {
+        console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
+        // Only update notiId for non-riders or non-OTP notifications
+        if (!isRider || !isOTPNotification) {
+          dispatch(updateNotiId(remoteMessage.notification?.body));
+        }
       }
+      console.log("=== onMessage complete ===");
     });
 
     // Cleanup to avoid memory leaks

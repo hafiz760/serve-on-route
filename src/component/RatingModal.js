@@ -5,9 +5,9 @@ import { COLOR, FAMILY, SIZE } from "../theme/typography";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { showMessage } from "../helper/showAlert";
-const RatingModal = ({ isVisible, onClose ,userID,riderID}) => {
-    // console.log(userID,">>>>>>>",riderID);
-    const { user } = useSelector((state) => state.session);
+const RatingModal = ({ isVisible, onClose, userID, riderID }) => {
+  // console.log(userID,">>>>>>>",riderID);
+  const { user } = useSelector((state) => state.session);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
 
@@ -19,21 +19,21 @@ const RatingModal = ({ isVisible, onClose ,userID,riderID}) => {
     setReview(text);
   };
 
-//   const handleSubmitRating = () => {
-//     // Handle submitting the rating and review to your backend or local storage
-//     console.log(`User rated ${rating} stars with review: ${review}`);
-//     onClose();
-//   };
+  //   const handleSubmitRating = () => {
+  //     // Handle submitting the rating and review to your backend or local storage
+  //     console.log(`User rated ${rating} stars with review: ${review}`);
+  //     onClose();
+  //   };
   const handleSubmitRating = async () => {
     try {
       const resp = await axios.post(
         `https://api.serveonroute.com/v1/rating-review`,
         {
-        rating: rating,
-        review: review,
-        rider: riderID,
-        user: userID
-      },
+          rating: rating,
+          review: review,
+          rider: riderID,
+          user: userID
+        },
         {
           headers: {
             Authorization: `Bearer ${user.access_token}`,
@@ -47,14 +47,14 @@ const RatingModal = ({ isVisible, onClose ,userID,riderID}) => {
       showMessage("error", "Review not submited");
     }
     onClose();
-};
+  };
 
   return (
     <Modal isVisible={isVisible} onBackdropPress={onClose} style={styles.modal}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Rate This User</Text>
-        {/* <StarRating
+        <View style={styles.container}>
+          <Text style={styles.title}>Rate This User</Text>
+          {/* <StarRating
           disabled={false}
           maxStars={5}
           rating={rating}
@@ -62,17 +62,17 @@ const RatingModal = ({ isVisible, onClose ,userID,riderID}) => {
           fullStarColor={COLOR.PRIMARY}
           starSize={40}
         /> */}
-        <TextInput
-          placeholder="Write a review..."
-          style={styles.reviewInput}
-          onChangeText={(text) => handleReviewChange(text)}
-          value={review}
-          multiline={true}
-        />
-        <TouchableOpacity onPress={handleSubmitRating} style={styles.submitButton}>
-          <Text style={styles.submitText}>Submit</Text>
-        </TouchableOpacity>
-      </View>
+          <TextInput
+            placeholder="Write a review..."
+            style={styles.reviewInput}
+            onChangeText={(text) => handleReviewChange(text)}
+            value={review}
+            multiline={true}
+          />
+          <TouchableOpacity onPress={handleSubmitRating} style={styles.submitButton}>
+            <Text style={styles.submitText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -82,20 +82,20 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: 'center',
     alignItems: 'center',
-    
+
   },
   container: {
     backgroundColor: 'white',
     borderRadius: 8,
-    // padding: 30,
-    paddingHorizontal:50,
-    paddingVertical:20
+    width: '80%',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color:COLOR.PRIMARY
+    color: COLOR.PRIMARY
   },
   reviewInput: {
     borderColor: 'gray',
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
-    minHeight: 100, // Adjust the minimum height as needed
+    minHeight: 50,
   },
   submitButton: {
     backgroundColor: COLOR.PRIMARY,

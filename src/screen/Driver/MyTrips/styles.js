@@ -224,7 +224,7 @@ export default {
   /** * -- ModalLayout -- ***/
   modalRating: {
     width: '90%',
-    height: 500,
+    height: 400,
     borderRadius: 20,
     backgroundColor: COLOR.LIGHT,
   },

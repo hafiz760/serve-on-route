@@ -17,13 +17,10 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
   const [biddingValue, setBiddingValue] = useState(val?.fare);
   const [isBidFormShow, setBidFormShow] = useState(false);
 
-  // Helper to format date safely
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    // If it's already a clean date string, return it
     if (typeof dateString === 'string' && dateString.length === 10) return dateString;
     try {
-      // Handle potential JSON stringified format from original code
       const cleanStr = dateString.replace(/['"]+/g, '');
       return cleanStr.substring(0, 10);
     } catch (e) {
@@ -33,7 +30,6 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
 
   return (
     <View style={styles.cardContainer}>
-      {/* Header Section */}
       <View style={styles.cardHeader}>
         <Image
           source={require('../../../assets/images/avatar.png')}
@@ -49,8 +45,6 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
         <Text style={styles.cardPrice}>$ {val?.fare}</Text>
       </View>
 
-
-      {/* Route Section */}
       <View style={styles.routeContainer}>
         <View style={styles.routeRow}>
           <View style={styles.routeItem}>

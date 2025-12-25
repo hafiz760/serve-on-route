@@ -1,23 +1,24 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-sparse-arrays */
-import React, {useState, useEffect} from 'react';
-import {View, ScrollView} from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {Button} from '../../../component/Form';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, ScrollView } from 'react-native';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { Button } from '../../../component/Form';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Accordion from './Accordion';
-import {COLOR} from '../../../theme/typography';
+import { COLOR } from '../../../theme/typography';
 import moment from 'moment';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import Header from '../../../component/Header';
-import {DarkStatusBar} from '../../../component/StatusBar';
-import {useSelector} from 'react-redux';
+import { DarkStatusBar } from '../../../component/StatusBar';
+import { useSelector } from 'react-redux';
 import ChatsModal from './ChatsModal';
 import AppSpinner from '../../../component/AppSpinner';
-import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate} from '../../../navigations';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate } from '../../../navigations';
+import { useFocusEffect } from '@react-navigation/native';
 import PaginationControls from '../../../component/PaginationControls';
 
 export default function MyTrip() {
@@ -34,7 +35,7 @@ export default function MyTrip() {
 
   const [users, setUsers] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
 
   const PAGE_LIMIT = 10;
 
@@ -86,6 +87,12 @@ export default function MyTrip() {
   useEffect(() => {
     fetchData(1);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData(1);
+    }, []),
+  );
 
   const handleNextPage = () => {
     if (!hasNextPage || pageLoading) return;
@@ -199,21 +206,19 @@ export default function MyTrip() {
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>PICK UP FROM</Text>
                         <Text style={styles.bookingText}>
-                          {`${
-                            (val?.from_location).length > 30
-                              ? val?.from_location.substr(0, 30)
-                              : val?.from_location
-                          }`}
+                          {`${(val?.from_location).length > 30
+                            ? val?.from_location.substr(0, 30)
+                            : val?.from_location
+                            }`}
                         </Text>
                       </View>
                       <View style={styles.bookingInfo}>
                         <Text style={styles.bookingTitle}>DROP AT</Text>
                         <Text style={styles.bookingText}>
-                          {`${
-                            (val?.to_location).length > 30
-                              ? val?.to_location.substr(0, 30)
-                              : val?.to_location
-                          }`}
+                          {`${(val?.to_location).length > 30
+                            ? val?.to_location.substr(0, 30)
+                            : val?.to_location
+                            }`}
                         </Text>
                       </View>
 
@@ -249,7 +254,7 @@ export default function MyTrip() {
                         <Button
                           style={styles.detailBtn}
                           onPress={() => {
-                            navigate('CustomerBookingComplete', {data: val});
+                            navigate('CustomerBookingComplete', { data: val });
                           }}>
                           <Icon
                             name="search"
@@ -265,7 +270,7 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                {backgroundColor: COLOR.BLUE},
+                                { backgroundColor: COLOR.BLUE },
                               ]}
                               onPress={() => {
                                 setSelectedParcel(val);
@@ -278,7 +283,7 @@ export default function MyTrip() {
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  {color: COLOR.LIGHT},
+                                  { color: COLOR.LIGHT },
                                 ]}>
                                 CHAT
                               </Text>
@@ -287,13 +292,13 @@ export default function MyTrip() {
                             <Button
                               style={[
                                 styles.detailBtn,
-                                {backgroundColor: COLOR.GREEN},
+                                { backgroundColor: COLOR.GREEN },
                               ]}
                               onPress={() => handleNavigation(val)}>
                               <Text
                                 style={[
                                   styles.detailBtnText,
-                                  {color: 'white'},
+                                  { color: 'white' },
                                 ]}>
                                 Tracking
                               </Text>
@@ -321,8 +326,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-          data?.length > 0 &&
-          data.filter(d => d.status === 'in_progress')?.length > 0 ? (
+            data?.length > 0 &&
+            data.filter(d => d.status === 'in_progress')?.length > 0 ? (
             [...data].reverse().map((val, index) => {
               if (val.status == 'in_progress') {
                 const cost = val?.pay_amount
@@ -335,10 +340,21 @@ export default function MyTrip() {
                   ? moment(val.time).format('YYYY-MM-DD HH:mm')
                   : '';
 
-                const title = `#${shortId} • ${val?.status?.toUpperCase()} • ${cost}
-📍 ${pickupLoc}
-🏁 ${dropLoc}
-⏰ ${tripTime}`;
+                const title = (
+                  <View style={styles.accordionTitle}>
+                    <View style={styles.accordionTitleRow}>
+                      <Text
+                        style={styles.accordionTitleText}>{`#${shortId}`}</Text>
+                      <Text style={styles.accordionTitleText}>{`${cost}`}</Text>
+                    </View>
+                    <Text
+                      style={styles.accordionTitleText}>{`📍 ${pickupLoc}`}</Text>
+                    <Text
+                      style={styles.accordionTitleText}>{`🏁 ${dropLoc}`}</Text>
+                    <Text
+                      style={styles.accordionTitleText}>{`⏰ ${tripTime}`}</Text>
+                  </View>
+                );
 
                 return (
                   <Accordion
@@ -384,6 +400,13 @@ export default function MyTrip() {
                             </Text>
                           </View>
                         )}
+
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>OTP </Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.receiving_otp}`}
+                          </Text>
+                        </View>
 
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
@@ -416,7 +439,7 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              {backgroundColor: COLOR.BLUE},
+                              { backgroundColor: COLOR.BLUE },
                             ]}
                             onPress={() => {
                               setSelectedParcel(val);
@@ -429,7 +452,7 @@ export default function MyTrip() {
                             <Text
                               style={[
                                 styles.detailBtnText,
-                                {color: COLOR.LIGHT},
+                                { color: COLOR.LIGHT },
                               ]}>
                               CHAT
                             </Text>
@@ -437,11 +460,11 @@ export default function MyTrip() {
                           <Button
                             style={[
                               styles.detailBtn,
-                              {backgroundColor: COLOR.GREEN},
+                              { backgroundColor: COLOR.GREEN },
                             ]}
                             onPress={() => handleNavigation(val)}>
                             <Text
-                              style={[styles.detailBtnText, {color: 'white'}]}>
+                              style={[styles.detailBtnText, { color: 'white' }]}>
                               Tracking
                             </Text>
                           </Button>
@@ -467,8 +490,8 @@ export default function MyTrip() {
       <View>
         <View style={styles.accordionLayout}>
           {data &&
-          data?.length > 0 &&
-          data.filter(d => d.status === 'completed')?.length > 0 ? (
+            data?.length > 0 &&
+            data.filter(d => d.status === 'completed')?.length > 0 ? (
             [...data].reverse().map((val, index) => {
               if (val.status == 'completed') {
                 const cost = val?.pay_amount
@@ -481,10 +504,21 @@ export default function MyTrip() {
                   ? moment(val.time).format('YYYY-MM-DD HH:mm')
                   : '';
 
-                const title = `#${shortId} • ${val?.status?.toUpperCase()} • ${cost}
-📍 ${pickupLoc}
-🏁 ${dropLoc}
-⏰ ${tripTime}`;
+                const title = (
+                  <View style={styles.accordionTitle}>
+                    <View style={styles.accordionTitleRow}>
+                      <Text
+                        style={styles.accordionTitleText}>{`#${shortId}`}</Text>
+                      <Text style={styles.accordionTitleText}>{`${cost}`}</Text>
+                    </View>
+                    <Text
+                      style={styles.accordionTitleText}>{`📍 ${pickupLoc}`}</Text>
+                    <Text
+                      style={styles.accordionTitleText}>{`🏁 ${dropLoc}`}</Text>
+                    <Text
+                      style={styles.accordionTitleText}>{`⏰ ${tripTime}`}</Text>
+                  </View>
+                );
 
                 return (
                   <Accordion
@@ -530,6 +564,13 @@ export default function MyTrip() {
                             </Text>
                           </View>
                         )}
+
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingTitle}>OTP </Text>
+                          <Text style={styles.bookingText}>
+                            {`${val?.receiving_otp}`}
+                          </Text>
+                        </View>
 
                         <View style={styles.bookingInfo}>
                           <Text style={styles.bookingTitle}>STATUS</Text>
@@ -635,7 +676,7 @@ export default function MyTrip() {
         </View>
       </View>
       {loading ? (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <AppSpinner color={COLOR.PRIMARY} size="large" />
         </View>
       ) : (
@@ -645,10 +686,10 @@ export default function MyTrip() {
               {tabSelected === 'all'
                 ? renderAll()
                 : tabSelected === 'open'
-                ? renderOpen()
-                : tabSelected === 'completed'
-                ? renderCompleted()
-                : null}
+                  ? renderOpen()
+                  : tabSelected === 'completed'
+                    ? renderCompleted()
+                    : null}
             </View>
             {/* <PaginationControls
               page={page}
