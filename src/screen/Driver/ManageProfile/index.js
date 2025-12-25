@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Linking } from 'react-native';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+
 import { Container, Content, Text } from '../../../component/Basic';
 import { Button } from '../../../component/Form';
 import styles from './styles';
@@ -92,9 +94,29 @@ export default function ManageProfile() {
 
       if (response.success) {
         console.log('URL>>>>>>:', response.data);
-        setUrlValue(response.data.url);
+        const url = response.data.url;
+        setUrlValue(url);
+
         if (isEnabled) {
-          Linking.openURL(response.data.url);
+          try {
+            if (await InAppBrowser.isAvailable()) {
+              await InAppBrowser.open(url, {
+                // optional styling
+                dismissButtonStyle: 'close',
+                preferredBarTintColor: '#ffffff',
+                preferredControlTintColor: '#000000',
+                // Android
+                showTitle: true,
+                toolbarColor: '#ffffff',
+                secondaryToolbarColor: '#ffffff',
+              });
+            } else {
+              // Fallback to normal Linking if in-app not available
+              Linking.openURL(url);
+            }
+          } catch (e) {
+            Linking.openURL(url);
+          }
         }
       } else {
         console.error('Link Account Failed:', response.message);
@@ -103,6 +125,7 @@ export default function ManageProfile() {
       console.error('Error in connectAccount:', error.message);
     }
   };
+
 
   return (
     <>
