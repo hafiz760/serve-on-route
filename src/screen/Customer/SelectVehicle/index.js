@@ -445,8 +445,10 @@ function SelectVehicle(params) {
   };
 
   const fetchData = async () => {
+    console.log("fetchData");
     setISLoading(true);
     var data = await AsyncStorage.getItem('response');
+    console.log(data)
     var datas = JSON.parse(data);
 
     const formData = new FormData();
@@ -494,11 +496,11 @@ function SelectVehicle(params) {
     };
     try {
       const res = await fetch(`${BASE_URL}${URL_V}parcel`, requestOptions);
-      // console.log("fetchData ~ result======>", JSON.stringify(res,null,2))
+      console.log("fetchData ~ result======>", JSON.stringify(res, null, 2))
       const result = await res.json();
       // console.log("result>>>>>", result);
       if (result.statusCode === 400) {
-        // showMessage("error", result.message);
+        showMessage("error", result.message);
       } else {
         setFocus(true);
         showMessage(
