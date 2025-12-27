@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Image,
@@ -7,19 +7,20 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { TextInput } from '../../../component/Form';
-import { Text, Icon } from '../../../component/Basic';
+import {TextInput} from '../../../component/Form';
+import {Text, Icon} from '../../../component/Basic';
 import theme from '../../../theme/styles';
-import { COLOR } from '../../../theme/typography';
+import {COLOR} from '../../../theme/typography';
 import styles from './styles';
 
-const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
+const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
   const [biddingValue, setBiddingValue] = useState(val?.fare);
   const [isBidFormShow, setBidFormShow] = useState(false);
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '';
-    if (typeof dateString === 'string' && dateString.length === 10) return dateString;
+    if (typeof dateString === 'string' && dateString.length === 10)
+      return dateString;
     try {
       const cleanStr = dateString.replace(/['"]+/g, '');
       return cleanStr.substring(0, 10);
@@ -32,7 +33,11 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
     <View style={styles.cardContainer}>
       <View style={styles.cardHeader}>
         <Image
-          source={require('../../../assets/images/avatar.png')}
+          source={
+            val?.customer_id?.avatar
+              ? {uri: val?.customer_id?.avatar}
+              : require('../../../assets/images/avatar.png')
+          }
           resizeMode="cover"
           style={styles.cardAvatar}
         />
@@ -66,11 +71,8 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
         </View>
         <View style={styles.detailItem}>
           <Text style={styles.detailLabel}>Delivery Time</Text>
-          <Text style={styles.detailValue}>
-            {formatDate(val?.time)}
-          </Text>
+          <Text style={styles.detailValue}>{formatDate(val?.time)}</Text>
         </View>
-
       </View>
 
       {/* Action Buttons */}
@@ -136,7 +138,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
               <Icon
                 name="send"
                 type="FontAwesome"
-                style={{ color: 'white', fontSize: 16 }}
+                style={{color: 'white', fontSize: 16}}
               />
             </TouchableOpacity>
           </View>
