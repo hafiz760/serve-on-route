@@ -11,6 +11,7 @@ import { persistor, store } from "../store";
 import Support from "../component/Support";
 import 'react-native-get-random-values'
 import GlobalBiddingModal from "../component/GlobalBiddingModal";
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -68,18 +69,22 @@ export default class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <PersistGate
-          loading={null}
-          persistor={persistor}
-          onBeforeLift={this.onBeforeLift}
-        >
-          {this.state.loading ? null :
-
-            <Navigator />}
-        </PersistGate>
-        <Toast visibilityTime={1800} />
-        <Support />
-        <GlobalBiddingModal />
+        <SafeAreaProvider>
+          <PersistGate
+            loading={null}
+            persistor={persistor}
+            onBeforeLift={this.onBeforeLift}
+          >
+            {this.state.loading ? null :
+              <SafeAreaView style={{ flex: 1 }}>
+                <Navigator />
+              </SafeAreaView>
+            }
+          </PersistGate>
+          <Toast visibilityTime={1800} />
+          <Support />
+          <GlobalBiddingModal />
+        </SafeAreaProvider>
       </Provider>
     );
   }

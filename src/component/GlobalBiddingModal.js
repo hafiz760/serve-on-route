@@ -4,34 +4,27 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateNotiId } from "../store/reducers/session";
 import Modal from "react-native-modalbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import BiddingCard from "../screen/Driver/Home/BiddingCard";
-import { BASE_URL, URL_V } from "../utilities/helper";
+import CustomerBiddingCard from "./CustomerBiddingCard";
+import { navigate } from "../navigations";
 
 const GlobalBiddingModal = () => {
     const notiId = useSelector((state) => state.session.notiId);
     const { socket } = useSelector((state) => state.socket);
     const { user } = useSelector((state) => state.session);
+    const isDriver = useSelector((state) => state.session.bool);
 
-    console.log("GlobalBiddingModal: mounted");
-    console.log("GlobalBiddingModal: notiId", notiId);
+    console.log("GlobalBiddingModal: mounted", isDriver ? "Driver" : "Customer");
 
     const [mainModel, setMainModel] = useState(false);
     const [incomingParcelNotifications, setIncomingParcelNotifications] = useState([]);
+    const [customerBids, setCustomerBids] = useState([]);
     const ModalNotification = useRef();
 
     const closeModelBaseOnId = (id) => {
-        console.log("GlobalBiddingModal: closeModelBaseOnId called with id", id);
-        console.log("GlobalBiddingModal: current notifications count", incomingParcelNotifications.length);
         if (incomingParcelNotifications.length === 1) {
-            console.log("GlobalBiddingModal: closing modal (last notification)");
             setMainModel(false);
         }
-        setIncomingParcelNotifications((previous) => {
-            const filtered = previous.filter((value) => value.id !== id);
-            console.log("GlobalBiddingModal: notifications after filter", filtered.length);
-            return filtered;
-        });
+        setIncomingParcelNotifications((previous) => previous.filter((value) => value.id !== id));
     };
 
     const handleBid = async (bidValue, selectedParcel) => {
@@ -48,20 +41,51 @@ const GlobalBiddingModal = () => {
             setMainModel(false);
             socket.emit("bidding", requestPayload);
             alert("You successfully bid on this parcel");
-
-            // Emit event to refresh Driver Home screen
             DeviceEventEmitter.emit('refreshHome');
-
-            // Remove the bid parcel from the list
             closeModelBaseOnId(selectedParcel.id);
-
         } catch (error) {
             console.log("Bid Error", error);
         }
     };
 
+    const handleAcceptCustomerBid = async (bid) => {
+        try {
+            var data = await AsyncStorage.getItem('response');
+            var datas = JSON.parse(data);
+
+            const formData = new FormData();
+            formData.append('rider_id', bid.bidder._id);
+            formData.append('status', 'in_progress');
+            formData.append('pay_amount', bid?.bid_amount);
+
+            await axios.patch(
+                `${BASE_URL}${URL_V}parcel/${bid.parcel._id}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${datas.access_token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                },
+            );
+
+            setCustomerBids(prev => prev.filter(b => b._id !== bid._id));
+            if (customerBids.length === 1) setMainModel(false);
+            
+            alert('You have chosen your driver. He is on his way!');
+            navigate('CustomerMyTrips');
+        } catch (err) {
+            console.log("Accept Bid Error", err);
+        }
+    };
+
+    const handleDeclineCustomerBid = (bid) => {
+        const filtered = customerBids.filter(b => b._id !== bid._id);
+        setCustomerBids(filtered);
+        if (filtered.length === 0) setMainModel(false);
+    };
+
     const getParcelById = async (parcelId) => {
-        console.log("GlobalBiddingModal: getParcelById called with", parcelId);
         try {
             var data = await AsyncStorage.getItem("response");
             var datas = JSON.parse(data);
@@ -75,98 +99,64 @@ const GlobalBiddingModal = () => {
                 }
             );
 
-            console.log("GlobalBiddingModal: parcel data received", responseOne.data);
-            
-            const exists = incomingParcelNotifications.some(
-                (item) => item.id === responseOne.data.id
-            );
-
-            console.log("GlobalBiddingModal: parcel already exists?", exists);
-
+            const exists = incomingParcelNotifications.some((item) => item.id === responseOne.data.id);
             if (!exists) {
-                console.log("GlobalBiddingModal: adding new parcel to notifications");
-                setIncomingParcelNotifications((prev) => {
-                    const updated = [...prev, responseOne.data];
-                    console.log("GlobalBiddingModal: updated notifications count", updated.length);
-                    return updated;
-                });
-                // Only open modal if we have valid parcel data
-                console.log("GlobalBiddingModal: opening modal");
+                setIncomingParcelNotifications((prev) => [...prev, responseOne.data]);
                 setMainModel(true);
-            } else {
-                console.log("GlobalBiddingModal: parcel already in list, skipping");
             }
         } catch (err) {
-            console.log("GlobalBiddingModal: Error fetching parcel", err?.response?.data || err?.message);
+            console.log("GlobalBiddingModal: Error", err);
         }
     };
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log("=== GlobalBiddingModal: useEffect triggered ===");
-        console.log("GlobalBiddingModal: notiId", notiId);
-        console.log("GlobalBiddingModal: user", user ? `${user.first_name} (role: ${user.role})` : "null");
-
-        if (notiId && user) {
-            // Check if this is an OTP notification - if so, skip it for riders
-            const isOTPNotification = notiId?.toLowerCase().includes('otp') || 
-                                      notiId?.toLowerCase().includes('verification');
-            const isRider = user?.role?.includes("rider");
-            
-            if (isOTPNotification && isRider) {
-                console.log("GlobalBiddingModal: 🚫 Skipping OTP notification for rider");
+        if (notiId && user && isDriver) {
+            const isOTPNotification = notiId?.toLowerCase().includes('otp') || notiId?.toLowerCase().includes('verification');
+            if (isOTPNotification) {
                 dispatch(updateNotiId(null));
                 return;
             }
-            
-            // 1. Only process bidding logic for riders/drivers
-            // 2. Only process if it follows the parcel notification format
-            console.log("GlobalBiddingModal: isRider?", isRider);
 
-            if (isRider && notiId.includes("Id: ") && notiId.includes(" has")) {
-                console.log("GlobalBiddingModal: notiId format is valid for parcel notification");
-                try {
-                    const parts = notiId.split("Id: ");
-                    console.log("GlobalBiddingModal: split parts", parts);
-                    if (parts.length > 1) {
-                        const id = parts[1].split(" has")[0];
-                        if (id) {
-                            console.log("GlobalBiddingModal: ✅ extracted parcel id:", id);
-                            getParcelById(id);
-                        } else {
-                            console.log("GlobalBiddingModal: ❌ extracted id is empty");
-                        }
-                    } else {
-                        console.log("GlobalBiddingModal: ❌ split failed, parts length:", parts.length);
-                    }
-                } catch (e) {
-                    console.log("GlobalBiddingModal: ❌ Error parsing notiId", e);
+            if (notiId.includes("Id: ") && notiId.includes(" has")) {
+                const parts = notiId.split("Id: ");
+                if (parts.length > 1) {
+                    const id = parts[1].split(" has")[0];
+                    if (id) getParcelById(id);
                 }
-            } else {
-                console.log("GlobalBiddingModal: ❌ Skipping - either not a rider or invalid notiId format");
-                console.log("  - isRider:", isRider);
-                console.log("  - contains 'Id: ':", notiId.includes("Id: "));
-                console.log("  - contains ' has':", notiId.includes(" has"));
             }
-
-            // Always clear notiId from store after processing 
-            // This prevents loops and stops non-bidding notifications (like OTPs) from lingering
-            console.log("GlobalBiddingModal: clearing notiId from Redux");
             dispatch(updateNotiId(null));
-        } else {
-            console.log("GlobalBiddingModal: ❌ Skipping - notiId or user is null");
         }
-        console.log("=== GlobalBiddingModal: useEffect complete ===");
-    }, [notiId, user]);
+    }, [notiId, user, isDriver]);
 
-    console.log("GlobalBiddingModal: render - mainModel:", mainModel, "notifications count:", incomingParcelNotifications.length);
-    console.log("GlobalBiddingModal: modal isOpen?", mainModel && incomingParcelNotifications.length > 0);
+    useEffect(() => {
+        if (socket && user && !isDriver) {
+            console.log("GlobalBiddingModal: Setting up customer socket listener");
+            socket.on('bidding', (incomingBid) => {
+                console.log("GlobalBiddingModal: Received bid for customer", incomingBid.bidder._id);
+                setCustomerBids(prev => {
+                    const exists = prev.find(b => b.bidder._id === incomingBid.bidder._id);
+                    if (exists) {
+                        return [incomingBid, ...prev.filter(b => b.bidder._id !== incomingBid.bidder._id)];
+                    }
+                    return [incomingBid, ...prev];
+                });
+                setMainModel(true);
+            });
+
+            return () => {
+                socket.off('bidding');
+            };
+        }
+    }, [socket, user, isDriver]);
+
+    const hasContent = (isDriver && incomingParcelNotifications.length > 0) || (!isDriver && customerBids.length > 0);
 
     return (
         <Modal
             ref={ModalNotification}
-            isOpen={mainModel && incomingParcelNotifications.length > 0}
+            isOpen={mainModel && hasContent}
             entry={"top"}
             swipeToClose={false}
             backdropPressToClose={false}
@@ -174,14 +164,25 @@ const GlobalBiddingModal = () => {
             backdropOpacity={0.5}
         >
             <View style={styles.container}>
-                {incomingParcelNotifications.map((val) => (
-                    <BiddingCard
-                        val={val}
-                        key={val?._id}
-                        CloseModelBaseOnId={closeModelBaseOnId}
-                        handleBid={handleBid}
-                    />
-                ))}
+                {isDriver ? (
+                    incomingParcelNotifications.map((val) => (
+                        <BiddingCard
+                            val={val}
+                            key={val?._id}
+                            CloseModelBaseOnId={closeModelBaseOnId}
+                            handleBid={handleBid}
+                        />
+                    ))
+                ) : (
+                    customerBids.map((bid) => (
+                        <CustomerBiddingCard
+                            value={bid}
+                            key={bid._id}
+                            onAccept={handleAcceptCustomerBid}
+                            onDecline={handleDeclineCustomerBid}
+                        />
+                    ))
+                )}
             </View>
         </Modal>
     );

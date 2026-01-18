@@ -43,7 +43,6 @@ function SelectVehicle(params) {
   const to_location_cor = `${params.route.params.to.latitude}, ${params.route.params.to.longitude}`;
 
   const isFocused = useIsFocused();
-  const [bids, setBids] = useState([]);
   const [imageForShow, setImageForShow] = useState([]);
   const [date, setDate] = useState('');
   const [date2, setDate2] = useState('');
@@ -89,7 +88,7 @@ function SelectVehicle(params) {
     { label: '08:00 - 12:00', value: '08:00 - 12:00', slot: 3 },
     { label: '12:00 - 16:00', value: '12:00 - 16:00', slot: 4 },
     { label: '16:00 - 20:00', value: '16:00 - 20:00', slot: 5 },
-    { label: '20:00 - 24:00', value: '20:00 - 24:00', slot: 6 },
+    { label: '20:00 - 00:00', value: '20:00 - 00:00', slot: 6 },
   ]);
   const [ageModels, setAgeModels] = useState(false);
   const [openWeightModel, setOpenWeightModel] = useState(false);
@@ -132,15 +131,6 @@ function SelectVehicle(params) {
   const { socket } = useSelector(state => state.socket);
   console.log(socket, 'socket');
 
-  const handleRejection = bid => {
-    const filteredBids = bids.filter(b => b._id !== bid._id);
-
-    if (filteredBids.length === 0) {
-      setMainModel(false);
-    }
-
-    setBids(filteredBids);
-  };
 
   const ModalNotification = useRef();
   const getPhotoFromCamera = () => {
@@ -181,260 +171,7 @@ function SelectVehicle(params) {
     }
   };
 
-  useEffect(() => {
-    // if (!isFocused) {
-    socket.on('bidding', incomingBid => {
-      const incomingBidId = incomingBid.bidder._id;
-      console.log(incomingBidId, 'incomingBidId');
-      setBids(prevBids => {
-        const newBids = [...prevBids];
-        if (prevBids?.length > 0) {
-          const isBidFound = newBids?.find(
-            bid => bid?.bidder?._id === incomingBidId,
-          );
-          if (isBidFound) {
-            const filteredBids = newBids?.filter(
-              bid => bid?.bidder?._id !== incomingBidId,
-            );
-            const sortedBids = filteredBids.sort((a, b) => {
-              const bidA = parseInt(a.bid_amount, 10);
-              const bidB = parseInt(b.bid_amount, 10);
-              return bidB - bidA;
-            });
-            return [incomingBid, ...sortedBids];
-          } else {
-            newBids.push(incomingBid);
-            const sortedBids = newBids.sort((a, b) => {
-              const bidA = parseInt(a.bid_amount, 10);
-              const bidB = parseInt(b.bid_amount, 10);
-              return bidB - bidA;
-            });
 
-            return sortedBids;
-          }
-        } else {
-          return [incomingBid];
-        }
-      });
-      if (!mainModel) {
-        setMainModel(true);
-        setTimerModel(false);
-        setUntil(0);
-      }
-    });
-    // }
-  }, []);
-
-  const MainModel = ({ value }) => {
-    const acceptRide = async value => {
-      try {
-        var data = await AsyncStorage.getItem('response');
-        var datas = JSON.parse(data);
-
-        const formData = new FormData();
-        formData.append('rider_id', value.bidder._id);
-        formData.append('status', 'in_progress');
-        formData.append('pay_amount', value?.bid_amount);
-
-        const requestOptions = {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
-        };
-        const resp = await axios.patch(
-          `${BASE_URL}${URL_V}parcel/${value.parcel._id}`,
-          requestOptions.body,
-          {
-            headers: {
-              Authorization: `Bearer ${datas.access_token}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
-
-        setMainModel(false);
-        setBids([]);
-        alert('You have chosen ur driver. He is on his way!');
-      } catch (err) { }
-    };
-    const cancelRide = async value => {
-      try {
-        var data = await AsyncStorage.getItem('response');
-        var datas = JSON.parse(data);
-
-        const formData = new FormData();
-        formData.append('rider_id', value.bidder._id);
-
-        const requestOptions = {
-          headers: {
-            Authorization: `Bearer ${datas.access_token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
-        };
-        const resp = await axios.patch(
-          `${BASE_URL}${URL_V}parcel/${value.parcel._id}`,
-          requestOptions.body,
-          {
-            headers: {
-              Authorization: `Bearer ${datas.access_token}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
-      } catch (err) { }
-    };
-
-    return (
-      <Modal
-        ref={ModalNotification}
-        isOpen={true}
-        entry={'top'}
-        // position={'center'}
-        swipeToClose={false}
-        style={{
-          height: 'auto',
-          width: '90%',
-          borderRadius: 16,
-          backgroundColor: 'white',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 10,
-        }}
-        swipeArea={300}
-        backdropPressToClose={false}>
-        <View style={{ padding: 20 }}>
-          {/* Header Section */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-            <View style={{
-              width: 60,
-              height: 60,
-              borderRadius: 30,
-              overflow: 'hidden',
-              borderWidth: 3,
-              borderColor: COLOR.PRIMARY,
-            }}>
-              <Image
-                source={
-                  value?.bidder?.avatar
-                    ? { uri: value?.bidder?.avatar }
-                    : require('../../../assets/images/driver.jpeg')
-                }
-                resizeMode="cover"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                }}
-              />
-            </View>
-
-            <View style={{ flex: 1, marginLeft: 16 }}>
-              <Text style={{
-                fontFamily: FAMILY.BOLD,
-                fontSize: SIZE.SIZE_16,
-                color: COLOR.DARK,
-                marginBottom: 4,
-              }}>
-                {value?.bidder?.first_name} {value?.bidder?.last_name}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Icon name="star" type="FontAwesome" style={{ fontSize: 14, color: '#FFB800', marginRight: 4 }} />
-                <Text style={{
-                  fontFamily: FAMILY.REGULAR,
-                  fontSize: SIZE.SIZE_12,
-                  color: COLOR.GREYVIOLET,
-                }}>
-                  Rating: {value?.bidder?.rating || '0'}
-                </Text>
-              </View>
-            </View>
-
-            <View style={{
-              backgroundColor: COLOR.GREEN,
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              borderRadius: 20,
-            }}>
-              <Text style={{
-                fontFamily: FAMILY.BOLD,
-                fontSize: SIZE.SIZE_18,
-                color: 'white',
-              }}>
-                ${value?.bid_amount}
-              </Text>
-            </View>
-          </View>
-
-          {/* Divider */}
-          <View style={{
-            height: 1,
-            backgroundColor: '#E8E8E8',
-            marginBottom: 16,
-          }} />
-
-          {/* Action Buttons */}
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            gap: 12,
-          }}>
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                backgroundColor: '#FFF',
-                borderWidth: 2,
-                borderColor: '#FF4444',
-                borderRadius: 12,
-                paddingVertical: 14,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={() => {
-                handleRejection(value);
-              }}>
-              <Text style={{
-                fontFamily: FAMILY.BOLD,
-                fontSize: SIZE.SIZE_14,
-                color: '#FF4444',
-              }}>
-                Decline
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                backgroundColor: COLOR.GREEN,
-                borderRadius: 12,
-                paddingVertical: 14,
-                alignItems: 'center',
-                justifyContent: 'center',
-                shadowColor: COLOR.GREEN,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 6,
-                elevation: 4,
-              }}
-              onPress={() => {
-                acceptRide(value);
-              }}>
-              <Text style={{
-                fontFamily: FAMILY.BOLD,
-                fontSize: SIZE.SIZE_14,
-                color: 'white',
-              }}>
-                Accept
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
   const getPhotoFromGallery = () => {
     // setBottomModal(true);
     if (imageForShow.length >= 3) {
@@ -445,6 +182,28 @@ function SelectVehicle(params) {
   };
 
   const fetchData = async () => {
+    if (!date) {
+      return showMessage('error', 'Please select a date');
+    }
+    if (!slotTimings) {
+      return showMessage('error', 'Please select a time slot');
+    }
+    if (!fare || isNaN(fare) || parseFloat(fare) <= 0) {
+      return showMessage('error', 'Please enter a valid fare amount');
+    }
+    if (!weight) {
+      return showMessage('error', 'Please select a weight range');
+    }
+    if (!length.title || !height.title || !width.title) {
+      return showMessage('error', 'Please select all parcel dimensions');
+    }
+    if (!itemsType) {
+      return showMessage('error', 'Please select a material type');
+    }
+    if (imageForShow.length === 0) {
+      return showMessage('error', 'Please upload at least one parcel photo');
+    }
+
     console.log("fetchData");
     setISLoading(true);
     var data = await AsyncStorage.getItem('response');
@@ -507,6 +266,7 @@ function SelectVehicle(params) {
           'success',
           'Parcel Created Successfully!. Wait for drivers to bid',
         );
+        params.navigation.navigate('CustomerMyTrips');
         // setUntil(10)
         // setTimerModel(true)
       }
@@ -553,35 +313,6 @@ function SelectVehicle(params) {
 
   return (
     <Container style={theme.layoutFx}>
-      <Modal
-        isOpen={mainModel}
-        entry={'top'}
-        backdropOpacity={0.5}
-        swipeToClose={false}
-        style={{
-          height: 'auto',
-          maxHeight: '80%',
-          width: '100%',
-          backgroundColor: 'transparent',
-          justifyContent: 'flex-start',
-          paddingTop: 10,
-        }}>
-        {bids.map(val => {
-          return (
-            <View style={{ height: '28%' }} key={val?.bidder?._id}>
-              <MainModel value={val} />
-            </View>
-          );
-        })}
-        <Button
-          style={[styles.bookingBtn, { backgroundColor: 'grey', marginTop: 40 }]}
-          onPress={() => {
-            navigate('CustomerPayment');
-            setMainModel(false);
-          }}>
-          <Text style={styles.bookingBtnText}>Cancel</Text>
-        </Button>
-      </Modal>
       <DarkStatusBar />
       <Header leftType="back" title={'Book Your Parcel'} />
       <Content contentContainerStyle={theme.layoutDf}>
@@ -678,7 +409,8 @@ function SelectVehicle(params) {
 
               <View
                 style={{
-                  height: 80,
+                  zIndex: 2000,
+                  marginBottom: 10,
                 }}>
                 <DropDownPicker
                   placeholder="Select Time Slot"
@@ -688,23 +420,12 @@ function SelectVehicle(params) {
                   value={slotTimings}
                   onSelectItem={e => {
                     setSlotTimings(e.value);
-                    if (e.value == '00:00 - 04:00') {
-                      setSelectSlot(1);
-                    } else if (e.value == '04:00 - 08:00') {
-                      setSelectSlot(2);
-                    } else if (e.value == '08:00 - 12:00') {
-                      setSelectSlot(3);
-                    } else if (e.value == '12:00 - 16:00') {
-                      setSelectSlot(4);
-                    } else if (e.value == '16:00 - 20:00') {
-                      setSelectSlot(5);
-                    } else if (e.value == '20:00 - 24:00') {
-                      setSelectSlot(6);
-                    }
+                    setSelectSlot(e.slot);
                   }}
-                  setItems={setItems}
+                  setItems={setTimes}
+                  listMode="SCROLLVIEW"
+                  dropDownMaxHeight={400}
                   style={{
-                    // flex: 1,
                     paddingVertical: 19,
                     marginTop: 10,
                     marginBottom: 0,
@@ -757,6 +478,7 @@ function SelectVehicle(params) {
                     title={'Weight Range(kg)'}
                     // touched={touched.job}
                     // errorMessage={errors.job}
+                    value={weightRange}
                     isPickerOpen={ageModels}
                     defaultButtonText={weightRange.title}
                   //   onFocus={() => setOpenBrandPicker(true)}
@@ -1015,9 +737,7 @@ function SelectVehicle(params) {
       <Button
         style={styles.bookingBtn}
         onPress={() => {
-          imageForShow.length == 0
-            ? showMessage('error', 'Please select atleast one image')
-            : fetchData();
+          fetchData();
         }}>
         {isloading ? (
           <View style={{ paddingVertical: 5 }}>

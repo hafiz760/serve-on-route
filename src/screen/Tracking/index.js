@@ -379,7 +379,7 @@ const TrackingScreen = ({ route }) => {
           {Object.values(state.droplocationCords).length > 0 && (
             <Marker
               coordinate={droplocationCords}
-              image={require("../../assets/images/greenMarker2x.png")}
+              image={require("../../assets/images/greenMarker.png")}
             />
           )}
           {Object.values(state.pickupCords).length > 0 &&
