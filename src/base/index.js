@@ -1,16 +1,18 @@
-import React from "react";
-import { BackHandler } from "react-native";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { requestUserPermission } from "../helper/pushnotification_helper";
-import Navigator from "../navigations/screen";
-import Toast from "react-native-toast-message";
-import { goBack } from "../navigations";
-import { persistor, store } from "../store";
-import Support from "../component/Support";
-import 'react-native-get-random-values'
-import GlobalBiddingModal from "../component/GlobalBiddingModal";
+import React from 'react';
+import {BackHandler} from 'react-native';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {requestUserPermission} from '../helper/pushnotification_helper';
+import Navigator from '../navigations/screen';
+import Toast from 'react-native-toast-message';
+import {goBack} from '../navigations';
+import {persistor, store} from '../store';
+import Support from '../component/Support';
+import 'react-native-get-random-values';
+import GlobalBiddingModal from '../component/GlobalBiddingModal';
+import CustomerBiddingModal from '../component/CustomerBiddingModal';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -30,7 +32,7 @@ export default class App extends React.Component {
     requestUserPermission();
     this.storage();
 
-    BackHandler.addEventListener("hardwareBackPress", function () {
+    BackHandler.addEventListener('hardwareBackPress', function () {
       goBack();
       return true;
     });
@@ -39,7 +41,7 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", function () { });
+    BackHandler.removeEventListener('hardwareBackPress', function () {});
   }
 
   async initiate() {
@@ -56,30 +58,33 @@ export default class App extends React.Component {
   }
 
   async storage() {
-    let mun = (await AsyncStorage.getItem("role")) == "Driver";
+    let mun = (await AsyncStorage.getItem('role')) == 'Driver';
 
-    this.setState({ bool: mun });
+    this.setState({bool: mun});
   }
 
   onBeforeLift() {
-    this.setState({ storeLoaded: true });
+    this.setState({storeLoaded: true});
   }
 
   render() {
     return (
       <Provider store={store}>
-        <PersistGate
-          loading={null}
-          persistor={persistor}
-          onBeforeLift={this.onBeforeLift}
-        >
-          {this.state.loading ? null :
-
-            <Navigator />}
-        </PersistGate>
-        <Toast visibilityTime={1800} />
-        <Support />
-        <GlobalBiddingModal />
+        <SafeAreaProvider>
+          <PersistGate
+            loading={null}
+            persistor={persistor}
+            onBeforeLift={this.onBeforeLift}>
+            {this.state.loading ? null : (
+              <SafeAreaView style={{flex: 1}}>
+                <Navigator />
+              </SafeAreaView>
+            )}
+          </PersistGate>
+          <Toast visibilityTime={1800} />
+          <Support />
+          {this.state.bool ? <GlobalBiddingModal /> : <CustomerBiddingModal />}
+        </SafeAreaProvider>
       </Provider>
     );
   }
