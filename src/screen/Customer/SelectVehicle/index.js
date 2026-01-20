@@ -473,9 +473,9 @@ function SelectVehicle(params) {
     if (!fare || isNaN(fare) || parseFloat(fare) <= 0) {
       return showMessage('error', 'Please enter a valid fare amount');
     }
-    if (!weight) {
-      return showMessage('error', 'Please select a weight range');
-    }
+    // if (!weight || !weight.title) {
+    //   return showMessage('error', 'Please select a weight range');
+    // }
     if (!length.title || !height.title || !width.title) {
       return showMessage('error', 'Please select all parcel dimensions');
     }
@@ -524,7 +524,7 @@ function SelectVehicle(params) {
     formData.append('biddingEndTime', '2026-12-12');
     formData.append('bidding_type', pracelTimeType);
 
-    // console.log("FormData", JSON.stringify(formData, null, 2));
+    console.log('FormData', JSON.stringify(formData, null, 2));
     // return
     const requestOptions = {
       method: 'POST',
@@ -547,7 +547,7 @@ function SelectVehicle(params) {
           'success',
           'Parcel Created Successfully!. Wait for drivers to bid',
         );
-        // params.navigation.navigate('CustomerMyTrips');
+        params.navigation.navigate('CustomerMyTrips');
         // setUntil(10)
         // setTimerModel(true)
       }
@@ -560,13 +560,10 @@ function SelectVehicle(params) {
     }
   };
 
-  // const deleteShowImage = (value) => {
-  //   // console.log("press")
-  //   setImageForShow((previous) =>
-  //     previous.filter((val) => val?.uri != value?.uri)
-  //   );
-  //   showMessage("success", "Image Delete Successfully");
-  // };
+  const deleteShowImage = value => {
+    setImageForShow(previous => previous.filter(val => val?.uri != value?.uri));
+    showMessage('success', 'Image Delete Successfully');
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
