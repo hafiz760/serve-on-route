@@ -28,6 +28,7 @@ import axios from 'axios';
 import RatingModal from '../../component/RatingModal';
 // import {GOOGLE_MAPS_KEY} from "@env"
 import {BASE_URL, URL_V, GOOGLE_MAPS_KEY} from '../../utilities/helper';
+import {useNavigation} from '@react-navigation/native';
 // const GOOGLE_MAPS_APIKEY = "AIzaSyABbE8m9cfg-OspSdVkr58Lo5SplQ_XFLA";
 const GOOGLE_MAPS_APIKEY = GOOGLE_MAPS_KEY;
 const screen = Dimensions.get('window');
@@ -217,10 +218,7 @@ const TrackingScreen = ({route}) => {
           },
         },
       );
-      // console.log("resp",JSON.stringify(resp.data,null,2));
       if (resp.data.success == true) {
-        // console.log("API STATUS ===>dd", resp.data.parcel.status);
-        // console.log("API STATUS ===>dd2", JSON.stringify(resp.data,null,2));
         setCurrentTripStatus('done');
         showMessage(
           'success',
@@ -231,10 +229,8 @@ const TrackingScreen = ({route}) => {
         setModalVisible(false); // Modal close after success
       }
     } catch (err) {
-      // console.log("ERROR===>dd", JSON.stringify(err.response,null,2));
       showMessage('error', 'OTP not match please enter right otp');
       setTripStatusLoading(false);
-      // setRatingModalVisible(true)
     }
   };
 

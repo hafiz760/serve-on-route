@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import Modal from 'react-native-modal';
-import { COLOR, FAMILY, SIZE } from "../theme/typography";
-import axios from "axios";
-import { useSelector } from "react-redux";
-import { showMessage } from "../helper/showAlert";
-const RatingModal = ({ isVisible, onClose, userID, riderID }) => {
+import {COLOR, FAMILY, SIZE} from '../theme/typography';
+import axios from 'axios';
+import {useSelector} from 'react-redux';
+import {showMessage} from '../helper/showAlert';
+import {useNavigation} from '@react-navigation/native';
+
+const RatingModal = ({isVisible, onClose, userID, riderID}) => {
+  const navigation = useNavigation();
   // console.log(userID,">>>>>>>",riderID);
-  const { user } = useSelector((state) => state.session);
+  const {user} = useSelector(state => state.session);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
 
-  const handleRating = (value) => {
+  const handleRating = value => {
     setRating(value);
   };
 
-  const handleReviewChange = (text) => {
+  const handleReviewChange = text => {
     setReview(text);
   };
 
@@ -32,26 +43,28 @@ const RatingModal = ({ isVisible, onClose, userID, riderID }) => {
           rating: rating,
           review: review,
           rider: riderID,
-          user: userID
+          user: userID,
         },
         {
           headers: {
             Authorization: `Bearer ${user.access_token}`,
           },
-        }
+        },
       );
       // console.log("resp",JSON.stringify(resp.data,null,2));
-      showMessage("success", `Review successfully submited`);
+      showMessage('success', `Review successfully submited`);
+      navigation.navigate('DriverMyTrips');
     } catch (err) {
       // console.log("ERROR===>dd", );
-      showMessage("error", "Review not submited");
+      showMessage('error', 'Review not submited');
     }
     onClose();
   };
 
   return (
     <Modal isVisible={isVisible} onBackdropPress={onClose} style={styles.modal}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={styles.container}>
           <Text style={styles.title}>Rate This User</Text>
           {/* <StarRating
@@ -65,11 +78,13 @@ const RatingModal = ({ isVisible, onClose, userID, riderID }) => {
           <TextInput
             placeholder="Write a review..."
             style={styles.reviewInput}
-            onChangeText={(text) => handleReviewChange(text)}
+            onChangeText={text => handleReviewChange(text)}
             value={review}
             multiline={true}
           />
-          <TouchableOpacity onPress={handleSubmitRating} style={styles.submitButton}>
+          <TouchableOpacity
+            onPress={handleSubmitRating}
+            style={styles.submitButton}>
             <Text style={styles.submitText}>Submit</Text>
           </TouchableOpacity>
         </View>
@@ -82,7 +97,6 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   container: {
     backgroundColor: 'white',
@@ -95,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: COLOR.PRIMARY
+    color: COLOR.PRIMARY,
   },
   reviewInput: {
     borderColor: 'gray',
