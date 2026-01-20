@@ -1,17 +1,17 @@
 import React from 'react';
-import {BackHandler} from 'react-native';
-import {Provider} from 'react-redux';
-import {PersistGate} from 'redux-persist/integration/react';
+import { BackHandler } from 'react-native';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {requestUserPermission} from '../helper/pushnotification_helper';
+import { requestUserPermission } from '../helper/pushnotification_helper';
 import Navigator from '../navigations/screen';
 import Toast from 'react-native-toast-message';
-import {goBack} from '../navigations';
-import {persistor, store} from '../store';
+import { goBack } from '../navigations';
+import { persistor, store } from '../store';
 import Support from '../component/Support';
 import 'react-native-get-random-values';
 import GlobalBiddingModal from '../component/GlobalBiddingModal';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import CustomerBiddingModal from '../component/CustomerBiddingModal';
 
 export default class App extends React.Component {
@@ -41,7 +41,7 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', function () {});
+    BackHandler.removeEventListener('hardwareBackPress', function () { });
   }
 
   async initiate() {
@@ -60,11 +60,11 @@ export default class App extends React.Component {
   async storage() {
     let mun = (await AsyncStorage.getItem('role')) == 'Driver';
 
-    this.setState({bool: mun});
+    this.setState({ bool: mun });
   }
 
   onBeforeLift() {
-    this.setState({storeLoaded: true});
+    this.setState({ storeLoaded: true });
   }
 
   render() {
@@ -76,15 +76,17 @@ export default class App extends React.Component {
             persistor={persistor}
             onBeforeLift={this.onBeforeLift}>
             {this.state.loading ? null : (
-              <SafeAreaView style={{flex: 1}}>
+              <SafeAreaView style={{ flex: 1 }}>
                 <Navigator />
               </SafeAreaView>
             )}
           </PersistGate>
           <Toast visibilityTime={1800} />
           <Support />
-          <CustomerBiddingModal /> {/* ✅ For customers */}
-          <GlobalBiddingModal />
+          <>
+            <CustomerBiddingModal />
+            <GlobalBiddingModal />
+          </>
         </SafeAreaProvider>
       </Provider>
     );

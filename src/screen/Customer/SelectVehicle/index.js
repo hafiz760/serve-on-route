@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View, ScrollView, Image, TouchableOpacity} from 'react-native';
-import {Container, Content, Text, Icon} from '../../../component/Basic';
-import {TextInput, Button, ToggleSwitch} from '../../../component/Form';
-import {COLOR, FAMILY, SIZE} from '../../../theme/typography';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { Container, Content, Text, Icon } from '../../../component/Basic';
+import { TextInput, Button, ToggleSwitch } from '../../../component/Form';
+import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
 import axios from 'axios';
 import styles from './styles';
 import theme from '../../../theme/styles';
@@ -11,16 +11,16 @@ import Header from '../../../component/Header';
 import Modal from 'react-native-modalbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DocumentPicker from 'react-native-document-picker';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import CountDown from 'react-native-countdown-component';
-import {DarkStatusBar} from '../../../component/StatusBar';
-import {connect} from 'react-redux';
+import { DarkStatusBar } from '../../../component/StatusBar';
+import { connect } from 'react-redux';
 import DatePicker from 'react-native-date-picker';
-import {showMessage} from '../../../helper/showAlert';
+import { showMessage } from '../../../helper/showAlert';
 import ImagePicker from 'react-native-image-crop-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import {useIsFocused} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -29,8 +29,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import TimerModal from '../../../component/TimerModal';
 // import { BASE_URL, URL_V } from "@env";
-import {BASE_URL, URL_V} from '../../../utilities/helper';
-import {navigate} from '../../../navigations';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
+import { navigate } from '../../../navigations';
 import DropdownPicker from '../../../component/DropdownPicker';
 import AppSpinner from '../../../component/AppSpinner';
 
@@ -52,9 +52,9 @@ function SelectVehicle(params) {
   const [images, setImages] = useState();
   const [fare, setfare] = useState();
   const [isloading, setISLoading] = useState(false);
-  const [width, setWidth] = useState({title: '0-1'});
-  const [height, setHeight] = useState({title: '0-1'});
-  const [length, setLength] = useState({title: '0-1'});
+  const [width, setWidth] = useState({ title: '0-1' });
+  const [height, setHeight] = useState({ title: '0-1' });
+  const [length, setLength] = useState({ title: '0-1' });
   const [weight, setWeight] = useState('');
   const [mainModel, setMainModel] = useState(false);
   const [openModel, setOpenModel] = useState(false);
@@ -67,29 +67,29 @@ function SelectVehicle(params) {
   const [selectSlot, setSelectSlot] = useState('');
   const [until, setUntil] = useState(0);
   const [slotTimings, setSlotTimings] = useState(
-    {label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1} || '',
+    { label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1 } || '',
   );
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [items, setItems] = useState([
-    {label: 'Solid', value: 'solid'},
-    {label: 'Metal', value: 'metal'},
-    {label: 'Wood', value: 'wood'},
-    {label: 'Fragile', value: 'fragile'},
-    {label: 'Other Items', value: 'otherItems'},
+    { label: 'Solid', value: 'solid' },
+    { label: 'Metal', value: 'metal' },
+    { label: 'Wood', value: 'wood' },
+    { label: 'Fragile', value: 'fragile' },
+    { label: 'Other Items', value: 'otherItems' },
   ]);
   const jobOptions = [
-    {title: 'CIB'},
-    {title: 'Detective'},
-    {title: 'Forensic'},
-    {title: 'Patrol'},
+    { title: 'CIB' },
+    { title: 'Detective' },
+    { title: 'Forensic' },
+    { title: 'Patrol' },
   ];
   const [times, setTimes] = useState([
-    {label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1},
-    {label: '04:00 - 08:00', value: '04:00 - 08:00', slot: 2},
-    {label: '08:00 - 12:00', value: '08:00 - 12:00', slot: 3},
-    {label: '12:00 - 16:00', value: '12:00 - 16:00', slot: 4},
-    {label: '16:00 - 20:00', value: '16:00 - 20:00', slot: 5},
-    {label: '20:00 - 24:00', value: '20:00 - 24:00', slot: 6},
+    { label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1 },
+    { label: '04:00 - 08:00', value: '04:00 - 08:00', slot: 2 },
+    { label: '08:00 - 12:00', value: '08:00 - 12:00', slot: 3 },
+    { label: '12:00 - 16:00', value: '12:00 - 16:00', slot: 4 },
+    { label: '16:00 - 20:00', value: '16:00 - 20:00', slot: 5 },
+    { label: '20:00 - 24:00', value: '20:00 - 24:00', slot: 6 },
   ]);
   const [ageModels, setAgeModels] = useState(false);
   const [openWeightModel, setOpenWeightModel] = useState(false);
@@ -104,32 +104,32 @@ function SelectVehicle(params) {
   //   { label: "35-40", value: "35-40" },
   //   { label: "40+", value: "40+" },
   // ]);
-  const [weightRange, setWeightRange] = useState({title: '0-5'});
+  const [weightRange, setWeightRange] = useState({ title: '0-5' });
   const weightRangeValue = [
-    {title: '0-5'},
-    {title: '5-10'},
-    {title: '10-15'},
-    {title: '15-20'},
-    {title: '20-25'},
-    {title: '25-30'},
-    {title: '35-40'},
-    {title: '40+'},
+    { title: '0-5' },
+    { title: '5-10' },
+    { title: '10-15' },
+    { title: '15-20' },
+    { title: '20-25' },
+    { title: '25-30' },
+    { title: '35-40' },
+    { title: '40+' },
   ];
   const WidthRangeValue = [
-    {title: '0-1'},
-    {title: '2-3'},
-    {title: '4-5'},
-    {title: '6-7'},
-    {title: '8-9'},
-    {title: '9-10'},
-    {title: '11-12'},
-    {title: '13+'},
+    { title: '0-1' },
+    { title: '2-3' },
+    { title: '4-5' },
+    { title: '6-7' },
+    { title: '8-9' },
+    { title: '9-10' },
+    { title: '11-12' },
+    { title: '13+' },
   ];
 
   const [pracelTimeType, setPracelTimeType] = useState('time');
   const [itemsType, setItemsType] = useState('solid');
   const [time, setTime] = useState('Select Time');
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
   console.log(socket, 'socket');
 
   const handleRejection = bid => {
@@ -225,7 +225,7 @@ function SelectVehicle(params) {
     // }
   }, []);
 
-  const MainModel = ({value}) => {
+  const MainModel = ({ value }) => {
     const acceptRide = async value => {
       try {
         var data = await AsyncStorage.getItem('response');
@@ -257,7 +257,7 @@ function SelectVehicle(params) {
         setMainModel(false);
         setBids([]);
         alert('You have chosen ur driver. He is on his way!');
-      } catch (err) {}
+      } catch (err) { }
     };
     const cancelRide = async value => {
       try {
@@ -284,7 +284,7 @@ function SelectVehicle(params) {
             },
           },
         );
-      } catch (err) {}
+      } catch (err) { }
     };
 
     return (
@@ -300,14 +300,14 @@ function SelectVehicle(params) {
           borderRadius: 16,
           backgroundColor: 'white',
           shadowColor: '#000',
-          shadowOffset: {width: 0, height: 4},
+          shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
           elevation: 10,
         }}
         swipeArea={300}
         backdropPressToClose={false}>
-        <View style={{padding: 20}}>
+        <View style={{ padding: 20 }}>
           {/* Header Section */}
           <View
             style={{
@@ -327,7 +327,7 @@ function SelectVehicle(params) {
               <Image
                 source={
                   value?.bidder?.avatar
-                    ? {uri: value?.bidder?.avatar}
+                    ? { uri: value?.bidder?.avatar }
                     : require('../../../assets/images/driver.jpeg')
                 }
                 resizeMode="cover"
@@ -338,7 +338,7 @@ function SelectVehicle(params) {
               />
             </View>
 
-            <View style={{flex: 1, marginLeft: 16}}>
+            <View style={{ flex: 1, marginLeft: 16 }}>
               <Text
                 style={{
                   fontFamily: FAMILY.BOLD,
@@ -348,11 +348,11 @@ function SelectVehicle(params) {
                 }}>
                 {value?.bidder?.first_name} {value?.bidder?.last_name}
               </Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon
                   name="star"
                   type="FontAwesome"
-                  style={{fontSize: 14, color: '#FFB800', marginRight: 4}}
+                  style={{ fontSize: 14, color: '#FFB800', marginRight: 4 }}
                 />
                 <Text
                   style={{
@@ -432,7 +432,7 @@ function SelectVehicle(params) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 shadowColor: COLOR.GREEN,
-                shadowOffset: {width: 0, height: 4},
+                shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 6,
                 elevation: 4,
@@ -606,13 +606,13 @@ function SelectVehicle(params) {
         }}>
         {bids.map(val => {
           return (
-            <View style={{height: '28%'}} key={val?.bidder?._id}>
+            <View style={{ height: '28%' }} key={val?.bidder?._id}>
               <MainModel value={val} />
             </View>
           );
         })}
         <Button
-          style={[styles.bookingBtn, {backgroundColor: 'grey', marginTop: 40}]}
+          style={[styles.bookingBtn, { backgroundColor: 'grey', marginTop: 40 }]}
           onPress={() => {
             navigate('CustomerPayment');
             setMainModel(false);
@@ -624,7 +624,7 @@ function SelectVehicle(params) {
       <Header leftType="back" title={'Book Your Parcel'} />
       <Content contentContainerStyle={theme.layoutDf}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={[styles.selectVehicleContainer, {height: '80%'}]}>
+          <View style={[styles.selectVehicleContainer, { height: '80%' }]}>
             <View style={styles.selectVehicleContent}>
               <View style={styles.labelContainer}>
                 <Text style={styles.label}>Booking Details</Text>
@@ -639,7 +639,7 @@ function SelectVehicle(params) {
                     <Text style={styles.selectDateText}>
                       {date === '' ? 'Select Date' : date}
                     </Text>
-                    <View style={{marginEnd: 20}}>
+                    <View style={{ marginEnd: 20 }}>
                       <Icon
                         name="calendar-month"
                         type="MaterialCommunityIcons"
@@ -709,7 +709,7 @@ function SelectVehicle(params) {
                     setfare(text);
                   }}
                   keyboardType="numeric"
-                  style={[styles.formInput, {flex: 1}]}
+                  style={[styles.formInput, { flex: 1 }]}
                 />
               </View>
 
@@ -732,8 +732,8 @@ function SelectVehicle(params) {
                     isPickerOpen={ageModels}
                     defaultButtonText={weightRange.title}
                     value={weightRange}
-                    //   onFocus={() => setOpenBrandPicker(true)}
-                    //   onBlur={() => setOpenBrandPicker(false)}
+                  //   onFocus={() => setOpenBrandPicker(true)}
+                  //   onBlur={() => setOpenBrandPicker(false)}
                   />
                   {/* <DropDownPicker
                   open={openWeightModel}
@@ -830,9 +830,9 @@ function SelectVehicle(params) {
                   // errorMessage={errors.job}
                   isPickerOpen={ageModels}
                   defaultButtonText={length.title}
-                  customButtonStyle={{width: 100}}
-                  //   onFocus={() => setOpenBrandPicker(true)}
-                  //   onBlur={() => setOpenBrandPicker(false)}
+                  customButtonStyle={{ width: 100 }}
+                //   onFocus={() => setOpenBrandPicker(true)}
+                //   onBlur={() => setOpenBrandPicker(false)}
                 />
                 {/* <View>
                   <View style={[styles.formRow2, { width: wp("25") }]}>
@@ -861,9 +861,9 @@ function SelectVehicle(params) {
                   // errorMessage={errors.job}
                   isPickerOpen={ageModels}
                   defaultButtonText={height.title}
-                  customButtonStyle={{width: 100}}
-                  //   onFocus={() => setOpenBrandPicker(true)}
-                  //   onBlur={() => setOpenBrandPicker(false)}
+                  customButtonStyle={{ width: 100 }}
+                //   onFocus={() => setOpenBrandPicker(true)}
+                //   onBlur={() => setOpenBrandPicker(false)}
                 />
                 {/* <View>
                   <View>
@@ -893,7 +893,7 @@ function SelectVehicle(params) {
                   defaultButtonText={width.title}
                   //   onFocus={() => setOpenBrandPicker(true)}
                   //   onBlur={() => setOpenBrandPicker(false)}
-                  customButtonStyle={{width: 100}}
+                  customButtonStyle={{ width: 100 }}
                 />
               </View>
 
@@ -944,7 +944,7 @@ function SelectVehicle(params) {
                   <Icon
                     name="upload"
                     type="AntDesign"
-                    style={{marginEnd: 20}}
+                    style={{ marginEnd: 20 }}
                   />
                 </Button>
               </View>
@@ -991,7 +991,7 @@ function SelectVehicle(params) {
           fetchData();
         }}>
         {isloading ? (
-          <View style={{paddingVertical: 5}}>
+          <View style={{ paddingVertical: 5 }}>
             <AppSpinner color={COLOR.PRIMARY} size="large" />
           </View>
         ) : (
@@ -1011,7 +1011,7 @@ function SelectVehicle(params) {
           borderTopRightRadius: 30,
         }}>
         <Button
-          style={[styles.bookingBtn, {backgroundColor: 'purple'}]}
+          style={[styles.bookingBtn, { backgroundColor: 'purple' }]}
           onPress={() => {
             getPhotoFromCamera();
             setBottomModal(false);
@@ -1027,7 +1027,7 @@ function SelectVehicle(params) {
           <Text style={styles.bookingBtnText}>SELECT FROM FILES</Text>
         </Button>
         <Button
-          style={[styles.bookingBtn, {backgroundColor: 'red'}]}
+          style={[styles.bookingBtn, { backgroundColor: 'red' }]}
           onPress={() => {
             setBottomModal(false);
           }}>
@@ -1045,7 +1045,7 @@ function SelectVehicle(params) {
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
         }}>
-        <View style={{alignSelf: 'center'}}>
+        <View style={{ alignSelf: 'center' }}>
           <Text
             style={{
               marginTop: hp(2),
@@ -1060,13 +1060,13 @@ function SelectVehicle(params) {
           until={until}
           size={30}
           onFinish={() => setTimerModel(false)}
-          digitStyle={{backgroundColor: '#FFF'}}
-          digitTxtStyle={{color: '#1CC625'}}
+          digitStyle={{ backgroundColor: '#FFF' }}
+          digitTxtStyle={{ color: '#1CC625' }}
           timeToShow={['M', 'S']}
-          timeLabels={{m: 'MM', s: 'SS'}}
+          timeLabels={{ m: 'MM', s: 'SS' }}
         />
       </Modal>
     </Container>
   );
 }
-export default connect(({session}) => ({session}))(SelectVehicle);
+export default connect(({ session }) => ({ session }))(SelectVehicle);

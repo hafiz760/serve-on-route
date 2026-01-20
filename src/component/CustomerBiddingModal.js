@@ -1,19 +1,19 @@
-import React, {useState, useEffect} from 'react';
-import {View, Image, TouchableOpacity, ScrollView} from 'react-native';
-import {Text, Icon} from './Basic';
-import {Button} from './Form';
-import {COLOR, FAMILY, SIZE} from '../theme/typography';
+import React, { useState, useEffect } from 'react';
+import { View, Image, TouchableOpacity, ScrollView, DeviceEventEmitter } from 'react-native';
+import { Text, Icon } from './Basic';
+import { Button } from './Form';
+import { COLOR, FAMILY, SIZE } from '../theme/typography';
 import Modal from 'react-native-modalbox';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import {BASE_URL, URL_V} from '../utilities/helper';
+import { BASE_URL, URL_V } from '../utilities/helper';
 
 const CustomerBiddingModal = () => {
   const [bids, setBids] = useState([]);
   const [mainModel, setMainModel] = useState(false);
-  const {socket} = useSelector(state => state.socket);
-  const {user} = useSelector(state => state.session);
+  const { socket } = useSelector(state => state.socket);
+  const { user } = useSelector(state => state.session);
 
   console.log('🔵 CustomerBiddingModal - Component Rendered');
   console.log('🔵 Socket State:', socket ? 'Connected' : 'Not Connected');
@@ -37,17 +37,13 @@ const CustomerBiddingModal = () => {
     // Check socket
     if (!socket) {
       console.log('🔴 Socket not available');
-      return;
     }
 
-    if (!socket.connected) {
+    if (socket && !socket.connected) {
       console.log('🔴 Socket not connected');
-      return;
     }
 
-    console.log('✅ Socket is connected');
-
-    // ✅ Check user role directly inside useEffect
+    // ✅ Check user role
     const checkIsCustomer = () => {
       if (!user) return false;
       if (Array.isArray(user.role)) {
@@ -61,7 +57,7 @@ const CustomerBiddingModal = () => {
       return;
     }
 
-    console.log('✅ User is a customer (role: user)');
+    console.log('✅ User is a customer (role: user) - Ready to listen');
 
     const handleBidding = incomingBid => {
       console.log('🎯 NEW BID RECEIVED!');
@@ -122,13 +118,80 @@ const CustomerBiddingModal = () => {
       });
     };
 
-    console.log('👂 Attaching socket listener for "bidding" event');
-    socket.on('bidding', handleBidding);
+    if (socket) {
+      console.log(`👂 Attaching socket listener for "bidding" event on socket ${socket.id}`);
+      socket.on('bidding', handleBidding);
+    }
+
+    // LISTENER FOR FCM FALLBACK
+    const subscription = DeviceEventEmitter.addListener('refreshBids', (body) => {
+      console.log('🔔 refreshBids event received via DeviceEventEmitter');
+      console.log('📝 Body:', body);
+
+      try {
+        // Attempt to parse the body string to extract Bidder ID and Parcel info
+        // Body format: "Rider with Id: <ID> has been bid on your parcel <JSON>"
+
+        const riderIdMatch = body.match(/Rider with Id: ([a-f0-9]+)/i);
+        const riderId = riderIdMatch ? riderIdMatch[1] : null;
+
+        if (riderId) {
+          console.log('✅ Extracted Rider ID:', riderId);
+
+          // Try to find bid amount (fare, amount, bid_amount) from body.
+          // The backend notification might dump the parcel object (which has the original fare), so we must be careful.
+          // We prioritize 'bid_amount' or 'amount' over 'fare'.
+          let bidAmount = '0';
+          const bidAmountMatch = body.match(/(?:bid_amount|amount)['"]?:\s*['"]?(\d+)['"]?/);
+
+          if (bidAmountMatch) {
+            bidAmount = bidAmountMatch[1];
+          } else {
+            const fareMatch = body.match(/fare['"]?:\s*['"]?(\d+)['"]?/);
+            bidAmount = fareMatch ? fareMatch[1] : '0';
+            if (bidAmount !== '0') {
+              console.log('⚠️ Warning: Using "fare" as bid amount. This might be the original parcel price, not the new bid.');
+            }
+          }
+
+          // Construct a fake/minimal bid object
+          const fakeBid = {
+            bidder: {
+              _id: riderId,
+              first_name: 'Driver',
+              last_name: ' (New Bid)',
+              rating: 'New',
+              avatar: null
+            },
+            bid_amount: bidAmount,
+            parcel: {
+              _id: 'unknown'
+            },
+            _id: 'temp_' + Date.now()
+          };
+
+          // Extract Parcel ID if possible
+          const parcelIdMatch = body.match(/_id:\s*new ObjectId\("([a-f0-9]+)"\)/) || body.match(/_id['"]?:\s*['"]?([a-f0-9]{24})['"]?/);
+          if (parcelIdMatch) {
+            fakeBid.parcel._id = parcelIdMatch[1];
+          }
+
+          console.log('🔨 Constructed Fallback Bid:', fakeBid);
+          handleBidding(fakeBid);
+        } else {
+          console.log('❌ Could not parse Rider ID from notification body');
+        }
+
+      } catch (e) {
+        console.log('❌ Error parsing notification body:', e);
+      }
+    });
 
     // Cleanup
     return () => {
       console.log('🧹 Cleaning up socket listener');
-      socket.off('bidding', handleBidding);
+      if (socket) socket.off('bidding', handleBidding);
+      subscription.remove();
     };
   }, [socket, user]); // ✅ Only socket and user in dependencies
 
@@ -193,7 +256,7 @@ const CustomerBiddingModal = () => {
   };
 
   // ✅ Single Bid Card Component (NOT a Modal)
-  const BidCard = ({value, index}) => {
+  const BidCard = ({ value, index }) => {
     console.log('🎨 Rendering bid card for:', value);
 
     return (
@@ -203,7 +266,7 @@ const CustomerBiddingModal = () => {
           borderRadius: 16,
           backgroundColor: 'white',
           shadowColor: '#000',
-          shadowOffset: {width: 0, height: 4},
+          shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
           elevation: 10,
@@ -227,7 +290,7 @@ const CustomerBiddingModal = () => {
             }}></View>
         )}
 
-        <View style={{padding: 20}}>
+        <View style={{ padding: 20 }}>
           {/* Header Section */}
           <View
             style={{
@@ -247,7 +310,7 @@ const CustomerBiddingModal = () => {
               <Image
                 source={
                   value?.bidder?.avatar
-                    ? {uri: value?.bidder?.avatar}
+                    ? { uri: value?.bidder?.avatar }
                     : require('../assets/images/driver.jpeg')
                 }
                 resizeMode="cover"
@@ -258,7 +321,7 @@ const CustomerBiddingModal = () => {
               />
             </View>
 
-            <View style={{flex: 1, marginLeft: 16}}>
+            <View style={{ flex: 1, marginLeft: 16 }}>
               <Text
                 style={{
                   fontFamily: FAMILY.BOLD,
@@ -268,11 +331,11 @@ const CustomerBiddingModal = () => {
                 }}>
                 {value?.bidder?.first_name} {value?.bidder?.last_name}
               </Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon
                   name="star"
                   type="FontAwesome"
-                  style={{fontSize: 14, color: '#FFB800', marginRight: 4}}
+                  style={{ fontSize: 14, color: '#FFB800', marginRight: 4 }}
                 />
                 <Text
                   style={{
@@ -353,7 +416,7 @@ const CustomerBiddingModal = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 shadowColor: COLOR.GREEN,
-                shadowOffset: {width: 0, height: 4},
+                shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 6,
                 elevation: 4,
@@ -430,7 +493,7 @@ const CustomerBiddingModal = () => {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 20}}>
+        contentContainerStyle={{ paddingBottom: 20 }}>
         {bids.map((val, index) => {
           console.log('🔄 Rendering bid card in loop:', val?.bidder?._id);
           return <BidCard key={val?.bidder?._id} value={val} index={index} />;
@@ -446,7 +509,7 @@ const CustomerBiddingModal = () => {
           marginHorizontal: 20,
           alignItems: 'center',
           shadowColor: '#000',
-          shadowOffset: {width: 0, height: 2},
+          shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.25,
           shadowRadius: 3.84,
           elevation: 5,

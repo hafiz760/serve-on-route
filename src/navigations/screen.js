@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dimensions, I18nManager } from "react-native";
+import { Dimensions, I18nManager, DeviceEventEmitter } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -123,18 +123,18 @@ const Navigator = () => {
       console.log("Notification type:", remoteMessage?.data?.notificationType);
       console.log("User role:", user?.role);
       console.log("Notification body:", remoteMessage.notification?.body);
-      
+
       // Check if this is an OTP notification for a rider - if so, skip it
-      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') || 
-                                remoteMessage.notification?.body?.toLowerCase().includes('verification');
+      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
+        remoteMessage.notification?.body?.toLowerCase().includes('verification');
       const isRider = user?.role?.includes("rider");
-      
+
       if (isOTPNotification && isRider) {
         console.log("🚫 Skipping OTP notification for rider (background)");
         console.log("=== onNotificationOpenedApp complete ===");
         return; // Don't process OTP notifications for riders
       }
-      
+
       if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.role?.includes("rider")) {
         console.log("✅ parcel_notify for rider - updating notiId");
         dispatch(updateNotiId(remoteMessage.notification?.body));
@@ -162,18 +162,18 @@ const Navigator = () => {
           console.log("Notification type:", remoteMessage?.data?.notificationType);
           console.log("User role:", user?.role);
           console.log("Notification body:", remoteMessage.notification?.body);
-          
+
           // Check if this is an OTP notification for a rider - if so, skip it
-          const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') || 
-                                    remoteMessage.notification?.body?.toLowerCase().includes('verification');
+          const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
+            remoteMessage.notification?.body?.toLowerCase().includes('verification');
           const isRider = user?.role?.includes("rider");
-          
+
           if (isOTPNotification && isRider) {
             console.log("🚫 Skipping OTP notification for rider (quit state)");
             console.log("=== getInitialNotification complete ===");
             return; // Don't process OTP notifications for riders
           }
-          
+
           if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.role?.includes("rider")) {
             console.log("✅ parcel_notify for rider - updating notiId");
             dispatch(updateNotiId(remoteMessage.notification?.body));
@@ -198,18 +198,18 @@ const Navigator = () => {
       console.log("Notification type:", remoteMessage?.data?.notificationType);
       console.log("User role:", user?.role);
       console.log("Notification body:", remoteMessage.notification?.body);
-      
+
       // Check if this is an OTP notification for a rider - if so, skip it
-      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') || 
-                                remoteMessage.notification?.body?.toLowerCase().includes('verification');
+      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
+        remoteMessage.notification?.body?.toLowerCase().includes('verification');
       const isRider = user?.role?.includes("rider");
-      
+
       if (isOTPNotification && isRider) {
         console.log("🚫 Skipping OTP notification for rider");
         console.log("=== onMessage complete ===");
         return; // Don't process OTP notifications for riders
       }
-      
+
       if (
         remoteMessage &&
         user?.role?.includes("rider") &&
@@ -229,6 +229,9 @@ const Navigator = () => {
         console.log("Foreground user notification");
         dispatch(updateNotiId(remoteMessage.notification?.body));
         // showMessage("success", remoteMessage.notification?.body);
+      } else if (remoteMessage?.data?.notificationType === "bid_created" && user?.role?.includes("user")) {
+        console.log("✅ bid_created for user in foreground");
+        DeviceEventEmitter.emit('refreshBids', remoteMessage.notification?.body);
       } else {
         console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
         // Only update notiId for non-riders or non-OTP notifications
