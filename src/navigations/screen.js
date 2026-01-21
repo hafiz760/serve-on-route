@@ -1,88 +1,86 @@
-import React, { useState, useEffect } from "react";
-import { Dimensions, I18nManager, DeviceEventEmitter } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import { navigationRef, onReady, onLastScreenLeave } from "../navigations";
-import { useDispatch, useSelector } from "react-redux";
-import DrawerLeft from "../component/Drawer/Left";
-import messaging from "@react-native-firebase/messaging";
-import { updateNotiId } from "../store/reducers/session.js";
-import { initilizeSocket } from "../store/reducers/socketReducer";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {useState, useEffect} from 'react';
+import {Dimensions, I18nManager, DeviceEventEmitter} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {navigationRef, onReady, onLastScreenLeave} from '../navigations';
+import {useDispatch, useSelector} from 'react-redux';
+import DrawerLeft from '../component/Drawer/Left';
+import messaging from '@react-native-firebase/messaging';
+import {updateNotiId} from '../store/reducers/session.js';
+import {initilizeSocket} from '../store/reducers/socketReducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get('window');
 
 const WIDTH_DRAWER = width * 0.78;
 
-const listeners = ({ navigation, route }) => ({
-  beforeRemove: (e) => {
-    if (e.data.action.type === "GO_BACK") {
+const listeners = ({navigation, route}) => ({
+  beforeRemove: e => {
+    if (e.data.action.type === 'GO_BACK') {
       onLastScreenLeave(e);
     }
   },
 });
 
-const DrawerNavUser = ({ navigation }) => {
-  const data = useSelector((state) => state);
-  console.log("cveer1", data.session);
+const DrawerNavUser = ({navigation}) => {
+  const data = useSelector(state => state);
+  console.log('cveer1', data.session);
 
   return (
     <Drawer.Navigator
       screenOptions={{
         headerShown: false,
         drawerWidth: WIDTH_DRAWER,
-        drawerStyle: { width: "75%" },
-        drawerPosition: I18nManager.isRTL ? "right" : "left",
+        drawerStyle: {width: '75%'},
+        drawerPosition: I18nManager.isRTL ? 'right' : 'left',
       }}
-      drawerContent={(props) => <DrawerLeft {...props} />}
-      minSwipeDistance={width}
-    >
+      drawerContent={props => <DrawerLeft {...props} />}
+      minSwipeDistance={width}>
       {data.session.bool ? (
         <Stack.Screen
           name="PublicHome"
-          component={require("../screen/Driver/Home").default}
+          component={require('../screen/Driver/Home').default}
         />
       ) : (
         <Stack.Screen
           name="PublicHome"
-          component={require("../screen/Public/Home/index.js").default}
+          component={require('../screen/Public/Home/index.js').default}
         />
       )}
     </Drawer.Navigator>
   );
 };
 
-const DrawerNavDriver = ({ navigation }) => {
+const DrawerNavDriver = ({navigation}) => {
   return (
     <Drawer.Navigator
       screenOptions={{
         headerShown: false,
         drawerWidth: WIDTH_DRAWER,
-        drawerStyle: { width: "75%" },
-        drawerPosition: I18nManager.isRTL ? "right" : "left",
+        drawerStyle: {width: '75%'},
+        drawerPosition: I18nManager.isRTL ? 'right' : 'left',
       }}
-      drawerContent={(props) => <DrawerLeft {...props} />}
-      minSwipeDistance={width}
-    >
+      drawerContent={props => <DrawerLeft {...props} />}
+      minSwipeDistance={width}>
       <Stack.Screen
         name="DriverHome"
-        component={require("../screen/Driver/Home").default}
+        component={require('../screen/Driver/Home').default}
       />
     </Drawer.Navigator>
   );
 };
 
-const NavRoot = ({ navigation }) => {
+const NavRoot = ({navigation}) => {
   return null;
 };
 
 const Navigator = () => {
-  const data = useSelector((state) => state);
-  const { user } = useSelector((state) => state.session);
-  const { socket } = useSelector((state) => state.socket);
+  const data = useSelector(state => state);
+  const {user} = useSelector(state => state.session);
+  const {socket} = useSelector(state => state.socket);
   const dispatch = useDispatch();
 
   // Re-initialize socket on app startup if user is logged in but socket is null
@@ -91,20 +89,22 @@ const Navigator = () => {
       try {
         // Check if user is logged in but socket is not initialized
         if (user && !socket) {
-          console.log("User is logged in but socket is null, re-initializing...");
+          console.log(
+            'User is logged in but socket is null, re-initializing...',
+          );
 
           // Get access token from AsyncStorage
-          const storedData = await AsyncStorage.getItem("response");
+          const storedData = await AsyncStorage.getItem('response');
           if (storedData) {
             const userData = JSON.parse(storedData);
             if (userData.access_token) {
-              console.log("Re-initializing socket with stored access token");
+              console.log('Re-initializing socket with stored access token');
               dispatch(initilizeSocket(userData.access_token));
             }
           }
         }
       } catch (error) {
-        console.error("Error re-initializing socket:", error);
+        console.error('Error re-initializing socket:', error);
       }
     };
 
@@ -114,132 +114,197 @@ const Navigator = () => {
   useEffect(() => {
     if (!user) return; // Only attach listeners if user is present
 
-    console.log("APP INITIALIZED");
+    console.log('APP INITIALIZED');
 
     // When the app is opened from the background by tapping the notification
-    const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log("=== onNotificationOpenedApp (Background) ===");
-      console.log("Full notification:", JSON.stringify(remoteMessage, null, 2));
-      console.log("Notification type:", remoteMessage?.data?.notificationType);
-      console.log("User role:", user?.role);
-      console.log("Notification body:", remoteMessage.notification?.body);
+    const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(
+      remoteMessage => {
+        console.log('=== onNotificationOpenedApp (Background) ===');
+        console.log(
+          'Full notification:',
+          JSON.stringify(remoteMessage, null, 2),
+        );
+        console.log(
+          'Notification type:',
+          remoteMessage?.data?.notificationType,
+        );
+        console.log('User role:', user?.role);
+        console.log('Notification body:', remoteMessage.notification?.body);
 
-      // Check if this is an OTP notification for a rider - if so, skip it
-      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
-        remoteMessage.notification?.body?.toLowerCase().includes('verification');
-      const isRider = user?.role?.includes("rider");
+        // Check if this is an OTP notification for a rider - if so, skip it
+        const isOTPNotification =
+          remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
+          remoteMessage.notification?.body
+            ?.toLowerCase()
+            .includes('verification');
+        const isRider =
+          user?.role?.includes('rider') || user?.role?.includes('driver');
 
-      if (isOTPNotification && isRider) {
-        console.log("🚫 Skipping OTP notification for rider (background)");
-        console.log("=== onNotificationOpenedApp complete ===");
-        return; // Don't process OTP notifications for riders
-      }
+        if (isOTPNotification && isRider) {
+          console.log('🚫 Skipping OTP notification for rider (background)');
+          console.log('=== onNotificationOpenedApp complete ===');
+          return; // Don't process OTP notifications for riders
+        }
 
-      if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.role?.includes("rider")) {
-        console.log("✅ parcel_notify for rider - updating notiId");
-        dispatch(updateNotiId(remoteMessage.notification?.body));
-        console.log("Notification opened from background: rider");
-        navigationRef.navigate("DrawerNav", {
-          screen: "PublicHome",
-          params: { data: remoteMessage.notification?.body },
-        });
-      } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.role?.includes("user")) {
-        console.log("Notification opened from background: user");
-        navigationRef.navigate("DrawerNav", { screen: "PublicHome" });
-      } else {
-        console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
-      }
-      console.log("=== onNotificationOpenedApp complete ===");
-    });
+        if (
+          remoteMessage?.data?.notificationType === 'parcel_notify' &&
+          (user?.role?.includes('rider') || user?.role?.includes('driver'))
+        ) {
+          console.log('✅ parcel_notify for rider - updating notiId');
+          dispatch(updateNotiId(remoteMessage.notification?.body));
+          console.log('Notification opened from background: rider');
+          navigationRef.navigate('DrawerNav', {
+            screen: 'PublicHome',
+            params: {data: remoteMessage.notification?.body},
+          });
+        } else if (
+          remoteMessage?.data?.notificationType === 'parcel_reboot' &&
+          user?.role?.includes('user')
+        ) {
+          console.log('Notification opened from background: user');
+          navigationRef.navigate('DrawerNav', {screen: 'PublicHome'});
+        } else {
+          console.log(
+            '❌ Notification not handled - type:',
+            remoteMessage?.data?.notificationType,
+            'user role:',
+            user?.role,
+          );
+        }
+        console.log('=== onNotificationOpenedApp complete ===');
+      },
+    );
 
     // When the app is opened from a quit state
     messaging()
       .getInitialNotification()
       .then(remoteMessage => {
-        console.log("=== getInitialNotification (Quit State) ===");
+        console.log('=== getInitialNotification (Quit State) ===');
         if (remoteMessage) {
-          console.log("Full notification:", JSON.stringify(remoteMessage, null, 2));
-          console.log("Notification type:", remoteMessage?.data?.notificationType);
-          console.log("User role:", user?.role);
-          console.log("Notification body:", remoteMessage.notification?.body);
+          console.log(
+            'Full notification:',
+            JSON.stringify(remoteMessage, null, 2),
+          );
+          console.log(
+            'Notification type:',
+            remoteMessage?.data?.notificationType,
+          );
+          console.log('User role:', user?.role);
+          console.log('Notification body:', remoteMessage.notification?.body);
 
           // Check if this is an OTP notification for a rider - if so, skip it
-          const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
-            remoteMessage.notification?.body?.toLowerCase().includes('verification');
-          const isRider = user?.role?.includes("rider");
+          const isOTPNotification =
+            remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
+            remoteMessage.notification?.body
+              ?.toLowerCase()
+              .includes('verification');
+          const isRider =
+            user?.role?.includes('rider') || user?.role?.includes('driver');
 
           if (isOTPNotification && isRider) {
-            console.log("🚫 Skipping OTP notification for rider (quit state)");
-            console.log("=== getInitialNotification complete ===");
+            console.log('🚫 Skipping OTP notification for rider (quit state)');
+            console.log('=== getInitialNotification complete ===');
             return; // Don't process OTP notifications for riders
           }
 
-          if (remoteMessage?.data?.notificationType === "parcel_notify" && user?.role?.includes("rider")) {
-            console.log("✅ parcel_notify for rider - updating notiId");
+          if (
+            remoteMessage?.data?.notificationType === 'parcel_notify' &&
+            (user?.role?.includes('rider') || user?.role?.includes('driver'))
+          ) {
+            console.log('✅ parcel_notify for rider - updating notiId');
             dispatch(updateNotiId(remoteMessage.notification?.body));
-            console.log("Notification opened from quit state: rider");
-            navigationRef.navigate("DrawerNav", {
-              screen: "PublicHome",
-              params: { data: remoteMessage.notification?.body },
+            console.log('Notification opened from quit state: rider');
+            navigationRef.navigate('DrawerNav', {
+              screen: 'PublicHome',
+              params: {data: remoteMessage.notification?.body},
             });
           } else {
-            console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
+            console.log(
+              '❌ Notification not handled - type:',
+              remoteMessage?.data?.notificationType,
+              'user role:',
+              user?.role,
+            );
           }
         } else {
-          console.log("No initial notification");
+          console.log('No initial notification');
         }
-        console.log("=== getInitialNotification complete ===");
+        console.log('=== getInitialNotification complete ===');
       });
 
     // Foreground notifications
     const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-      console.log("=== onMessage (Foreground) ===");
-      console.log("FOREGROUND notification", JSON.stringify(remoteMessage, null, 2));
-      console.log("Notification type:", remoteMessage?.data?.notificationType);
-      console.log("User role:", user?.role);
-      console.log("Notification body:", remoteMessage.notification?.body);
+      console.log('=== onMessage (Foreground) ===');
+      console.log(
+        'FOREGROUND notification',
+        JSON.stringify(remoteMessage, null, 2),
+      );
+      console.log('Notification type:', remoteMessage?.data?.notificationType);
+      console.log('User role:', user?.role);
+      console.log('Notification body:', remoteMessage.notification?.body);
 
       // Check if this is an OTP notification for a rider - if so, skip it
-      const isOTPNotification = remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
-        remoteMessage.notification?.body?.toLowerCase().includes('verification');
-      const isRider = user?.role?.includes("rider");
+      const isOTPNotification =
+        remoteMessage.notification?.body?.toLowerCase().includes('otp') ||
+        remoteMessage.notification?.body
+          ?.toLowerCase()
+          .includes('verification');
+      const isRider =
+        user?.role?.includes('rider') || user?.role?.includes('driver');
 
       if (isOTPNotification && isRider) {
-        console.log("🚫 Skipping OTP notification for rider");
-        console.log("=== onMessage complete ===");
+        console.log('🚫 Skipping OTP notification for rider');
+        console.log('=== onMessage complete ===');
         return; // Don't process OTP notifications for riders
       }
 
       if (
         remoteMessage &&
-        user?.role?.includes("rider") &&
-        remoteMessage?.data?.notificationType === "parcel_notify"
+        (user?.role?.includes('rider') || user?.role?.includes('driver')) &&
+        remoteMessage?.data?.notificationType === 'parcel_notify'
       ) {
-        console.log("✅ parcel_notify for rider in foreground - updating notiId");
+        console.log(
+          '✅ parcel_notify for rider in foreground - updating notiId',
+        );
         dispatch(updateNotiId(remoteMessage.notification?.body));
-        console.log("After notiId update");
+        console.log('After notiId update');
 
-        navigationRef.navigate("DrawerNav", {
-          screen: "PublicHome",
+        navigationRef.navigate('DrawerNav', {
+          screen: 'PublicHome',
           params: {
             data: remoteMessage.notification?.body,
           },
         });
-      } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.role?.includes("user")) {
-        console.log("Foreground user notification");
+      } else if (
+        remoteMessage?.data?.notificationType === 'parcel_reboot' &&
+        user?.role?.includes('user')
+      ) {
+        console.log('Foreground user notification');
         dispatch(updateNotiId(remoteMessage.notification?.body));
         // showMessage("success", remoteMessage.notification?.body);
-      } else if (remoteMessage?.data?.notificationType === "bid_created" && user?.role?.includes("user")) {
-        console.log("✅ bid_created for user in foreground");
-        DeviceEventEmitter.emit('refreshBids', remoteMessage.notification?.body);
+      } else if (
+        remoteMessage?.data?.notificationType === 'bid_created' &&
+        user?.role?.includes('user')
+      ) {
+        console.log('✅ bid_created for user in foreground');
+        console.log(remoteMessage.notification?.body);
+        DeviceEventEmitter.emit(
+          'refreshBids',
+          remoteMessage.notification?.body,
+        );
       } else {
-        console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
+        console.log(
+          '❌ Notification not handled - type:',
+          remoteMessage?.data?.notificationType,
+          'user role:',
+          user?.role,
+        );
         // Only update notiId for non-riders or non-OTP notifications
         if (!isRider || !isOTPNotification) {
           dispatch(updateNotiId(remoteMessage.notification?.body));
         }
       }
-      console.log("=== onMessage complete ===");
+      console.log('=== onMessage complete ===');
     });
 
     // Cleanup to avoid memory leaks
@@ -256,154 +321,157 @@ const Navigator = () => {
           headerShown: false,
         }}
         initialRouteName="NavRoot"
-        screenListeners={listeners}
-      >
+        screenListeners={listeners}>
         <Stack.Screen name="NavRoot" component={NavRoot} />
         <Stack.Screen name="DrawerNav" component={DrawerNavUser} />
         {/* <Stack.Screen name="DrawerNav" component={DrawerNavDriver} /> */}
         <Stack.Screen
           name="PublicIntro"
-          component={require("../screen/Public/Intro").default}
+          component={require('../screen/Public/Intro').default}
         />
         <Stack.Screen
           name="PublicSignUp"
-          component={require("../screen/Public/SignUp").default}
+          component={require('../screen/Public/SignUp').default}
         />
         <Stack.Screen
           name="PublicLogin"
-          component={require("../screen/Public/Login").default}
+          component={require('../screen/Public/Login').default}
         />
 
         <Stack.Screen
           name="PublicVerification"
-          component={require("../screen/Public/Verification").default}
+          component={require('../screen/Public/Verification').default}
         />
         <Stack.Screen
           name="ResetPassword"
-          component={require("../screen/Public/ResetPassword").default}
+          component={require('../screen/Public/ResetPassword').default}
         />
         <Stack.Screen
           name="PublicForgotPassword"
-          component={require("../screen/Public/ForgotPassword").default}
+          component={require('../screen/Public/ForgotPassword').default}
         />
         <Stack.Screen
           name="PublicAboutUs"
-          component={require("../screen/Public/AboutUs").default}
+          component={require('../screen/Public/AboutUs').default}
         />
         <Stack.Screen
           name="PublicContact"
-          component={require("../screen/Public/Contact").default}
+          component={require('../screen/Public/Contact').default}
         />
         {data.session.bool ? (
           <Stack.Screen
             name="PublicHome"
-            component={require("../screen/Driver/Home").default}
+            component={require('../screen/Driver/Home').default}
           />
         ) : (
           <Stack.Screen
             name="PublicHome"
-            component={require("../screen/Public/Home").default}
+            component={require('../screen/Public/Home').default}
           />
         )}
         <Stack.Screen
           name="PublicSplash"
-          component={require("../screen/Public/Splash").default}
+          component={require('../screen/Public/Splash').default}
         />
         <Stack.Screen
           name="CustomerLanguage"
-          component={require("../screen/Customer/Language").default}
+          component={require('../screen/Customer/Language').default}
         />
         <Stack.Screen
           name="CustomerSelectVehicle"
-          component={require("../screen/Customer/SelectVehicle").default}
+          component={require('../screen/Customer/SelectVehicle').default}
         />
         <Stack.Screen
           name="CustomerSharedVehicle"
-          component={require("../screen/Customer/SharedVehicle").default}
+          component={require('../screen/Customer/SharedVehicle').default}
         />
         <Stack.Screen
           name="CustomerPayment"
-          component={require("../screen/Customer/Payment").default}
+          component={require('../screen/Customer/Payment').default}
         />
         <Stack.Screen
           name="CustomerBookingComplete"
-          component={require("../screen/Customer/BookingComplete").default}
+          component={require('../screen/Customer/BookingComplete').default}
         />
         <Stack.Screen
           name="DriverBookingComplete"
-          component={require("../screen/Driver/BookingComplete").default}
+          component={require('../screen/Driver/BookingComplete').default}
         />
         <Stack.Screen
           name="CustomerBookingConfirm"
-          component={require("../screen/Customer/BookingConfirm").default}
+          component={require('../screen/Customer/BookingConfirm').default}
         />
         <Stack.Screen
           name="CustomerWriteUs"
-          component={require("../screen/Customer/WriteUs").default}
+          component={require('../screen/Customer/WriteUs').default}
         />
         <Stack.Screen
           name="CustomerManageProfile"
-          component={require("../screen/Customer/ManageProfile").default}
+          component={require('../screen/Customer/ManageProfile').default}
         />
         <Stack.Screen
           name="CustomerMyTrips"
-          component={require("../screen/Customer/MyTrips").default}
+          component={require('../screen/Customer/MyTrips').default}
         />
         <Stack.Screen
           name="CustomerNotification"
-          component={require("../screen/Customer/Notification").default}
+          component={require('../screen/Customer/Notification').default}
         />
         <Stack.Screen
           name="CustomerAllPayments"
-          component={require("../screen/Customer/AllPayments").default}
+          component={require('../screen/Customer/AllPayments').default}
         />
         <Stack.Screen
           name="DriverManageProfile"
-          component={require("../screen/Driver/ManageProfile").default}
+          component={require('../screen/Driver/ManageProfile').default}
         />
         <Stack.Screen
           name="DriverDrivingLicense"
-          component={require("../screen/Driver/ManageProfile/DrivingLicense").default}
+          component={
+            require('../screen/Driver/ManageProfile/DrivingLicense').default
+          }
         />
         <Stack.Screen
           name="DriverGovernmentId"
-          component={require("../screen/Driver/ManageProfile/GovernmentId").default}
+          component={
+            require('../screen/Driver/ManageProfile/GovernmentId').default
+          }
         />
         <Stack.Screen
           name="DriverAddRoutes"
-          component={require("../screen/Driver/MyRoutes").default}
+          component={require('../screen/Driver/MyRoutes').default}
         />
         <Stack.Screen
           name="DriverRoutes"
-          component={require("../screen/Driver/MyAllRoute").default}
+          component={require('../screen/Driver/MyAllRoute').default}
         />
         <Stack.Screen
           name="DriverNotification"
-          component={require("../screen/Driver/Notification").default}
+          component={require('../screen/Driver/Notification').default}
         />
         <Stack.Screen
           name="DriverBooking"
-          component={require("../screen/Driver/Booking").default}
+          component={require('../screen/Driver/Booking').default}
         />
         <Stack.Screen
           name="DriverSettlement"
-          component={require("../screen/Driver/Settlement")?.default}
+          component={require('../screen/Driver/Settlement')?.default}
         />
         <Stack.Screen
           name="DriverPermissions"
-          component={require("../screen/Driver/Permissions")?.default}
+          component={require('../screen/Driver/Permissions')?.default}
         />
         <Stack.Screen
           name="DriverMyTrips"
-          component={require("../screen/Driver/MyTrips")?.default}
+          component={require('../screen/Driver/MyTrips')?.default}
         />
         <Stack.Screen
           name="CustomerDriverTracking"
-          component={require("../screen/Tracking").default}
+          component={require('../screen/Tracking').default}
         />
         <Stack.Screen
           name="showNotification"
-          component={require("../screen/Driver/Home/ShowNotification")?.default}
+          component={require('../screen/Driver/Home/ShowNotification')?.default}
         />
       </Stack.Navigator>
     </NavigationContainer>
