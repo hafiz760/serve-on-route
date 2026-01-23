@@ -69,7 +69,7 @@ export default function BookingComplete(props) {
     };
     try {
       const res = await fetch(
-        `h${BASE_URL}${URL_V}complaints`,
+        `${BASE_URL}${URL_V}complaints`,
         requestOptions
       );
       const result = await res.json();

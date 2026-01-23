@@ -1,109 +1,143 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Alert } from "react-native";
 import { useSelector } from "react-redux";
 import Modal from "react-native-modalbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import BiddingCard from "../screen/Driver/Home/BiddingCard";
 import { BASE_URL, URL_V } from "../utilities/helper";
+import { STORAGE_KEYS, SUCCESS_MESSAGES } from "../constant/appConstants";
 
+/**
+ * GlobalBiddingModal Component
+ * Displays bidding interface for drivers when new parcel notifications arrive
+ * Only visible to users with driver role
+ */
 const GlobalBiddingModal = () => {
     const notiId = useSelector((state) => state.session.notiId);
     const { socket } = useSelector((state) => state.socket);
+    const { user } = useSelector((state) => state.session);
 
-    console.log("GlobalBiddingModal: mounted");
-    console.log("GlobalBiddingModal: notiId", notiId);
+    const isDriver = user?.roles?.includes("rider") || user?.role === "driver";
 
-    const [mainModel, setMainModel] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [incomingParcelNotifications, setIncomingParcelNotifications] = useState([]);
-    const ModalNotification = useRef();
+    const modalRef = useRef();
 
-    const closeModelBaseOnId = (id) => {
+    /**
+     * Close modal and remove parcel from notification list
+     * @param {string} parcelId - ID of the parcel to remove
+     */
+    const closeModalByParcelId = (parcelId) => {
         if (incomingParcelNotifications.length === 1) {
-            setMainModel(false);
+            setIsModalOpen(false);
         }
-        setIncomingParcelNotifications((previous) => {
-            return previous.filter((value) => value.id !== id);
-        });
+        setIncomingParcelNotifications((previous) =>
+            previous.filter((parcel) => parcel.id !== parcelId)
+        );
     };
 
+    /**
+     * Handle bid submission
+     * @param {number} bidValue - Bid amount
+     * @param {Object} selectedParcel - Parcel object
+     */
     const handleBid = async (bidValue, selectedParcel) => {
         try {
-            var data = await AsyncStorage.getItem("response");
-            var datas = JSON.parse(data);
+            const userDataString = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
+            if (!userDataString) {
+                throw new Error("User data not found");
+            }
+
+            const userData = JSON.parse(userDataString);
             const requestPayload = {
                 bid_amount: bidValue,
                 parcel: selectedParcel._id,
-                bidder: datas._id,
-                description: "string",
+                bidder: userData._id,
+                description: "Bid placed via GlobalBiddingModal",
             };
 
-            setMainModel(false);
+            setIsModalOpen(false);
             socket.emit("bidding", requestPayload);
-            alert("You successfully bid on this parcel");
 
-            // Remove the bid parcel from the list
-            closeModelBaseOnId(selectedParcel.id);
+            Alert.alert("Success", SUCCESS_MESSAGES.BID_PLACED);
+            closeModalByParcelId(selectedParcel.id);
 
         } catch (error) {
-            console.log("Bid Error", error);
+            Alert.alert("Error", "Failed to place bid. Please try again.");
         }
     };
 
-    const getParcelById = async (parcelId) => {
-        console.log("GlobalBiddingModal: getParcelById called with", parcelId);
+    /**
+     * Fetch parcel details by ID
+     * @param {string} parcelId - Parcel ID
+     */
+    const fetchParcelById = async (parcelId) => {
         try {
-            var data = await AsyncStorage.getItem("response");
-            var datas = JSON.parse(data);
+            const userDataString = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
+            if (!userDataString) {
+                return;
+            }
 
-            const responseOne = await axios.get(
+            const userData = JSON.parse(userDataString);
+
+            const response = await axios.get(
                 `${BASE_URL}${URL_V}parcel/${parcelId}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${datas.access_token}`,
+                        Authorization: `Bearer ${userData.access_token}`,
                     },
                 }
             );
 
-            const exists = incomingParcelNotifications.some(
-                (item) => item.id === responseOne.data.id
+            const parcelAlreadyExists = incomingParcelNotifications.some(
+                (parcel) => parcel.id === response.data.id
             );
 
-            if (!exists) {
-                setIncomingParcelNotifications((prev) => [...prev, responseOne.data]);
-                // Only open modal if we have valid parcel data
-                setMainModel(true);
+            if (!parcelAlreadyExists && response.data) {
+                setIncomingParcelNotifications((prev) => [...prev, response.data]);
+                setIsModalOpen(true);
             }
-        } catch (err) {
-            console.log("Error fetching parcel", err?.response);
+        } catch (error) {
+            // Silently fail - parcel might not be available anymore
         }
     };
 
+    /**
+     * Extract parcel ID from notification and fetch details
+     */
     useEffect(() => {
-        console.log("GlobalBiddingModal: useEffect triggered with notiId", notiId);
-        if (notiId) {
-            const id = notiId.split("Id: ")[1].split(" has")[0];
-            console.log("GlobalBiddingModal: extracted id", id);
-            getParcelById(id);
+        if (!isDriver || !notiId || typeof notiId !== 'string') {
+            return;
         }
-    }, [notiId]);
+
+        const parcelId = notiId.split("Id: ")[1]?.split(" has")[0];
+        if (parcelId) {
+            fetchParcelById(parcelId);
+        }
+    }, [notiId, isDriver]);
+
+    // Don't render for non-drivers
+    if (!isDriver) {
+        return null;
+    }
 
     return (
         <Modal
-            ref={ModalNotification}
-            isOpen={mainModel && incomingParcelNotifications.length > 0}
-            entry={"top"}
+            ref={modalRef}
+            isOpen={isModalOpen && incomingParcelNotifications.length > 0}
+            entry="top"
             swipeToClose={false}
             backdropPressToClose={false}
             style={styles.modal}
             backdropOpacity={0.5}
         >
             <View style={styles.container}>
-                {incomingParcelNotifications.map((val) => (
+                {incomingParcelNotifications.map((parcel) => (
                     <BiddingCard
-                        val={val}
-                        key={val?._id}
-                        CloseModelBaseOnId={closeModelBaseOnId}
+                        val={parcel}
+                        key={parcel?._id}
+                        CloseModelBaseOnId={closeModalByParcelId}
                         handleBid={handleBid}
                     />
                 ))}

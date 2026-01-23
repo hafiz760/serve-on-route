@@ -8,7 +8,6 @@ import { goBack } from '@navigation';
 import Navigator from '@navigation/screen';
 import { store, persistor } from '@store';
 import Toast from 'react-native-toast-message';
-import { StripeProvider } from '@stripe/stripe-react-native';
 import { requestUserPermission } from '../helper/pushnotification_helper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
