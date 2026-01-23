@@ -19,37 +19,7 @@ export default function SelfieUpload({
 }) {
   return (
     <>
-      <View>
-        <Text
-          style={{
-            fontWeight: '400',
-            fontSize: 14,
-            color: '#59499E',
-            marginTop: 7,
-          }}>
-          Take a Selfie
-        </Text>
-        <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            height: hp(7),
-            backgroundColor: '#E6E6E6',
-            alignItems: 'center',
-            borderRadius: 10,
-            paddingHorizontal: wp(5),
-          }}
-          onPress={() => {
-            getPhotoFromGallery1();
-          }}>
-          <Text style={{color: '#59499E99'}}>Upload for verification</Text>
-          <Image
-            source={require('../../../../assets/images/upload.png')}
-            style={{}}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-      </View>
+     
 
       <View style={{flexDirection: 'row'}}>
         {imageForShowSelfi.map((item, index) => (

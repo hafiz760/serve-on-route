@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import React, {useEffect, useState} from 'react';
+import {Text, View} from 'react-native';
 
-import styles from "./styles";
-import theme from "../../../theme/styles";
+import styles from './styles';
+import theme from '../../../theme/styles';
 
-import { Icon } from "../../../component/Basic";
-import { Button } from "../../../component/Form";
+import {Icon} from '../../../component/Basic';
+import {Button} from '../../../component/Form';
 
 const Accordion = ({
   title,
@@ -40,7 +40,7 @@ const Accordion = ({
             <Text style={opened ? styles.accordionActiveText : styles.accordionInactiveText}>{text}</Text>
           </View> */}
           <Icon
-            name={opened ? "keyboard-arrow-down" : "keyboard-arrow-right"}
+            name={opened ? 'keyboard-arrow-down' : 'keyboard-arrow-right'}
             type="MaterialIcons"
             style={[theme.SIZE_20, theme.DARKBLUE]}
           />

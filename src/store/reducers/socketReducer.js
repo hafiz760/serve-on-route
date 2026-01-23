@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 const ENDPOINT = "https://api.serveonroute.com";
 
 const initialState = {
-  socket: "",
+  socket: null,
 };
 
 const initilizeSocket_ = (state, action) => {

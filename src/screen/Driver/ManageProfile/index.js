@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Linking } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Linking, Alert } from 'react-native';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+
 import { Container, Content, Text } from '../../../component/Basic';
 import { Button } from '../../../component/Form';
 import styles from './styles';
@@ -84,6 +86,7 @@ export default function ManageProfile() {
         return_url: 'https://serveonroute.com/return',
         type: 'account_onboarding',
       };
+      console.log('payload', payload);
       const response = await linkStripeAccount(
         payload,
         parsedData?.access_token,
@@ -91,9 +94,29 @@ export default function ManageProfile() {
 
       if (response.success) {
         console.log('URL>>>>>>:', response.data);
-        setUrlValue(response.data.url);
+        const url = response.data.url;
+        setUrlValue(url);
+
         if (isEnabled) {
-          Linking.openURL(response.data.url);
+          try {
+            if (await InAppBrowser.isAvailable()) {
+              await InAppBrowser.open(url, {
+                // optional styling
+                dismissButtonStyle: 'close',
+                preferredBarTintColor: '#ffffff',
+                preferredControlTintColor: '#000000',
+                // Android
+                showTitle: true,
+                toolbarColor: '#ffffff',
+                secondaryToolbarColor: '#ffffff',
+              });
+            } else {
+              // Fallback to normal Linking if in-app not available
+              Linking.openURL(url);
+            }
+          } catch (e) {
+            Linking.openURL(url);
+          }
         }
       } else {
         console.error('Link Account Failed:', response.message);
@@ -102,6 +125,49 @@ export default function ManageProfile() {
       console.error('Error in connectAccount:', error.message);
     }
   };
+
+  const handleDeepLink = useCallback(
+    async ({ url }) => {
+      console.log('Deep link received:', url);
+
+      try {
+        if (url.startsWith('com.truckie://stripe-return')) {
+          InAppBrowser.close();
+        } else if (url.startsWith('com.truckie://stripe-refresh')) {
+          InAppBrowser.close();
+          Alert.alert(
+            'Session Expired',
+            'Let\'s try that again.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setIsEnabled(true);
+                },
+              },
+            ],
+          );
+        }
+      } catch (e) {
+        console.error('Error handling deep link', e);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const sub = Linking.addEventListener('url', handleDeepLink);
+    Linking.getInitialURL().then(initialUrl => {
+      if (initialUrl) {
+        handleDeepLink({ url: initialUrl });
+      }
+    });
+
+    return () => sub.remove();
+  }, [handleDeepLink]);
+
+
+
 
   return (
     <>

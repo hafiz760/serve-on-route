@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Image,
@@ -7,23 +7,21 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { TextInput } from '../../../component/Form';
-import { Text, Icon } from '../../../component/Basic';
+import {TextInput} from '../../../component/Form';
+import {Text, Icon} from '../../../component/Basic';
 import theme from '../../../theme/styles';
-import { COLOR } from '../../../theme/typography';
+import {COLOR} from '../../../theme/typography';
 import styles from './styles';
 
-const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
+const BiddingCard = ({val, CloseModelBaseOnId, handleBid}) => {
   const [biddingValue, setBiddingValue] = useState(val?.fare);
   const [isBidFormShow, setBidFormShow] = useState(false);
 
-  // Helper to format date safely
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '';
-    // If it's already a clean date string, return it
-    if (typeof dateString === 'string' && dateString.length === 10) return dateString;
+    if (typeof dateString === 'string' && dateString.length === 10)
+      return dateString;
     try {
-      // Handle potential JSON stringified format from original code
       const cleanStr = dateString.replace(/['"]+/g, '');
       return cleanStr.substring(0, 10);
     } catch (e) {
@@ -33,10 +31,13 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
 
   return (
     <View style={styles.cardContainer}>
-      {/* Header Section */}
       <View style={styles.cardHeader}>
         <Image
-          source={require('../../../assets/images/avatar.png')}
+          source={
+            val?.customer_id?.avatar
+              ? {uri: val?.customer_id?.avatar}
+              : require('../../../assets/images/avatar.png')
+          }
           resizeMode="cover"
           style={styles.cardAvatar}
         />
@@ -49,7 +50,6 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
         <Text style={styles.cardPrice}>$ {val?.fare}</Text>
       </View>
 
-      {/* Route Section */}
       <View style={styles.routeContainer}>
         <View style={styles.routeRow}>
           <View style={styles.routeItem}>
@@ -71,9 +71,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
         </View>
         <View style={styles.detailItem}>
           <Text style={styles.detailLabel}>Delivery Time</Text>
-          <Text style={styles.detailValue}>
-            {formatDate(val?.time)}
-          </Text>
+          <Text style={styles.detailValue}>{formatDate(val?.time)}</Text>
         </View>
       </View>
 
@@ -140,7 +138,7 @@ const BiddingCard = ({ val, CloseModelBaseOnId, handleBid }) => {
               <Icon
                 name="send"
                 type="FontAwesome"
-                style={{ color: 'white', fontSize: 16 }}
+                style={{color: 'white', fontSize: 16}}
               />
             </TouchableOpacity>
           </View>
