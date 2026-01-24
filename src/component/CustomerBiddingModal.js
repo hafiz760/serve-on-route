@@ -213,13 +213,41 @@ const CustomerBiddingModal = () => {
     return user.role === 'user';
   };
 
+  const fetchBids = async parcelId => {
+    try {
+      console.log('🎯 Fetching bids for parcel:', parcelId);
+      const userData = await AsyncStorage.getItem('response');
+      if (!userData) return;
+      const {access_token} = JSON.parse(userData);
+
+      const res = await axios.get(
+        `${BASE_URL}${URL_V}bid?parcel=${parcelId}&populate=bidder&sort=-createdAt&limit=100&page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        },
+      );
+
+      if (res.data && Array.isArray(res.data.docs)) {
+        console.log('✅ Bids fetched successfully:', res.data.docs.length);
+        setBids(res.data.docs);
+        if (res.data.docs.length > 0) {
+          setMainModel(true);
+        }
+      }
+    } catch (error) {
+      console.log('❌ Error fetching bids:', error?.response?.data || error.message);
+    }
+  };
+
   useEffect(() => {
     if (!socket || !isCustomer()) {
       return;
     }
 
     const handleBidding = incomingBid => {
-      console.log('🎯 NEW BID RECEIVED CUSTOMER!');
+      console.log('🎯 NEW BID RECEIVED CUSTOMER via Socket!');
       const incomingBidId = incomingBid.bidder._id;
 
       setBids(prevBids => {
@@ -246,14 +274,47 @@ const CustomerBiddingModal = () => {
 
     socket.on('bidding', handleBidding);
 
-    // Also listen to refreshBids events if they come from notifications
     const refreshListener = DeviceEventEmitter.addListener(
       'refreshBids',
       data => {
-        console.log('🎯 REFRESH BIDS RECEIVED!');
-        // Usually data would be the bid or we might need to fetch.
-        // If the backend sends full bid in notification body, we can handle it.
-        // But for now, we rely on socket for real-time.
+        console.log('🎯 REFRESH BIDS EVENT:', typeof data);
+        
+        let parcelId = null;
+        if (typeof data === 'string') {
+          // Look for parcel ID specifically. It often follows "parcel {" or contains "_id"
+          // Priority 1: ID inside ObjectId()
+          const objectIdMatch = data.match(/ObjectId\("([a-f\d]{24})"\)/);
+          if (objectIdMatch) {
+            parcelId = objectIdMatch[1];
+            console.log('✅ Extracted parcelId from ObjectId:', parcelId);
+          } else {
+            // Priority 2: ID after "parcel" keyword
+            const parcelMatch = data.match(/parcel\s+([a-f\d]{24})/i);
+            if (parcelMatch) {
+              parcelId = parcelMatch[1];
+              console.log('✅ Extracted parcelId from parcel keyword:', parcelId);
+            } else {
+              // Fallback: search for any hex string but avoid the first one if it's likely the rider ID
+              // (This is risky but a common pattern in the user's logs is Rider ID first, then Parcel ID)
+              const allHexStrings = data.match(/[a-f\d]{24}/gi);
+              if (allHexStrings && allHexStrings.length > 1) {
+                parcelId = allHexStrings[1]; // Likely the parcel ID according to user logs
+                console.log('✅ Extracted likely parcelId (second hex string):', parcelId);
+              } else if (allHexStrings && allHexStrings.length === 1) {
+                parcelId = allHexStrings[0];
+                console.log('✅ Extracted only found hex string:', parcelId);
+              }
+            }
+          }
+        } else if (data && typeof data === 'object') {
+          parcelId = data._id || data.parcelId || data.parcel?._id;
+        }
+
+        if (parcelId) {
+          fetchBids(parcelId);
+        } else {
+          console.log('⚠️ Could not extract parcelId from notification data');
+        }
       },
     );
 
@@ -273,30 +334,49 @@ const CustomerBiddingModal = () => {
 
   const acceptRide = async value => {
     try {
-      var data = await AsyncStorage.getItem('response');
-      var datas = JSON.parse(data);
+      console.log('🎯 Accepting ride for parcel bid:', value?._id);
+      const userData = await AsyncStorage.getItem('response');
+      if (!userData) return;
+      const datas = JSON.parse(userData);
 
-      const formData = new FormData();
-      formData.append('rider_id', value.bidder._id);
-      formData.append('status', 'in_progress');
-      formData.append('pay_amount', value?.bid_amount);
+      // Robustly get parcel ID (it could be a populated object or a string ID)
+      const parcelId = value.parcel?._id || value.parcel;
+
+      if (!parcelId) {
+        console.error('❌ Could not find parcel ID in bid data');
+        alert('Could not find parcel information. Please try refreshing.');
+        return;
+      }
+
+      console.log('🎯 Updating parcel:', parcelId, 'with driver:', value.bidder?._id);
+
+      // Using JSON payload instead of FormData for status updates
+      // This is more consistent with successful status updates elsewhere in the app
+      const payload = {
+        rider_id: value.bidder?._id,
+        status: 'in_progress',
+        pay_amount: value?.bid_amount,
+      };
 
       const resp = await axios.patch(
-        `${BASE_URL}${URL_V}parcel/${value.parcel._id}`,
-        formData,
+        `${BASE_URL}${URL_V}parcel/${parcelId}`,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${datas.access_token}`,
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
           },
         },
       );
+
+      console.log('✅ Accept ride response:', resp.data);
 
       setMainModel(false);
       setBids([]);
       alert('You have chosen ur driver. He is on his way!');
     } catch (err) {
-      console.error('❌ Error accepting ride:', err);
+      console.error('❌ Error accepting ride:', err?.response?.data || err.message);
+      alert('Something went wrong while accepting the ride. Please try again.');
     }
   };
 

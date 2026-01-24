@@ -53,7 +53,7 @@ export default function MyTrip() {
       console.log(userJsonData, 'User Data');
 
       const res = await axios.get(
-        `${BASE_URL}${URL_V}parcel?page=${pageToLoad}&limit=500&populate=customer_id%20rider_id&sort=desc&customer_id=${userJsonData._id}`,
+        `${BASE_URL}${URL_V}parcel?page=${pageToLoad}&limit=20&populate=customer_id%20rider_id&sort=desc&customer_id=${userJsonData._id}`,
         {
           headers: {
             Authorization: `Bearer ${userJsonData.access_token}`,
