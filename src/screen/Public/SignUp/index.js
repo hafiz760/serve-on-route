@@ -33,7 +33,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-var qs = require('qs');
+
 export default function SignUp() {
   const SignupSchema = Yup.object().shape({
     firstName: Yup.string()
@@ -147,7 +147,11 @@ export default function SignUp() {
     setLoading(true);
 
     axios
-      .post(`${BASE_URL}${URL_V}auth/signup`, qs.stringify(cd))
+      .post(`${BASE_URL}${URL_V}auth/signup`, cd, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       .then(response => {
         if (response.status === 201) {
           if (response?.data?.status === 500) {

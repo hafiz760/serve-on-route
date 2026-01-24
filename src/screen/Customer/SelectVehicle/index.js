@@ -54,7 +54,7 @@ function SelectVehicle(params) {
   const [width, setWidth] = useState({ title: '0-1' });
   const [height, setHeight] = useState({ title: '0-1' });
   const [length, setLength] = useState({ title: '0-1' });
-  const [weight, setWeight] = useState('');
+  const [weight, setWeight] = useState({ title: '0-5' });
   const [mainModel, setMainModel] = useState(false);
   const [openModel, setOpenModel] = useState(false);
   const [openTimeModel, setOpenTimeModel] = useState(false);
@@ -65,9 +65,7 @@ function SelectVehicle(params) {
   const [dateOneTimeSelect, setDateOneTimeSelect] = useState(false);
   const [selectSlot, setSelectSlot] = useState('');
   const [until, setUntil] = useState(0);
-  const [slotTimings, setSlotTimings] = useState(
-    { label: '00:00 - 04:00', value: '00:00 - 04:00', slot: 1 } || '',
-  );
+  const [slotTimings, setSlotTimings] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [items, setItems] = useState([
     { label: 'Solid', value: 'solid' },
@@ -191,7 +189,7 @@ function SelectVehicle(params) {
     if (!fare || isNaN(fare) || parseFloat(fare) <= 0) {
       return showMessage('error', 'Please enter a valid fare amount');
     }
-    if (!weight) {
+    if (!weight || !weight.title) {
       return showMessage('error', 'Please select a weight range');
     }
     if (!length.title || !height.title || !width.title) {
@@ -237,7 +235,7 @@ function SelectVehicle(params) {
     formData.append('time', formatedDate);
     // formData.append("time", "2023-10-25T18:37:33.582Z");
     formData.append('length', length.title);
-    formData.append('weight', width.title);
+    formData.append('weight', weight.title);
     formData.append('parcel_type', itemsType);
     formData.append('receiving_slot', slotTimings);
     formData.append('biddingEndTime', '2026-12-12');
@@ -255,37 +253,41 @@ function SelectVehicle(params) {
     };
     try {
       const res = await fetch(`${BASE_URL}${URL_V}parcel`, requestOptions);
-      console.log("fetchData ~ result======>", JSON.stringify(res, null, 2))
+      console.log("fetchData ~ status======>", res.status)
       const result = await res.json();
-      // console.log("result>>>>>", result);
-      if (result.statusCode === 400) {
-        showMessage("error", result.message);
-      } else {
-        setFocus(true);
-        showMessage(
-          'success',
-          'Parcel Created Successfully!. Wait for drivers to bid',
-        );
-        params.navigation.navigate('CustomerMyTrips');
-        // setUntil(10)
-        // setTimerModel(true)
+      console.log("result>>>>>", result);
+
+      // Check if response is not OK (status code outside 200-299)
+      if (!res.ok || result.statusCode === 400 || result.statusCode >= 400) {
+        showMessage("error", result.message || "Failed to create parcel");
+        setISLoading(false);
+        return;
       }
 
-      // console.log("RESULT ===>111", result);
+      // Success case
+      setFocus(true);
+      showMessage(
+        'success',
+        'Parcel Created Successfully!. Wait for drivers to bid',
+      );
+      // params.navigation.navigate('CustomerMyTrips');
+      // setUntil(10)
+      // setTimerModel(true)
     } catch (err) {
-      showMessage('error', 'Something went wrong');
+      console.log('Error creating parcel:', err);
+      showMessage('error', err.message || 'Something went wrong');
     } finally {
       setISLoading(false);
     }
   };
 
-  // const deleteShowImage = (value) => {
-  //   // console.log("press")
-  //   setImageForShow((previous) =>
-  //     previous.filter((val) => val?.uri != value?.uri)
-  //   );
-  //   showMessage("success", "Image Delete Successfully");
-  // };
+  const deleteShowImage = (value) => {
+    // console.log("press")
+    setImageForShow((previous) =>
+      previous.filter((val) => val?.uri != value?.uri)
+    );
+    showMessage("success", "Image Delete Successfully");
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -317,7 +319,7 @@ function SelectVehicle(params) {
       <Header leftType="back" title={'Book Your Parcel'} />
       <Content contentContainerStyle={theme.layoutDf}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={[styles.selectVehicleContainer, { height: '80%' }]}>
+          <View style={[styles.selectVehicleContainer]}>
             <View style={styles.selectVehicleContent}>
               <View style={styles.labelContainer}>
                 <Text style={styles.label}>Booking Details</Text>
@@ -424,7 +426,7 @@ function SelectVehicle(params) {
                   }}
                   setItems={setTimes}
                   listMode="SCROLLVIEW"
-                  dropDownMaxHeight={400}
+                  dropDownMaxHeight={1000}
                   style={{
                     paddingVertical: 19,
                     marginTop: 10,

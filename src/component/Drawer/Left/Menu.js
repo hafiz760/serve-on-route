@@ -33,7 +33,7 @@ export const Data2 = [
     image: require('../../../assets/images/Home.png'),
   },
   {
-    name: 'My Trips',
+    name: 'My Parcels',
     route: 'CustomerMyTrips',
     iconName: 'truck',
     iconType: 'Fontisto',

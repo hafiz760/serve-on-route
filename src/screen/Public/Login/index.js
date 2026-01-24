@@ -29,7 +29,7 @@ import { showMessage } from '../../../helper/showAlert';
 import { logIn } from '../../../services/apicalls/auth';
 import { BASE_URL, URL_V } from '../../../utilities/helper';
 import { navigate, navigateReset } from '../../../navigations';
-var qs = require('qs');
+
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [isSelected, setSelection] = useState(false);
@@ -82,7 +82,11 @@ export default function SignUp() {
     );
     try {
       axios
-        .post(`${BASE_URL}${URL_V}auth/login`, qs.stringify(cd))
+        .post(`${BASE_URL}${URL_V}auth/login`, cd, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
         .then(response => {
           console.log('CURRET LOGIN===>', response.data.status);
           if (response.data.status === 200) {

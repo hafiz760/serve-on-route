@@ -11,6 +11,7 @@ import { persistor, store } from "../store";
 import Support from "../component/Support";
 import 'react-native-get-random-values'
 import GlobalBiddingModal from "../component/GlobalBiddingModal";
+import GlobalCustomerBiddingModal from "../component/GlobalCustomerBiddingModal";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default class App extends React.Component {
@@ -84,6 +85,7 @@ export default class App extends React.Component {
           <Toast visibilityTime={1800} />
           <Support />
           <GlobalBiddingModal />
+          <GlobalCustomerBiddingModal />
         </SafeAreaProvider>
       </Provider>
     );

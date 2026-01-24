@@ -137,6 +137,13 @@ export default function MyTrip() {
   function renderAll() {
     return (
       <View>
+        {selectedMenuItemId && (
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.overlay}
+            onPress={() => setSelectedMenuItemId(null)}
+          />
+        )}
         <ScrollView>
           {data && data.length > 0 && data.filter((d) => d.isActive)?.length > 0 ? (
             data.map((val, index) => {
@@ -251,6 +258,13 @@ export default function MyTrip() {
   function renderOpen() {
     return (
       <View>
+        {selectedMenuItemId && (
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.overlay}
+            onPress={() => setSelectedMenuItemId(null)}
+          />
+        )}
         <ScrollView>
           {data && data.length > 0 && data.filter((d) => !d.isActive)?.length > 0 ? (
             data.map((val, index) => {
@@ -368,7 +382,7 @@ export default function MyTrip() {
       <Header leftType="back" title="MY ROUTES" />
 
 
-      <Content style={{ flex: 0.175, }}>
+      <View style={{height: 90, justifyContent: 'center'}}>
         <View style={styles.myTripTabItems}>
           <Button
             style={tabSelected === "all" ? styles.tabActive : styles.tabInactive}
@@ -399,7 +413,7 @@ export default function MyTrip() {
             </Text>
           </Button>
         </View>
-      </Content>
+      </View>
 
 
       {loading ? (

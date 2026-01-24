@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Image, TouchableOpacity, ScrollView, Text, View} from 'react-native';
+import {Icon} from '../../../component/Basic';
 import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -56,33 +57,28 @@ function MenuLeft() {
   };
 
   const renderMenuList = menus => {
-    return menus.map(menu => (
-      <TouchableOpacity
-        key={menu.name}
-        style={styles.item}
-        underlayColor="transparent"
-        onPress={() => {
-          closeDrawer();
-          if (menu.route === 'PublicIntro') {
-            handleLogout();
-          } else if (menu.route === 'UserLogout') {
-            handleLogout();
-          } else {
+    return menus
+      .filter(menu => menu.name !== 'Logout')
+      .map(menu => (
+        <TouchableOpacity
+          key={menu.name}
+          style={styles.item}
+          underlayColor="transparent"
+          onPress={() => {
+            closeDrawer();
             navigate(menu.route, menu.params || {});
-          }
-        }}>
-        <View style={styles.col}>
-          <Image
-            source={menu?.image}
-            style={{height: 20, width: 30}}
-            resizeMode="contain"
-          />
-        </View>
-        <View style={theme.row}>
+          }}>
+          <View style={styles.col}>
+            <Icon
+              name={menu?.iconName}
+              type={menu?.iconType}
+              color="LIGHT"
+              style={styles.menuIcon}
+            />
+          </View>
           <Text style={styles.itemText}>{menu.name}</Text>
-        </View>
-      </TouchableOpacity>
-    ));
+        </TouchableOpacity>
+      ));
   };
 
   return (
@@ -98,16 +94,15 @@ function MenuLeft() {
             resizeMode="cover"
             style={styles.headerImg}
           />
-          <View>
-            <View style={theme.row}>
-              <Text style={styles.headerName}>{user?.first_name}</Text>
-            </View>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerName}>{user?.first_name || 'User'}</Text>
+            <Text style={styles.headerSubtitle}>View Profile</Text>
           </View>
         </View>
       </View>
       <View style={styles.content}>
         <View style={styles.navMenu}>
-          <ScrollView>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {session.bool
               ? session.isVerified
                 ? renderMenuList(MENU.Data3)
@@ -115,6 +110,12 @@ function MenuLeft() {
               : renderMenuList(MENU.Data2)}
           </ScrollView>
         </View>
+      </View>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <Icon name="logout" type="AntDesign" color="LIGHT" style={styles.logoutIcon} />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

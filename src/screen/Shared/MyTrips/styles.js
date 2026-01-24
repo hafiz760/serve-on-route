@@ -7,7 +7,7 @@ export default {
   myTripHeader: {
     backgroundColor: COLOR.PRIMARY,
     paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingBottom: 15,
   },
   balanceBtnText1: {
     backgroundColor: COLOR.GREEN,
@@ -31,7 +31,8 @@ export default {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 15,
+    marginTop: 10,
+    marginBottom: 5,
   },
   tabActive: {
     flex: 1,
@@ -86,8 +87,8 @@ export default {
 
   /** Content */
   myTripContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 30,
+    flex: 1,
+    paddingHorizontal: 15,
   },
   openBtnText: {
     fontFamily: FAMILY.BOLD,
@@ -115,54 +116,53 @@ export default {
     justifyContent: "space-between",
     borderBottomWidth: 1,
     borderColor: COLOR.SMOKELIGHT,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: 0,
+    paddingVertical: 10,
   },
   bookingTitle: {
     fontFamily: FAMILY.REGULAR,
-    fontSize: SIZE.SIZE_12,
-    color: COLOR.DARKBLUE,
+    fontSize: SIZE.SIZE_10,
+    color: COLOR.GREYVIOLET,
+    textTransform: "uppercase",
   },
   bookingDetailInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   bookingDetail: {
-    fontFamily: FAMILY.BOLD,
-    fontSize: SIZE.SIZE_12,
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_11,
     color: COLOR.DARK,
-    borderColor: COLOR.GREY,
-    borderRightWidth: 1,
-    paddingRight: 5,
   },
   bookingText: {
-    fontFamily: FAMILY.BOLD,
-    fontSize: SIZE.SIZE_12,
-    color: COLOR.GREYVIOLET,
-    borderColor: COLOR.GREY,
-    paddingLeft: 5,
+    fontFamily: FAMILY.REGULAR,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.DARK,
   },
   btnInfo: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    margin: 15,
+    justifyContent: "space-around",
+    paddingHorizontal: 15,
+    paddingTop: 12,
+    paddingBottom: 15,
   },
   detailBtn: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
+    justifyContent: "center",
     backgroundColor: COLOR.SMOKELIGHT,
-    borderRadius: 5,
-    paddingHorizontal: 10,
+    borderRadius: 8,
+    paddingHorizontal: 12,
     paddingVertical: 10,
-    marginRight: 10,
+    flex: 1,
+    marginHorizontal: 4,
   },
   detailBtnText: {
     fontFamily: FAMILY.BOLD,
-    fontSize: SIZE.SIZE_12,
+    fontSize: SIZE.SIZE_10,
     color: COLOR.GREYDARK,
-    marginLeft: 5,
+    marginLeft: 4,
   },
   detailTag: {
     flex: 3,
@@ -251,9 +251,17 @@ export default {
   /** * -- Accordion -- ***/
   accordionContent: {
     backgroundColor: COLOR.LIGHT,
-    borderRadius: 5,
-    paddingVertical: 15,
-    marginTop: 5,
+    borderRadius: 10,
+    paddingVertical: 0,
+    marginTop: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
   },
   accordion: {
     width: "100%",
@@ -264,13 +272,24 @@ export default {
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: COLOR.LIGHT,
-    borderRadius: 5,
+    borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   accordionTitle: {
     fontFamily: FAMILY.BOLD,
-    fontSize: SIZE.SIZE_12,
+    fontSize: SIZE.SIZE_11,
+    color: COLOR.DARK,
+    flex: 1,
+    lineHeight: 18,
   },
   accOrderInfo: {
     borderColor: COLOR.LIGHT,
@@ -347,12 +366,13 @@ export default {
   noTripsFoundContainer: {
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 60,
   },
 
   noTripsFoundText: {
-    color: "#000",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: FAMILY.REGULAR,
+    color: COLOR.GREYVIOLET,
+    fontSize: SIZE.SIZE_14,
   },
 
   tripsAllLable: {
@@ -361,7 +381,7 @@ export default {
   },
 
   accordionLayout: {
-    paddingHorizontal: 20,
-    paddingVertical: 30,
+    paddingTop: 15,
+    paddingBottom: 20,
   },
 };

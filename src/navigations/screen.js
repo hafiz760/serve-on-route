@@ -146,6 +146,13 @@ const Navigator = () => {
       } else if (remoteMessage?.data?.notificationType === "parcel_reboot" && user?.role?.includes("user")) {
         console.log("Notification opened from background: user");
         navigationRef.navigate("DrawerNav", { screen: "PublicHome" });
+      } else if (remoteMessage?.data?.notificationType === "bid_created" && user?.role?.includes("user")) {
+        console.log("✅ bid_created for customer (background) - updating notiId");
+        dispatch(updateNotiId(remoteMessage.notification?.body));
+        navigationRef.navigate("DrawerNav", {
+          screen: "PublicHome",
+          params: { bidNotification: remoteMessage.notification?.body },
+        });
       } else {
         console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
       }
@@ -181,6 +188,13 @@ const Navigator = () => {
             navigationRef.navigate("DrawerNav", {
               screen: "PublicHome",
               params: { data: remoteMessage.notification?.body },
+            });
+          } else if (remoteMessage?.data?.notificationType === "bid_created" && user?.role?.includes("user")) {
+            console.log("✅ bid_created for customer (quit state) - updating notiId");
+            dispatch(updateNotiId(remoteMessage.notification?.body));
+            navigationRef.navigate("DrawerNav", {
+              screen: "PublicHome",
+              params: { bidNotification: remoteMessage.notification?.body },
             });
           } else {
             console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
@@ -229,6 +243,10 @@ const Navigator = () => {
         console.log("Foreground user notification");
         dispatch(updateNotiId(remoteMessage.notification?.body));
         // showMessage("success", remoteMessage.notification?.body);
+      } else if (remoteMessage?.data?.notificationType === "bid_created" && user?.role?.includes("user")) {
+        console.log("✅ bid_created for customer (foreground) - updating notiId");
+        dispatch(updateNotiId(remoteMessage.notification?.body));
+        // Don't navigate in foreground - let the modal handle it
       } else {
         console.log("❌ Notification not handled - type:", remoteMessage?.data?.notificationType, "user role:", user?.role);
         // Only update notiId for non-riders or non-OTP notifications

@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {baseURL, endPoints} from '../constants'
-var qs = require('qs')
 
 export const logIn = async (userData) => {
     let response = null
@@ -8,11 +7,11 @@ export const logIn = async (userData) => {
         headers: {
             Authorization: '',
             Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/json'
         }
     }
     await axios
-        .post(`${baseURL + endPoints.logIn}`, qs.stringify(userData), config)
+        .post(`${baseURL + endPoints.logIn}`, userData, config)
         .then(async (responseJson) => {
             console.log("response in aut responseJson",responseJson.data);
             const tempResponseData = responseJson.data

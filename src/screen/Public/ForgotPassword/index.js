@@ -24,7 +24,6 @@ import { showMessage } from "../../../helper/showAlert";
 import { BASE_URL, URL_V } from "../../../utilities/helper";
 import { navigate, navigateReset } from "../../../navigations";
 
-var qs = require("qs");
 export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [isSelected, setSelection] = useState(false);
@@ -72,7 +71,11 @@ export default function ForgotPassword() {
     // console.log("from data",cd);
     setLoading(true);
     axios
-      .post(`${BASE_URL}${URL_V}auth/login`, qs.stringify(cd))
+      .post(`${BASE_URL}${URL_V}auth/login`, cd, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
   }
 
   const onSubmit = (value) => {
@@ -88,7 +91,11 @@ export default function ForgotPassword() {
       // console.log("from data",cd);
       setLoading(true);
       axios
-        .post(`${BASE_URL}${URL_V}auth/send-otp`, qs.stringify(cd))
+        .post(`${BASE_URL}${URL_V}auth/send-otp`, cd, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
         .then(()=>{
           if(statusCode==200 || statusCode==500)
           console.log("API Hitted")
