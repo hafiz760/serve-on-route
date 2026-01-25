@@ -59,21 +59,33 @@ export default function Home(params) {
   const [droplocationCords, setDroplocationCords] = useState(
     params?.route?.params?.mydata?.droplocationCords || {},
   );
+  const [region, setRegion] = useState({
+    ...defaultLocation,
+    ...params?.route?.params?.mydata?.pickupCords,
+  });
+  const [mapRefreshKey, setMapRefreshKey] = useState(0);
   const [temporaryPickUpCords, setTemporaryPickUpCords] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [tripDetails, setTripDetails] = useState({distance: 0, duration: 0});
   
   useEffect(() => {
-    if (pickupCords?.latitude) {
-      mapRef.current?.animateToRegion({
-        latitude: Number(pickupCords.latitude),
-        longitude: Number(pickupCords.longitude),
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      }, 1000);
+    if (pickupCords?.latitude || droplocationCords?.latitude) {
+      setMapRefreshKey(prev => prev + 1);
+      if (pickupCords?.latitude) {
+        const newRegion = {
+          latitude: Number(pickupCords.latitude),
+          longitude: Number(pickupCords.longitude),
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        };
+        setRegion(newRegion);
+        setTimeout(() => {
+          mapRef.current?.animateToRegion(newRegion, 1000);
+        }, 100);
+      }
     }
-  }, [pickupCords?.latitude, pickupCords?.longitude]);
+  }, [pickupCords?.latitude, pickupCords?.longitude, droplocationCords?.latitude, droplocationCords?.longitude]);
 
   useEffect(() => {
     console.log('DEBUG: API KEY:', GOOGLE_MAPS_APIKEY ? 'Present' : 'MISSING');
@@ -200,21 +212,21 @@ export default function Home(params) {
 
             setPickupCords(newPickupCords);
             
+            const newRegion = {
+              latitude,
+              longitude,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            };
+            setRegion(newRegion);
+            
             // Add a small delay to ensure the autocomplete component has finished 
             // its internal state updates before we manually set the text
             setTimeout(() => {
               pickupRef.current?.setAddressText(address);
             }, 100);
 
-            mapRef.current?.animateToRegion(
-              {
-                latitude,
-                longitude,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-              },
-              1000,
-            );
+            mapRef.current?.animateToRegion(newRegion, 1000);
           } catch (e) {
             console.error('Error handling location result:', e);
           } finally {
@@ -384,22 +396,24 @@ export default function Home(params) {
           <View style={styles.mMap}>
             <MapView
               ref={mapRef}
+              key={`map-${mapRefreshKey}`}
               style={styles.mMap}
               provider={PROVIDER_GOOGLE}
-              initialRegion={defaultLocation}
+              region={region}
               onRegionChangeComplete={async (coords, {isGesture}) => {
+                setRegion(coords);
                 if (isGesture && !pickupCords?.latitude) {
                   setTemporaryPickUpCords(coords);
                   handleRegionChangeComplete(coords);
                 }
               }}
             >
-              {pickupCords?.latitude && !isNaN(parseFloat(pickupCords.latitude)) ? (
+              {pickupCords?.latitude ? (
                 <Marker
-                  key={`pickup-${pickupCords.latitude}-${pickupCords.longitude}`}
+                  key="pickup-marker"
                   coordinate={{
-                    latitude: parseFloat(pickupCords.latitude),
-                    longitude: parseFloat(pickupCords.longitude),
+                    latitude: Number(pickupCords.latitude),
+                    longitude: Number(pickupCords.longitude),
                   }}
                   title="Pickup"
                   pinColor="blue"
@@ -407,30 +421,29 @@ export default function Home(params) {
                 />
               ) : null}
               
-              {droplocationCords?.latitude && !isNaN(parseFloat(droplocationCords.latitude)) ? (
+              {droplocationCords?.latitude ? (
                 <Marker
-                  key={`drop-${droplocationCords.latitude}-${droplocationCords.longitude}`}
+                  key="drop-marker"
                   coordinate={{
-                    latitude: parseFloat(droplocationCords.latitude),
-                    longitude: parseFloat(droplocationCords.longitude),
+                    latitude: Number(droplocationCords.latitude),
+                    longitude: Number(droplocationCords.longitude),
                   }}
                   title="Destination"
                   pinColor="red"
                   zIndex={999}
                 />
               ) : null}
-
-              {pickupCords?.latitude && droplocationCords?.latitude && 
-               !isNaN(parseFloat(pickupCords.latitude)) && !isNaN(parseFloat(droplocationCords.latitude)) && (
+              
+              {pickupCords?.latitude && droplocationCords?.latitude && (
                 <MapViewDirections
-                  key={`route-${pickupCords.latitude}-${pickupCords.longitude}-${droplocationCords.latitude}-${droplocationCords.longitude}`}
+                  key="route-directions"
                   origin={{
-                    latitude: parseFloat(pickupCords.latitude),
-                    longitude: parseFloat(pickupCords.longitude),
+                    latitude: Number(pickupCords.latitude),
+                    longitude: Number(pickupCords.longitude),
                   }}
                   destination={{
-                    latitude: parseFloat(droplocationCords.latitude),
-                    longitude: parseFloat(droplocationCords.longitude),
+                    latitude: Number(droplocationCords.latitude),
+                    longitude: Number(droplocationCords.longitude),
                   }}
                   apikey={GOOGLE_MAPS_APIKEY}
                   strokeWidth={6}
@@ -444,10 +457,10 @@ export default function Home(params) {
                     });
                     mapRef.current?.fitToCoordinates(result.coordinates, {
                       edgePadding: {
-                        top: 250,
-                        right: 80,
-                        bottom: 250,
-                        left: 80,
+                        top: 150,
+                        right: 50,
+                        bottom: 150,
+                        left: 50,
                       },
                       animated: true,
                     });
@@ -479,12 +492,14 @@ export default function Home(params) {
                     ref={pickupRef}
                     onFail={error => console.error('Pickup error:', error)}
                     placeholder="My Current Location"
+                    keyboardShouldPersistTaps='handled'
+                    listViewDisplayed='auto'
                     textInputProps={{
                       placeholderTextColor: '#9CA3AF',
                       returnKeyType: 'search',
                     }}
                     styles={{
-                      container: {flex: 0, marginBottom: 10},
+                      container: {flex: 0, marginBottom: 10, zIndex: 3000},
                       textInput: {
                         backgroundColor: '#F3F4F6',
                         borderRadius: 10,
@@ -500,8 +515,12 @@ export default function Home(params) {
                         right: 0,
                         backgroundColor: 'white',
                         borderRadius: 10,
-                        elevation: 5,
-                        zIndex: 2000,
+                        elevation: 10,
+                        shadowColor: '#000',
+                        shadowOffset: {width: 0, height: 2},
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        zIndex: 5000,
                       },
                       description: {
                         color: '#000',
@@ -554,12 +573,14 @@ export default function Home(params) {
                     ref={droplocationRef}
                     onFail={error => console.error('Drop error:', error)}
                     placeholder="Enter destination"
+                    keyboardShouldPersistTaps='handled'
+                    listViewDisplayed='auto'
                     textInputProps={{
                       placeholderTextColor: '#9CA3AF',
                       returnKeyType: 'search',
                     }}
                     styles={{
-                      container: {flex: 0},
+                      container: {flex: 0, zIndex: 3000},
                       textInput: {
                         backgroundColor: '#F3F4F6',
                         borderRadius: 10,
@@ -575,8 +596,12 @@ export default function Home(params) {
                         right: 0,
                         backgroundColor: 'white',
                         borderRadius: 10,
-                        elevation: 5,
-                        zIndex: 2000,
+                        elevation: 10,
+                        shadowColor: '#000',
+                        shadowOffset: {width: 0, height: 2},
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        zIndex: 5000,
                       },
                       description: {
                         color: '#000',
