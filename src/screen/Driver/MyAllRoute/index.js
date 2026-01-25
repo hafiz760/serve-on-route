@@ -429,24 +429,36 @@ export default function MyTrip() {
               {tabSelected === "all" ? renderAll() : renderOpen()}
             </View>
           </ScrollView>
-          <View style={styles.myTripHeader}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                style={[styles.tabActive1]}
-                onPress={() => navigate("DriverAddRoutes")}
-              >
-                <Text style={styles.tabActiveText}>ADD</Text>
-              </Button>
-            </View>
-          </View>
         </Content>
       )}
+
+      {/* Floating Add Route Button */}
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 30,
+          right: 20,
+          backgroundColor: '#4CAF50',
+          borderRadius: 30,
+          width: 60,
+          height: 60,
+          justifyContent: 'center',
+          alignItems: 'center',
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 4},
+          shadowOpacity: 0.3,
+          shadowRadius: 6,
+          zIndex: 1000,
+        }}
+        onPress={() => navigate("DriverAddRoutes")}
+      >
+        <Icon
+          name="plus"
+          type="MaterialCommunityIcons"
+          style={{fontSize: 32, color: '#FFF'}}
+        />
+      </TouchableOpacity>
 
       {/* <Modal isOpen={true} position={"center"}>
         <Text>muneeb</Text>
