@@ -59,8 +59,6 @@ export default {
     marginBottom: 10,
     paddingVertical: 15,
     marginHorizontal: 20,
-
-
   },
   shareBtn: {
     flex: 1,

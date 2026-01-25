@@ -12,11 +12,13 @@ import {
   TextInput,
   Button,
   Linking,
-  Platform
+  Platform,
+  BackHandler
 } from "react-native";
 import MapView, { Marker, AnimatedRegion } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
 import {
   getUserCurrentPosition,
   locationPermission,
@@ -35,7 +37,20 @@ const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const TrackingScreen = ({ route }) => {
+const parseCoordinates = (loc) => {
+  if (!loc) return {};
+  if (typeof loc === 'object' && loc.latitude && loc.longitude) return loc;
+  if (typeof loc === 'string' && loc.includes(',')) {
+    const [lat, lng] = loc.split(',');
+    return {
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lng),
+    };
+  }
+  return {};
+};
+
+const TrackingScreen = ({ route, navigation }) => {
   const [isTrackingStart, setIsTrackingStart] = useState(false);
   const [code, setCode] = useState("");
   const [text, onChangeText] = React.useState('Enter Code');
@@ -45,6 +60,7 @@ const TrackingScreen = ({ route }) => {
   const [currentTripStatus, setCurrentTripStatus] = useState(
     route?.params?.data?.status
   );
+  const isFocused = useIsFocused();
   console.log("currentTripStatus", currentTripStatus);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
@@ -56,36 +72,33 @@ const TrackingScreen = ({ route }) => {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [state, setState] = useState({
-    pickupCords: route?.params?.data?.from_location_cor
-      ? {
-        latitude: parseFloat(route.params.data.from_location_cor.split(',')[0]),
-        longitude: parseFloat(route.params.data.from_location_cor.split(',')[1])
-      }
+    pickupCords: (user?.role?.includes("driver") || user?.role?.includes("rider"))
+      ? {} // Driver will get their own location via getCurrentLocation
+      : {}, // Customer waits for socket, starts empty
+    parcelPickupCords: route?.params?.data?.from_location_cor
+      ? parseCoordinates(route.params.data.from_location_cor)
       : {},
-    droplocationCords: route?.params?.data?.to_location_cor
-      ? {
-        latitude: parseFloat(route.params.data.to_location_cor.split(',')[0]),
-        longitude: parseFloat(route.params.data.to_location_cor.split(',')[1])
-      }
+    parcelDropCords: route?.params?.data?.to_location_cor
+      ? parseCoordinates(route.params.data.to_location_cor)
       : {},
     isLoading: false,
     coordinate: new AnimatedRegion({
       latitude: route?.params?.data?.from_location_cor
         ? parseFloat(route.params.data.from_location_cor.split(',')[0])
-        : "",
+        : 31.5204, // Default fallback
       longitude: route?.params?.data?.from_location_cor
         ? parseFloat(route.params.data.from_location_cor.split(',')[1])
-        : "",
+        : 74.3587, // Default fallback
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
     }),
     heading: 0,
   });
 
-  const { pickupCords, droplocationCords, coordinate, heading } = state;
+  const { pickupCords, parcelPickupCords, parcelDropCords, coordinate, heading } = state;
   // Debug logs
   console.log("pickupCords:", state.pickupCords);
-  console.log("droplocationCords:", state.droplocationCords);
+  // console.log("droplocationCords:", state.droplocationCords);
   console.log("currentTripStatus:", currentTripStatus);
   console.log("user:", user);
   console.log("user roles:", user?.role[0]);
@@ -125,9 +138,6 @@ const TrackingScreen = ({ route }) => {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           },
-          droplocationCords: route?.params?.data?.from_location
-            ? route?.params?.data?.from_location
-            : {},
           heading: res.heading,
         });
       } else if (status === "pickup") {
@@ -139,9 +149,6 @@ const TrackingScreen = ({ route }) => {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           },
-          droplocationCords: route?.params?.data?.to_location
-            ? route?.params?.data?.to_location
-            : {},
           heading: res.heading,
         });
       }
@@ -185,6 +192,32 @@ const TrackingScreen = ({ route }) => {
       setTripStatusLoading(false);
     }
   };
+
+  const fetchTripStatus = async () => {
+    try {
+      const resp = await axios.get(
+        `${BASE_URL}${URL_V}parcel/${route?.params?.data?._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        }
+      );
+      if (resp.status === 200) {
+        console.log("REFRESHED status:", resp.data.status);
+        setCurrentTripStatus(resp.data.status);
+      }
+    } catch (err) {
+      console.log("GET PARCEL ERROR:", err?.response?.data || err.message || err);
+    }
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchTripStatus();
+    }
+  }, [isFocused]);
+
   const handleDoneTripStatus = async () => {
     // console.log("route?.params?.data?._id",route?.params?.data?._id);
     setTripStatusLoading(true);
@@ -222,9 +255,11 @@ const TrackingScreen = ({ route }) => {
 
 
   useEffect(() => {
+    const isDriver = (user && (Array.isArray(user.roles) && user.roles.includes("driver") || Array.isArray(user.role) && user.role.includes("driver") || Array.isArray(user.roles) && user.roles.includes("rider") || Array.isArray(user.role) && user.role.includes("rider")));
+    const isUser = (user && (Array.isArray(user.roles) && user.roles.includes("user") || Array.isArray(user.role) && user.role.includes("user")));
+
     if (
-      ((user && Array.isArray(user.roles) && user.roles.includes("driver")) ||
-        (user && Array.isArray(user.roles) && user.roles.includes("rider"))) &&
+      isDriver &&
       currentTripStatus !== "in_progress" &&
       currentTripStatus !== "done"
     ) {
@@ -232,8 +267,7 @@ const TrackingScreen = ({ route }) => {
     }
 
     if (
-      ((user && Array.isArray(user.roles) && user.roles.includes("driver")) ||
-        (user && Array.isArray(user.roles) && user.roles.includes("rider"))) &&
+      isDriver &&
       currentTripStatus !== "in_progress" &&
       currentTripStatus !== "done"
     ) {
@@ -244,7 +278,7 @@ const TrackingScreen = ({ route }) => {
       return () => clearInterval(interval);
     }
 
-    if (user && Array.isArray(user.roles) && user.roles.includes("user") && socket) {
+    if (isUser && socket) {
       socket.on("tracking", (incomingData) => {
         if (
           !isTrackingStart &&
@@ -272,6 +306,7 @@ const TrackingScreen = ({ route }) => {
         const headingPoints = +incomingData.data.heading;
 
         animate(latitudePoints, longitudePoints);
+        animate(latitudePoints, longitudePoints);
         if (incomingData?.data?.status === "started") {
           setState({
             ...state,
@@ -285,9 +320,6 @@ const TrackingScreen = ({ route }) => {
               latitudeDelta: LATITUDE_DELTA,
               longitudeDelta: LONGITUDE_DELTA,
             },
-            droplocationCords: route?.params?.data?.from_location
-              ? route?.params?.data?.from_location
-              : {},
             heading: headingPoints,
           });
         } else if (incomingData?.data?.status === "pickup") {
@@ -304,15 +336,52 @@ const TrackingScreen = ({ route }) => {
               latitudeDelta: LATITUDE_DELTA,
               longitudeDelta: LONGITUDE_DELTA,
             },
-            droplocationCords: route?.params?.data?.to_location
-              ? route?.params?.data?.to_location
-              : {},
             heading: headingPoints,
           });
         }
       });
     }
   }, [animate, getCurrentLocation, isTrackingStart, route?.params?.data?._id, route?.params?.data?.from_location, route?.params?.data?.to_location, socket, state, user, currentTripStatus]);
+
+  useEffect(() => {
+    const isRider = user?.role?.includes("driver") || user?.role?.includes("rider");
+    
+    if (isRider && currentTripStatus === "pickup") {
+      console.log("DEBUG: Navigation lock enabled for pickup status");
+      const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user
+        Alert.alert(
+          'Ongoing Pickup',
+          'You cannot leave this screen while in Pickup status. Please complete the trip first.',
+          [
+            { text: 'OK', style: 'cancel', onPress: () => {} }
+          ]
+        );
+      });
+
+      return unsubscribe;
+    }
+  }, [navigation, currentTripStatus, user]);
+
+  useEffect(() => {
+    const isRider = user?.role?.includes("driver") || user?.role?.includes("rider");
+    
+    if (isRider && currentTripStatus === "pickup") {
+      const onBackPress = () => {
+        Alert.alert(
+          'Ongoing Pickup',
+          'You cannot leave this screen while in Pickup status. Please complete the trip first.'
+        );
+        return true; // Block back action
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }
+  }, [currentTripStatus, user]);
 
   return (
     <View>
@@ -341,28 +410,6 @@ const TrackingScreen = ({ route }) => {
               : null
           }
         >
-          {/* Hardcoded markers and route for debug */}
-          <Marker
-            coordinate={{
-              latitude: 31.5611865,
-              longitude: 74.4071271
-            }}
-          />
-          <Marker
-            coordinate={{
-              latitude: 31.4772238,
-              longitude: 74.278166
-            }}
-          />
-          <MapViewDirections
-            origin={{ latitude: 31.5611865, longitude: 74.4071271 }}
-            destination={{ latitude: 31.4772238, longitude: 74.278166 }}
-            apikey={GOOGLE_MAPS_APIKEY}
-            strokeWidth={6}
-            strokeColor="hotpink"
-            onError={e => console.log('MapViewDirections error:', e)}
-          />
-          {/* ...existing dynamic marker/route code... */}
           {Object.values(state.pickupCords).length > 0 && (
             <Marker.Animated ref={markerRef} coordinate={coordinate}>
               <Image
@@ -376,24 +423,43 @@ const TrackingScreen = ({ route }) => {
               />
             </Marker.Animated>
           )}
-          {Object.values(state.droplocationCords).length > 0 && (
+
+          {Object.values(state.parcelPickupCords).length > 0 && (
             <Marker
-              coordinate={droplocationCords}
+              coordinate={state.parcelPickupCords}
+              title="Pickup Location"
+              pinColor="green"
+            />
+          )}
+
+          {Object.values(state.parcelDropCords).length > 0 && (
+            <Marker
+              coordinate={state.parcelDropCords}
+              title="Drop Location"
               image={require("../../assets/images/greenMarker.png")}
             />
           )}
+
           {Object.values(state.pickupCords).length > 0 &&
-            Object.values(state.droplocationCords).length > 0 && (
+            Object.values(currentTripStatus === 'started' ? state.parcelPickupCords : state.parcelDropCords).length > 0 && (
               <MapViewDirections
                 origin={pickupCords}
-                destination={droplocationCords}
+                destination={currentTripStatus === 'started' ? parcelPickupCords : parcelDropCords}
                 apikey={GOOGLE_MAPS_APIKEY}
                 strokeWidth={6}
-                strokeColor="hotpink"
+                strokeColor={COLOR.PRIMARY}
                 optimizeWaypoints={true}
                 onError={e => console.log('MapViewDirections error:', e)}
                 onReady={(result) => {
-                  mapRef.current.fitToCoordinates(result.coordinates);
+                  mapRef.current.fitToCoordinates(result.coordinates, {
+                    edgePadding: {
+                      top: 100,
+                      right: 50,
+                      bottom: 250,
+                      left: 50,
+                    },
+                    animated: true,
+                  });
                 }}
               />
             )}

@@ -388,7 +388,7 @@ const Navigator = () => {
         />
         <Stack.Screen
           name="DriverBooking"
-          component={require("../screen/Driver/Booking").default}
+          component={require("../screen/Driver/Booking")?.default}
         />
         <Stack.Screen
           name="DriverSettlement"
@@ -404,7 +404,7 @@ const Navigator = () => {
         />
         <Stack.Screen
           name="CustomerDriverTracking"
-          component={require("../screen/Tracking").default}
+          component={require("../screen/Tracking")?.default}
         />
         <Stack.Screen
           name="showNotification"

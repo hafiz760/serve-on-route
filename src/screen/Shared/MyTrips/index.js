@@ -17,6 +17,7 @@ import ChatsModal from './ChatsModal';
 import AppSpinner from '../../../component/AppSpinner';
 import { BASE_URL, URL_V } from '../../../utilities/helper';
 import { navigate } from '../../../navigations';
+import { useIsFocused } from '@react-navigation/native';
 
 /**
  * Shared MyTrips component for both Customer and Driver
@@ -30,6 +31,7 @@ export default function MyTrips({ userRole = 'customer' }) {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const { socket } = useSelector(state => state.socket);
+  const isFocused = useIsFocused();
 
   // Determine which field to filter by based on user role
   const isCustomer = userRole === 'customer';
@@ -70,10 +72,12 @@ export default function MyTrips({ userRole = 'customer' }) {
   };
 
 
-  useEffect(() => {
-    fetchData();
+   useEffect(() => {
+    if (isFocused) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isFocused]);
 
   const handleNavigation = val => {
     const fromCor = val.from_location_cor ? val.from_location_cor.replace(/['"']+/g, '').trim() : '';
@@ -252,24 +256,26 @@ export default function MyTrips({ userRole = 'customer' }) {
                   </View>
                 )}
 
-                <View style={styles.bookingInfo}>
-                  <Text style={styles.bookingTitle}>OTP</Text>
-                  <View style={{
-                    backgroundColor: COLOR.PRIMARY,
-                    paddingHorizontal: 12,
-                    paddingVertical: 4,
-                    borderRadius: 6
-                  }}>
-                    <Text style={{
-                      fontFamily: FAMILY.BOLD,
-                      fontSize: SIZE.SIZE_14,
-                      color: COLOR.LIGHT,
-                      letterSpacing: 2
+                {isCustomer && (
+                  <View style={styles.bookingInfo}>
+                    <Text style={styles.bookingTitle}>OTP</Text>
+                    <View style={{
+                      backgroundColor: COLOR.PRIMARY,
+                      paddingHorizontal: 12,
+                      paddingVertical: 4,
+                      borderRadius: 6
                     }}>
-                      {val?.receiving_otp}
-                    </Text>
+                      <Text style={{
+                        fontFamily: FAMILY.BOLD,
+                        fontSize: SIZE.SIZE_14,
+                        color: COLOR.LIGHT,
+                        letterSpacing: 2
+                      }}>
+                        {val?.receiving_otp}
+                      </Text>
+                    </View>
                   </View>
-                </View>
+                )}
 
                 <View style={[styles.bookingInfo, { borderBottomWidth: 0, paddingBottom: 8 }]}>
                   <Text style={styles.bookingTitle}>STATUS</Text>
