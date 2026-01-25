@@ -471,8 +471,8 @@ export default function Home(params) {
             </MapView>
 
             {/* Top Floating Route Entry Container */}
-            <View style={styles.addressListContainer} pointerEvents="box-none">
-              <View style={styles.inputWrapper} pointerEvents="box-none">
+            <View style={styles.routeEntryContainer} pointerEvents="box-none">
+              <View style={styles.routeHeader} pointerEvents="box-none">
                 <TouchableOpacity onPress={() => openDrawer()}>
                   <Icon name="menu" type="MaterialIcons" style={{fontSize: 24, color: '#333'}} />
                 </TouchableOpacity>
@@ -499,7 +499,7 @@ export default function Home(params) {
                       returnKeyType: 'search',
                     }}
                     styles={{
-                      container: {flex: 0, marginBottom: 10, zIndex: 3000},
+                      container: {flex: 0, marginBottom: 10, zIndex: 4000},
                       textInput: {
                         backgroundColor: '#F3F4F6',
                         borderRadius: 10,
@@ -515,12 +515,12 @@ export default function Home(params) {
                         right: 0,
                         backgroundColor: 'white',
                         borderRadius: 10,
-                        elevation: 10,
+                        elevation: 15,
                         shadowColor: '#000',
                         shadowOffset: {width: 0, height: 2},
                         shadowOpacity: 0.25,
                         shadowRadius: 3.84,
-                        zIndex: 5000,
+                        zIndex: 6000,
                       },
                       description: {
                         color: '#000',

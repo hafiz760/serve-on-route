@@ -184,7 +184,7 @@ export default {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#3B82F6',
+    backgroundColor: COLOR.PRIMARY,
   },
   dotRed: {
     width: 10,
@@ -245,7 +245,7 @@ export default {
     color: '#111827',
   },
   nextBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: COLOR.PRIMARY,
     borderRadius: 15,
     flexDirection: 'row',
     alignItems: 'center',

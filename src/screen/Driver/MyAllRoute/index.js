@@ -27,9 +27,6 @@ export default function MyTrip() {
   const [isToggleSuccess, setIsToggleSuccess] = useState(false);
   const isFocused = useIsFocused();
 
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMenuItemId, setSelectedMenuItemId] = useState(null);
   useEffect(() => {
     getRoutes();
@@ -119,7 +116,7 @@ export default function MyTrip() {
 
   function renderAll() {
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <ScrollView>
           {data && data.length > 0 && data.filter((d) => d.isActive)?.length > 0 ? (
             data.map((val, index) => {
@@ -159,36 +156,51 @@ export default function MyTrip() {
                       />
                     </TouchableOpacity>
                     {selectedMenuItemId === val._id && (
-                      <View
-                        pointerEvents='auto'
-                        style={{
-                        position: 'absolute',
-                        top: 36,
-                        right: 16,
-                        backgroundColor: 'white',
-                        borderRadius: 8,
-                        elevation: 8,
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.15,
-                        shadowRadius: 8,
-                        zIndex: 100,
-                      }}>
+                      <>
                         <TouchableOpacity
-                          onPress={() => {
-                            setSelectedMenuItemId(null);
-                            onDelete(val._id);
+                          style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 99,
+                            backgroundColor: 'transparent',
                           }}
-                          style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}
-                        >
-                          <Icon
-                            name="delete"
-                            type="MaterialCommunityIcons"
-                            style={{ marginRight: 8, color: 'red', fontSize: 18 }}
-                          />
-                          <Text style={{ color: 'red', fontWeight: 'bold' }}>Delete</Text>
-                        </TouchableOpacity>
-                      </View>
+                          activeOpacity={1}
+                          onPress={() => setSelectedMenuItemId(null)}
+                        />
+                        <View
+                          pointerEvents='auto'
+                          style={{
+                          position: 'absolute',
+                          top: 36,
+                          right: 16,
+                          backgroundColor: 'white',
+                          borderRadius: 8,
+                          elevation: 8,
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.15,
+                          shadowRadius: 8,
+                          zIndex: 100,
+                        }}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setSelectedMenuItemId(null);
+                              onDelete(val._id);
+                            }}
+                            style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}
+                          >
+                            <Icon
+                              name="delete"
+                              type="MaterialCommunityIcons"
+                              style={{ marginRight: 8, color: 'red', fontSize: 18 }}
+                            />
+                            <Text style={{ color: 'red', fontWeight: 'bold' }}>Delete</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
                     )}
                     {/* Route Info */}
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -235,7 +247,7 @@ export default function MyTrip() {
 
   function renderOpen() {
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <ScrollView>
           {data && data.length > 0 && data.filter((d) => !d.isActive)?.length > 0 ? (
             data.map((val, index) => {
@@ -275,36 +287,51 @@ export default function MyTrip() {
                       />
                     </TouchableOpacity>
                     {selectedMenuItemId === val._id && (
-                      <View
-                        pointerEvents='auto'
-                        style={{
-                        position: 'absolute',
-                        top: 36,
-                        right: 16,
-                        backgroundColor: 'white',
-                        borderRadius: 8,
-                        elevation: 8,
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.15,
-                        shadowRadius: 8,
-                        zIndex: 100,
-                      }}>
+                      <>
                         <TouchableOpacity
-                          onPress={() => {
-                            setSelectedMenuItemId(null);
-                            onDelete(val._id);
+                          style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 99,
+                            backgroundColor: 'transparent',
                           }}
-                          style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}
-                        >
-                          <Icon
-                            name="delete"
-                            type="MaterialCommunityIcons"
-                            style={{ marginRight: 8, color: 'red', fontSize: 18 }}
-                          />
-                          <Text style={{ color: 'red', fontWeight: 'bold' }}>Delete</Text>
-                        </TouchableOpacity>
-                      </View>
+                          activeOpacity={1}
+                          onPress={() => setSelectedMenuItemId(null)}
+                        />
+                        <View
+                          pointerEvents='auto'
+                          style={{
+                          position: 'absolute',
+                          top: 36,
+                          right: 16,
+                          backgroundColor: 'white',
+                          borderRadius: 8,
+                          elevation: 8,
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.15,
+                          shadowRadius: 8,
+                          zIndex: 100,
+                        }}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setSelectedMenuItemId(null);
+                              onDelete(val._id);
+                            }}
+                            style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}
+                          >
+                            <Icon
+                              name="delete"
+                              type="MaterialCommunityIcons"
+                              style={{ marginRight: 8, color: 'red', fontSize: 18 }}
+                            />
+                            <Text style={{ color: 'red', fontWeight: 'bold' }}>Delete</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
                     )}
                     {/* Route Info */}
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
