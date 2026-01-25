@@ -7,6 +7,7 @@ const ThreeDotsMenu = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const toggleModal = () => {
+    console.log("DEBUG: toggleModal called");
     setIsModalVisible(!isModalVisible);
   };
 

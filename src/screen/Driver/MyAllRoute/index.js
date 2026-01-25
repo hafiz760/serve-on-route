@@ -2,15 +2,11 @@ import React, { useState } from "react";
 import { View, ScrollView, TouchableOpacity, Image } from "react-native";
 import { Container, Content, Text, Icon } from "../../../component/Basic";
 import { Button, TextInput } from "../../../component/Form";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import Modal from "react-native-modalbox";
 
 import styles from "./styles";
 import theme from "../../../theme/styles";
-import { COLOR, FAMILY, SIZE } from "../../../theme/typography";
+import { COLOR } from "../../../theme/typography";
 import Header from "../../../component/Header";
 import { DarkStatusBar } from "../../../component/StatusBar";
 import { useEffect } from "react";
@@ -19,7 +15,6 @@ import axios from "axios";
 import { useIsFocused } from "@react-navigation/native";
 import AppSpinner from "../../../component/AppSpinner";
 import { showMessage } from "../../../helper/showAlert";
-// import {BASE_URL,URL_V} from "@env"
 import { BASE_URL, URL_V } from "../../../utilities/helper";
 import { navigate } from "../../../navigations";
 
@@ -71,10 +66,9 @@ export default function MyTrip() {
   async function onDelete(id) {
     var riderData = await AsyncStorage.getItem("response");
     var rider = JSON.parse(riderData);
-    const res =await axios
+    const res = await axios
       .delete(
-        `  ${BASE_URL}${URL_V}routes/${id}
-        `,
+        `${BASE_URL}${URL_V}routes/${id}`,
         {
           headers: {
             Authorization: `Bearer ${rider.access_token}`,
@@ -88,8 +82,6 @@ export default function MyTrip() {
           })
         );
         showMessage("success", "Route Has Been Deleted Succefully!");
-
-        // console.log("route deleted succfully", data);
       })
       .catch((err) => {
         console.log(("error", err));
@@ -107,8 +99,7 @@ export default function MyTrip() {
     console.log("body", body);
     axios
       .put(
-        `  ${BASE_URL}${URL_V}routes/updateStatus${id}
-        `,
+        `${BASE_URL}${URL_V}routes/updateStatus${id}`,
         body,
         {
           headers: {
@@ -117,16 +108,8 @@ export default function MyTrip() {
         }
       )
       .then((response) => {
-        // const updatedData = data.map((item) => {
-        //   if (item._id === id) {
-        //     return { ...item, isActive: "true" };
-        //   }
-        //   return item;
-        // });
         setIsToggleSuccess(!isToggleSuccess);
         showMessage("success", "Route Has Been Active Succefully!");
-        //  setData(updatedData)
-        // console.log("route deleted succfully", data);
       })
       .catch((err) => {
         console.log(("error", err));
@@ -137,13 +120,6 @@ export default function MyTrip() {
   function renderAll() {
     return (
       <View>
-        {selectedMenuItemId && (
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.overlay}
-            onPress={() => setSelectedMenuItemId(null)}
-          />
-        )}
         <ScrollView>
           {data && data.length > 0 && data.filter((d) => d.isActive)?.length > 0 ? (
             data.map((val, index) => {
@@ -183,7 +159,9 @@ export default function MyTrip() {
                       />
                     </TouchableOpacity>
                     {selectedMenuItemId === val._id && (
-                      <View style={{
+                      <View
+                        pointerEvents='auto'
+                        style={{
                         position: 'absolute',
                         top: 36,
                         right: 16,
@@ -194,7 +172,7 @@ export default function MyTrip() {
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.15,
                         shadowRadius: 8,
-                        zIndex: 20,
+                        zIndex: 100,
                       }}>
                         <TouchableOpacity
                           onPress={() => {
@@ -258,13 +236,6 @@ export default function MyTrip() {
   function renderOpen() {
     return (
       <View>
-        {selectedMenuItemId && (
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.overlay}
-            onPress={() => setSelectedMenuItemId(null)}
-          />
-        )}
         <ScrollView>
           {data && data.length > 0 && data.filter((d) => !d.isActive)?.length > 0 ? (
             data.map((val, index) => {
@@ -304,7 +275,9 @@ export default function MyTrip() {
                       />
                     </TouchableOpacity>
                     {selectedMenuItemId === val._id && (
-                      <View style={{
+                      <View
+                        pointerEvents='auto'
+                        style={{
                         position: 'absolute',
                         top: 36,
                         right: 16,
@@ -315,7 +288,7 @@ export default function MyTrip() {
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.15,
                         shadowRadius: 8,
-                        zIndex: 20,
+                        zIndex: 100,
                       }}>
                         <TouchableOpacity
                           onPress={() => {

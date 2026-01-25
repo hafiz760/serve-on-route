@@ -471,8 +471,8 @@ export default function Home(params) {
             </MapView>
 
             {/* Top Floating Route Entry Container */}
-            <View style={styles.routeEntryContainer}>
-              <View style={styles.routeHeader}>
+            <View style={styles.addressListContainer} pointerEvents="box-none">
+              <View style={styles.inputWrapper} pointerEvents="box-none">
                 <TouchableOpacity onPress={() => openDrawer()}>
                   <Icon name="menu" type="MaterialIcons" style={{fontSize: 24, color: '#333'}} />
                 </TouchableOpacity>
@@ -486,13 +486,13 @@ export default function Home(params) {
                   <View style={styles.dotRed} />
                 </View>
 
-                <View style={styles.inputColumn}>
+                <View style={styles.inputColumn} pointerEvents="box-none">
                   <Text style={styles.inputLabel}>Pickup Location</Text>
                   <GooglePlacesAutocomplete
                     ref={pickupRef}
                     onFail={error => console.error('Pickup error:', error)}
                     placeholder="My Current Location"
-                    keyboardShouldPersistTaps='handled'
+                    keyboardShouldPersistTaps="always"
                     listViewDisplayed='auto'
                     textInputProps={{
                       placeholderTextColor: '#9CA3AF',
@@ -573,8 +573,8 @@ export default function Home(params) {
                     ref={droplocationRef}
                     onFail={error => console.error('Drop error:', error)}
                     placeholder="Enter destination"
-                    keyboardShouldPersistTaps='handled'
-                    listViewDisplayed='auto'
+                    keyboardShouldPersistTaps="always"
+                    listViewDisplayed="auto"
                     textInputProps={{
                       placeholderTextColor: '#9CA3AF',
                       returnKeyType: 'search',
