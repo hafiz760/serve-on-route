@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, Alert } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Modal from "react-native-modalbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import CustomerBiddingCard from "./CustomerBiddingCard";
 import { BASE_URL, URL_V } from "../utilities/helper";
 import { STORAGE_KEYS, SUCCESS_MESSAGES } from "../constant/appConstants";
+import { updateNotiId } from "../store/reducers/session";
 
 /**
  * GlobalCustomerBiddingModal Component
@@ -17,6 +18,7 @@ const GlobalCustomerBiddingModal = () => {
     const notiId = useSelector((state) => state.session.notiId);
     const { socket } = useSelector((state) => state.socket);
     const { user } = useSelector((state) => state.session);
+    const dispatch = useDispatch();
 
     const isCustomer = user?.role?.includes("user");
 
@@ -43,6 +45,7 @@ const GlobalCustomerBiddingModal = () => {
      */
     const handleAcceptBid = async (bidData) => {
         try {
+            console.log('🎯 Accepting bid:', bidData?._id);
             const userDataString = await AsyncStorage.getItem('response');
             if (!userDataString) {
                 throw new Error("User data not found");
@@ -50,18 +53,39 @@ const GlobalCustomerBiddingModal = () => {
 
             const userData = JSON.parse(userDataString);
 
-            // Emit socket event to accept the bid
-            socket.emit("accept_bid", {
-                bid_id: bidData._id,
-                parcel_id: bidData.parcel,
-                customer_id: userData._id,
-            });
+            // Robustly get parcel ID (it could be a populated object or a string ID)
+            const parcelId = bidData.parcel?._id || bidData.parcel;
+
+            if (!parcelId) {
+                console.error('❌ Could not find parcel ID in bid data');
+                Alert.alert("Error", "Could not find parcel information.");
+                return;
+            }
+
+            const payload = {
+                rider_id: bidData.bidder?._id,
+                status: 'in_progress',
+                pay_amount: bidData?.bid_amount,
+            };
+
+            const resp = await axios.patch(
+                `${BASE_URL}${URL_V}parcel/${parcelId}`,
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${userData.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            console.log('✅ Accept bid response:', resp.data);
 
             Alert.alert("Success", "Bid accepted successfully!");
             closeModalByBidId(bidData._id);
 
         } catch (error) {
-            console.error("Error accepting bid:", error);
+            console.error("Error accepting bid:", error?.response?.data || error.message);
             Alert.alert("Error", "Failed to accept bid. Please try again.");
         }
     };
@@ -149,7 +173,7 @@ const GlobalCustomerBiddingModal = () => {
             // Try approach 1: Fetch all bids filtered by parcel
             try {
                 const bidsResponse = await axios.get(
-                    `${BASE_URL}${URL_V}bid?parcel=${parcelId}&populate=bidder&sort=-createdAt&limit=100`,
+                    `${BASE_URL}${URL_V}bid?parcel=${parcelId}&populate=bidder&sort=-createdAt&limit=100&page=1`,
                     {
                         headers: {
                             Authorization: `Bearer ${userData.access_token}`,
@@ -310,12 +334,36 @@ const GlobalCustomerBiddingModal = () => {
             const riderId = notiId.split("Rider with Id: ")[1]?.split(" has")[0];
 
             // Try to extract parcel ID from the notification body
-            // The notification body contains the parcel object with _id
-            const parcelIdMatch = notiId.match(/_id: new ObjectId\("([^"]+)"\)/);
-            const parcelId = parcelIdMatch ? parcelIdMatch[1] : null;
+            // Priority 1: ID inside ObjectId()
+            const objectIdMatch = notiId.match(/ObjectId\("([a-f\d]{24})"\)/);
+            let parcelId = null;
+            
+            if (objectIdMatch) {
+              parcelId = objectIdMatch[1];
+              console.log('✅ Extracted parcelId from ObjectId:', parcelId);
+            } else {
+              // Priority 2: ID after "parcel" keyword
+              const parcelMatch = notiId.match(/parcel\s+([a-f\d]{24})/i);
+              if (parcelMatch) {
+                parcelId = parcelMatch[1];
+                console.log('✅ Extracted parcelId from parcel keyword:', parcelId);
+              } else {
+                // Fallback: search for any hex string but avoid the first one if it's likely the rider ID
+                const allHexStrings = notiId.match(/[a-f\d]{24}/gi);
+                if (allHexStrings && allHexStrings.length > 1) {
+                  parcelId = allHexStrings[1]; // Likely the parcel ID according to user logs
+                  console.log('✅ Extracted likely parcelId (second hex string):', parcelId);
+                } else if (allHexStrings && allHexStrings.length === 1) {
+                  parcelId = allHexStrings[0];
+                  console.log('✅ Extracted only found hex string:', parcelId);
+                }
+              }
+            }
 
             if (parcelId) {
                 console.log("Customer received bid notification for parcel:", parcelId);
+                // Clear notiId so it doesn't re-trigger on refresh
+                dispatch(updateNotiId(null));
                 fetchBidsForParcel(parcelId);
             } else {
                 console.log("Could not extract parcel ID from notification");

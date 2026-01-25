@@ -270,7 +270,7 @@ function SelectVehicle(params) {
         'success',
         'Parcel Created Successfully!. Wait for drivers to bid',
       );
-      // params.navigation.navigate('CustomerMyTrips');
+      navigate('PublicHome');
       // setUntil(10)
       // setTimerModel(true)
     } catch (err) {

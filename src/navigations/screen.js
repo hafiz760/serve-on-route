@@ -41,12 +41,12 @@ const DrawerNavUser = ({ navigation }) => {
       minSwipeDistance={width}
     >
       {data.session.bool ? (
-        <Stack.Screen
+        <Drawer.Screen
           name="PublicHome"
           component={require("../screen/Driver/Home").default}
         />
       ) : (
-        <Stack.Screen
+        <Drawer.Screen
           name="PublicHome"
           component={require("../screen/Public/Home/index.js").default}
         />
@@ -309,17 +309,7 @@ const Navigator = () => {
           name="PublicContact"
           component={require("../screen/Public/Contact").default}
         />
-        {data.session.bool ? (
-          <Stack.Screen
-            name="PublicHome"
-            component={require("../screen/Driver/Home").default}
-          />
-        ) : (
-          <Stack.Screen
-            name="PublicHome"
-            component={require("../screen/Public/Home").default}
-          />
-        )}
+
         <Stack.Screen
           name="PublicSplash"
           component={require("../screen/Public/Splash").default}

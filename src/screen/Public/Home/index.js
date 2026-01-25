@@ -199,7 +199,12 @@ export default function Home(params) {
             };
 
             setPickupCords(newPickupCords);
-            pickupRef.current?.setAddressText(address);
+            
+            // Add a small delay to ensure the autocomplete component has finished 
+            // its internal state updates before we manually set the text
+            setTimeout(() => {
+              pickupRef.current?.setAddressText(address);
+            }, 100);
 
             mapRef.current?.animateToRegion(
               {
@@ -498,11 +503,16 @@ export default function Home(params) {
                         elevation: 5,
                         zIndex: 2000,
                       },
+                      description: {
+                        color: '#000',
+                      },
+                      predefinedPlacesDescription: {
+                        color: '#000',
+                      },
                     }}
                     query={{key: GOOGLE_MAPS_APIKEY, language: 'en'}}
                     onPress={async (data, details = null) => {
                       if (data.description === 'Current location' || data.isPredefinedPlace) {
-                        pickupRef.current?.setAddressText('');
                         handleGetCurrentLocation(true);
                         return;
                       }
@@ -567,6 +577,12 @@ export default function Home(params) {
                         borderRadius: 10,
                         elevation: 5,
                         zIndex: 2000,
+                      },
+                      description: {
+                        color: '#000',
+                      },
+                      predefinedPlacesDescription: {
+                        color: '#000',
                       },
                     }}
                     query={{key: GOOGLE_MAPS_APIKEY, language: 'en'}}

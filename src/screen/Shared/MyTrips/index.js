@@ -45,7 +45,7 @@ export default function MyTrips({ userRole = 'customer' }) {
       const userJsonData = JSON.parse(userData);
 
       const res = await axios.get(
-        `${BASE_URL}${URL_V}parcel?page=1&limit=500&populate=customer_id%20rider_id&sort=desc&${filterField}=${userJsonData._id}`,
+        `${BASE_URL}${URL_V}parcel?page=1&limit=100&populate=customer_id%20rider_id&sort=-createdAt&${filterField}=${userJsonData._id}`,
         {
           headers: {
             Authorization: `Bearer ${userJsonData.access_token}`,
@@ -131,7 +131,7 @@ export default function MyTrips({ userRole = 'customer' }) {
   };
 
   const renderTrips = (trips) => {
-    const displayTrips = isCustomer ? [...trips].reverse() : trips;
+    const displayTrips = trips;
 
     if (!displayTrips || displayTrips.length === 0) {
       return (

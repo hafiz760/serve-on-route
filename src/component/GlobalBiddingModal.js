@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, Alert } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Modal from "react-native-modalbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import BiddingCard from "../screen/Driver/Home/BiddingCard";
 import { BASE_URL, URL_V } from "../utilities/helper";
 import { STORAGE_KEYS, SUCCESS_MESSAGES } from "../constant/appConstants";
+import { updateNotiId } from "../store/reducers/session";
 
 /**
  * GlobalBiddingModal Component
@@ -17,6 +18,7 @@ const GlobalBiddingModal = () => {
     const notiId = useSelector((state) => state.session.notiId);
     const { socket } = useSelector((state) => state.socket);
     const { user } = useSelector((state) => state.session);
+    const dispatch = useDispatch();
 
     const isDriver = user?.roles?.includes("rider") || user?.role === "driver";
 
@@ -113,6 +115,8 @@ const GlobalBiddingModal = () => {
 
         const parcelId = notiId.split("Id: ")[1]?.split(" has")[0];
         if (parcelId) {
+            // Clear notiId so it doesn't re-trigger on refresh
+            dispatch(updateNotiId(null));
             fetchParcelById(parcelId);
         }
     }, [notiId, isDriver]);
