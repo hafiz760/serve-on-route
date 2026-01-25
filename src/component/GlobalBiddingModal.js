@@ -20,7 +20,7 @@ const GlobalBiddingModal = () => {
     const { user } = useSelector((state) => state.session);
     const dispatch = useDispatch();
 
-    const isDriver = user?.roles?.includes("rider") || user?.role === "driver";
+    const isDriver = user?.role?.includes("rider") || user?.role?.includes("driver");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [incomingParcelNotifications, setIncomingParcelNotifications] = useState([]);
@@ -110,16 +110,22 @@ const GlobalBiddingModal = () => {
      */
     useEffect(() => {
         if (!isDriver || !notiId || typeof notiId !== 'string') {
+            console.log('DEBUG GlobalBiddingModal: Skipping -', {isDriver, notiId: notiId?.substring(0, 50)});
             return;
         }
 
+        console.log('DEBUG GlobalBiddingModal: Processing notification:', notiId);
         const parcelId = notiId.split("Id: ")[1]?.split(" has")[0];
+        console.log('DEBUG GlobalBiddingModal: Extracted parcelId:', parcelId);
+        
         if (parcelId) {
             // Clear notiId so it doesn't re-trigger on refresh
             dispatch(updateNotiId(null));
             fetchParcelById(parcelId);
+        } else {
+            console.log('DEBUG GlobalBiddingModal: Could not extract parcel ID from notification');
         }
-    }, [notiId, isDriver]);
+    }, [notiId, isDriver, dispatch, fetchParcelById]);
 
     // Don't render for non-drivers
     if (!isDriver) {
