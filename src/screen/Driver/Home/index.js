@@ -1,24 +1,30 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, ScrollView, FlatList, Alert, DeviceEventEmitter } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateNotiId } from '../../../store/reducers/session';
-import { Container, Content, Text, Icon } from '../../../component/Basic';
-import { Button } from '../../../component/Form';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
+import {
+  View,
+  ScrollView,
+  FlatList,
+  Alert,
+  DeviceEventEmitter,
+} from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import {updateNotiId} from '../../../store/reducers/session';
+import {Container, Content, Text, Icon} from '../../../component/Basic';
+import {Button} from '../../../component/Form';
 import styles from './styles';
 import axios from 'axios';
 
 import Accordion from '../../Driver/MyTrips/Accordion';
-import { DarkStatusBar } from '../../../component/StatusBar';
+import {DarkStatusBar} from '../../../component/StatusBar';
 import BiddingCard from './BiddingCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE_URL, URL_V } from '../../../utilities/helper';
+import {BASE_URL, URL_V} from '../../../utilities/helper';
 import Header from '../../../component/Header';
 import moment from 'moment';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
-export default function Home({ route }) {
+export default function Home({route}) {
   console.log('route', route);
-  const { socket } = useSelector(state => state.socket);
+  const {socket} = useSelector(state => state.socket);
 
   const closeModelBaseOnId = id => {
     // Modal is now handled globally
@@ -77,7 +83,6 @@ export default function Home({ route }) {
     }
   };
 
-
   useFocusEffect(
     useCallback(() => {
       fetchData();
@@ -116,13 +121,11 @@ export default function Home({ route }) {
     return str.length > len ? `${str.substr(0, len)}...` : str;
   }
 
-
-  const renderOpen = ({ item: val, index }) => {
+  const renderOpen = ({item: val, index}) => {
     if (val.status == 'in_progress') {
       const cost = val?.pay_amount
         ? `${val?.pay_amount} USD`
         : `${val?.fare} USD`;
-      console.log(val, 'val');
       const pickupLoc = truncate(cleanLocation(val?.from_location));
       const dropLoc = truncate(cleanLocation(val?.to_location));
       const shortId = val?._id || '';
@@ -207,7 +210,6 @@ export default function Home({ route }) {
 
   return (
     <Container>
-
       <DarkStatusBar />
 
       <Header leftType="menu" title={'Dashboard'} />
@@ -224,7 +226,7 @@ export default function Home({ route }) {
               },
             ]}
           />
-          <View style={{ width: '90%', alignSelf: 'center', paddingTop: 15 }}>
+          <View style={{width: '90%', alignSelf: 'center', paddingTop: 15}}>
             <FlatList
               data={data}
               showsHorizontalScrollIndicator={false}
