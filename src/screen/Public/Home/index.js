@@ -16,7 +16,7 @@ import {DarkStatusBar} from '../../../component/StatusBar';
 import styles from './styles';
 import MapView, {Marker, AnimatedRegion, PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import LocationAutocomplete from '../../../component/LocationAutocomplete';
 import Geocoder from 'react-native-geocoding';
 import {locationPermission} from '../../../helper/getCurrentLocation';
 import {useDispatch, useSelector} from 'react-redux';
@@ -68,6 +68,7 @@ export default function Home(params) {
   const [isLoading, setIsLoading] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [tripDetails, setTripDetails] = useState({distance: 0, duration: 0});
+  const [activeField, setActiveField] = useState(null); // NEW: Track active field
   
   useEffect(() => {
     if (pickupCords?.latitude || droplocationCords?.latitude) {
@@ -88,9 +89,11 @@ export default function Home(params) {
   }, [pickupCords?.latitude, pickupCords?.longitude, droplocationCords?.latitude, droplocationCords?.longitude]);
 
   useEffect(() => {
-    console.log('DEBUG: API KEY:', GOOGLE_MAPS_APIKEY ? 'Present' : 'MISSING');
-    console.log('DEBUG: Pickup:', pickupCords);
-    console.log('DEBUG: Drop:', droplocationCords);
+    if (__DEV__) {
+      console.log('DEBUG: API KEY:', GOOGLE_MAPS_APIKEY ? 'Present' : 'MISSING');
+      console.log('DEBUG: Pickup:', pickupCords);
+      console.log('DEBUG: Drop:', droplocationCords);
+    }
   }, [pickupCords, droplocationCords]);
 
   // Memoized reverse geocoding with error handling
@@ -471,8 +474,8 @@ export default function Home(params) {
             </MapView>
 
             {/* Top Floating Route Entry Container */}
-            <View style={styles.routeEntryContainer} pointerEvents="box-none">
-              <View style={styles.routeHeader} pointerEvents="box-none">
+            <View style={styles.routeEntryContainer}>
+              <View style={styles.routeHeader}>
                 <TouchableOpacity onPress={() => openDrawer()}>
                   <Icon name="menu" type="MaterialIcons" style={{fontSize: 24, color: '#333'}} />
                 </TouchableOpacity>
@@ -486,156 +489,51 @@ export default function Home(params) {
                   <View style={styles.dotRed} />
                 </View>
 
-                <View style={styles.inputColumn} pointerEvents="box-none">
+                <View style={styles.inputColumn}>
                   <Text style={styles.inputLabel}>Pickup Location</Text>
-                  <GooglePlacesAutocomplete
-                    ref={pickupRef}
-                    onFail={error => console.error('Pickup error:', error)}
+                  <LocationAutocomplete
                     placeholder="My Current Location"
-                    keyboardShouldPersistTaps="always"
-                    listViewDisplayed='auto'
-                    textInputProps={{
-                      placeholderTextColor: '#9CA3AF',
-                      returnKeyType: 'search',
-                    }}
-                    styles={{
-                      container: {flex: 0, marginBottom: 10, zIndex: 4000},
-                      textInput: {
-                        backgroundColor: '#F3F4F6',
-                        borderRadius: 10,
-                        height: 45,
-                        color: '#000',
-                        fontSize: 14,
-                        paddingHorizontal: 15,
-                      },
-                      listView: {
-                        position: 'absolute',
-                        top: 45,
-                        left: 0,
-                        right: 0,
-                        backgroundColor: 'white',
-                        borderRadius: 10,
-                        elevation: 15,
-                        shadowColor: '#000',
-                        shadowOffset: {width: 0, height: 2},
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        zIndex: 6000,
-                      },
-                      description: {
-                        color: '#000',
-                      },
-                      predefinedPlacesDescription: {
-                        color: '#000',
-                      },
-                    }}
-                    query={{key: GOOGLE_MAPS_APIKEY, language: 'en'}}
-                    onPress={async (data, details = null) => {
-                      if (data.description === 'Current location' || data.isPredefinedPlace) {
-                        handleGetCurrentLocation(true);
-                        return;
-                      }
-                      
-                      let lat = details?.geometry?.location?.lat;
-                      let lng = details?.geometry?.location?.lng;
-                      
-                      if (!lat || !lng) {
-                        console.log('DEBUG: Fetching details via Geocoder for pickup');
-                        try {
-                          const json = await Geocoder.from(data.description);
-                          lat = json.results[0].geometry.location.lat;
-                          lng = json.results[0].geometry.location.lng;
-                        } catch (e) { console.error('Geocoding failed', e); }
-                      }
-                      
-                      if (lat && lng) {
-                        const coords = {
-                          latitude: parseFloat(lat),
-                          longitude: parseFloat(lng),
-                          locationName: data.description || data?.structured_formatting?.main_text,
-                        };
-                        console.log('DEBUG: Setting Pickup Coords:', coords);
-                        setPickupCords(coords);
-                      }
-                    }}
-                    fetchDetails={true}
-                    enablePoweredByContainer={false}
+                    value={pickupCords?.locationName || ''}
+                    apiKey={GOOGLE_MAPS_APIKEY}
                     predefinedPlaces={[
                       {
                         description: 'Current location',
-                        geometry: {location: {lat: 0, lng: 0}},
+                        isPredefined: true,
                       },
                     ]}
+                    isActive={activeField === 'pickup'}
+                    onFocus={() => setActiveField('pickup')}
+                    onBlur={() => setActiveField(null)}
+                    onLocationSelect={(location) => {
+                      if (location.isPredefined) {
+                        handleGetCurrentLocation(true);
+                      } else {
+                        const coords = {
+                          latitude: location.latitude,
+                          longitude: location.longitude,
+                          locationName: location.description,
+                        };
+                        setPickupCords(coords);
+                      }
+                    }}
                   />
 
                   <Text style={styles.inputLabel}>Where to?</Text>
-                  <GooglePlacesAutocomplete
-                    ref={droplocationRef}
-                    onFail={error => console.error('Drop error:', error)}
+                  <LocationAutocomplete
                     placeholder="Enter destination"
-                    keyboardShouldPersistTaps="always"
-                    listViewDisplayed="auto"
-                    textInputProps={{
-                      placeholderTextColor: '#9CA3AF',
-                      returnKeyType: 'search',
+                    value={droplocationCords?.locationName || ''}
+                    apiKey={GOOGLE_MAPS_APIKEY}
+                    isActive={activeField === 'destination'}
+                    onFocus={() => setActiveField('destination')}
+                    onBlur={() => setActiveField(null)}
+                    onLocationSelect={(location) => {
+                      const coords = {
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        locationName: location.description,
+                      };
+                      setDroplocationCords(coords);
                     }}
-                    styles={{
-                      container: {flex: 0, zIndex: 3000},
-                      textInput: {
-                        backgroundColor: '#F3F4F6',
-                        borderRadius: 10,
-                        height: 45,
-                        color: '#000',
-                        fontSize: 14,
-                        paddingHorizontal: 15,
-                      },
-                      listView: {
-                        position: 'absolute',
-                        top: 45,
-                        left: 0,
-                        right: 0,
-                        backgroundColor: 'white',
-                        borderRadius: 10,
-                        elevation: 10,
-                        shadowColor: '#000',
-                        shadowOffset: {width: 0, height: 2},
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.84,
-                        zIndex: 5000,
-                      },
-                      description: {
-                        color: '#000',
-                      },
-                      predefinedPlacesDescription: {
-                        color: '#000',
-                      },
-                    }}
-                    query={{key: GOOGLE_MAPS_APIKEY, language: 'en'}}
-                    onPress={async (data, details = null) => {
-                      let lat = details?.geometry?.location?.lat;
-                      let lng = details?.geometry?.location?.lng;
-                      
-                      if (!lat || !lng) {
-                        console.log('DEBUG: Fetching details via Geocoder for drop-off');
-                        try {
-                          const json = await Geocoder.from(data.description);
-                          lat = json.results[0].geometry.location.lat;
-                          lng = json.results[0].geometry.location.lng;
-                        } catch (e) { console.error('Geocoding failed', e); }
-                      }
-                      
-                      if (lat && lng) {
-                        const coords = {
-                          latitude: parseFloat(lat),
-                          longitude: parseFloat(lng),
-                          locationName: data.description || data?.structured_formatting?.main_text,
-                        };
-                        console.log('DEBUG: Setting Drop-off Coords:', coords);
-                        setDroplocationCords(coords);
-                      }
-                    }}
-                    fetchDetails={true}
-                    enablePoweredByContainer={false}
                   />
                 </View>
               </View>
@@ -674,8 +572,6 @@ export default function Home(params) {
             </TouchableOpacity>
 
             <View style={styles.estimateSheet}>
-             
-            
               <TouchableOpacity
                 style={[styles.nextBtn, {opacity: hasLocations ? 1 : 0.6}]}
                 onPress={() => {

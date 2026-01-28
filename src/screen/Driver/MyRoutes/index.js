@@ -66,23 +66,54 @@ function MyRoute({navigation}) {
   const [pickupCords, setPickupCords] = useState({});
   const [droplocationCords, setDroplocationCords] = useState({});
   const [region, setRegion] = useState(defaultLocation);
-  const [mapRefreshKey, setMapRefreshKey] = useState(0);
 
   useEffect(() => {
-    if (pickupCords?.latitude || droplocationCords?.latitude) {
-      setMapRefreshKey(prev => prev + 1);
-      if (pickupCords?.latitude) {
-        const newRegion = {
-          latitude: Number(pickupCords.latitude),
-          longitude: Number(pickupCords.longitude),
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        };
-        setRegion(newRegion);
-        setTimeout(() => {
-          mapRef.current?.animateToRegion(newRegion, 1000);
-        }, 100);
-      }
+    if (pickupCords?.latitude && droplocationCords?.latitude) {
+      // Both locations selected - fit to show both markers
+      setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.fitToCoordinates(
+            [
+              {
+                latitude: Number(pickupCords.latitude),
+                longitude: Number(pickupCords.longitude),
+              },
+              {
+                latitude: Number(droplocationCords.latitude),
+                longitude: Number(droplocationCords.longitude),
+              },
+            ],
+            {
+              edgePadding: {top: 200, right: 50, bottom: 200, left: 50},
+              animated: true,
+            }
+          );
+        }
+      }, 100);
+    } else if (pickupCords?.latitude) {
+      // Only pickup selected - zoom to pickup
+      const newRegion = {
+        latitude: Number(pickupCords.latitude),
+        longitude: Number(pickupCords.longitude),
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      };
+      setRegion(newRegion);
+      setTimeout(() => {
+        mapRef.current?.animateToRegion(newRegion, 1000);
+      }, 100);
+    } else if (droplocationCords?.latitude) {
+      // Only destination selected - zoom to destination
+      const newRegion = {
+        latitude: Number(droplocationCords.latitude),
+        longitude: Number(droplocationCords.longitude),
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      };
+      setRegion(newRegion);
+      setTimeout(() => {
+        mapRef.current?.animateToRegion(newRegion, 1000);
+      }, 100);
     }
   }, [pickupCords?.latitude, pickupCords?.longitude, droplocationCords?.latitude, droplocationCords?.longitude]);
 
@@ -142,7 +173,9 @@ function MyRoute({navigation}) {
       const result = await Geocoder.from(lat, lng);
       return result?.results[0]?.formatted_address || 'Unknown location';
     } catch (err) {
-      console.error('Reverse geocoding error:', err);
+      if (__DEV__) {
+        console.error('Reverse geocoding error:', err);
+      }
       return 'Unknown location';
     }
   };
@@ -188,7 +221,6 @@ function MyRoute({navigation}) {
       <View style={{flex: 1}}>
         <MapView
           ref={mapRef}
-          key={`map-${mapRefreshKey}`}
           style={StyleSheet.absoluteFill}
           provider="google"
           region={region}
@@ -246,7 +278,11 @@ function MyRoute({navigation}) {
                   animated: true,
                 });
               }}
-              onError={err => console.error('Directions Error:', err)}
+              onError={err => {
+                if (__DEV__) {
+                  console.error('Directions Error:', err);
+                }
+              }}
             />
           )}
         </MapView>
@@ -266,14 +302,19 @@ function MyRoute({navigation}) {
                 ref={pickupRef}
                 onFail={error => console.error('Pickup error:', error)}
                 placeholder="Enter pickup location"
-                keyboardShouldPersistTaps="always"
-                listViewDisplayed="auto"
+                keyboardShouldPersistTaps="handled"
+                listViewDisplayed={false}
                 textInputProps={{
                   placeholderTextColor: '#9CA3AF',
                   returnKeyType: 'search',
                 }}
                 styles={{
-                  container: {flex: 0, marginBottom: 10, zIndex: 4000},
+                  container: {
+                    flex: 0,
+                    marginBottom: 10,
+                    zIndex: 10001,
+                    elevation: 10001,
+                  },
                   textInput: {
                     backgroundColor: '#F3F4F6',
                     borderRadius: 10,
@@ -281,23 +322,30 @@ function MyRoute({navigation}) {
                     color: '#000',
                     fontSize: 14,
                     paddingHorizontal: 15,
+                    zIndex: 10001,
                   },
                   listView: {
                     position: 'absolute',
-                    top: 45,
+                    top: 47,
                     left: 0,
                     right: 0,
                     backgroundColor: 'white',
                     borderRadius: 10,
-                    elevation: 15,
+                    elevation: 10002,
                     shadowColor: '#000',
-                    shadowOffset: {width: 0, height: 2},
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    zIndex: 6000,
+                    shadowOffset: {width: 0, height: 4},
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    zIndex: 10002,
+                    maxHeight: 300,
                   },
                   description: {
                     color: '#000',
+                  },
+                  row: {
+                    backgroundColor: 'white',
+                    paddingVertical: 12,
+                    paddingHorizontal: 15,
                   },
                 }}
                 query={{key: GOOGLE_MAPS_APIKEY, language: 'en'}}
@@ -314,7 +362,9 @@ function MyRoute({navigation}) {
                       coords.latitude = json.results[0].geometry.location.lat;
                       coords.longitude = json.results[0].geometry.location.lng;
                     } catch (e) {
-                      console.error('Geocoding failed', e);
+                      if (__DEV__) {
+                        console.error('Geocoding failed', e);
+                      }
                     }
                   }
 
@@ -331,14 +381,18 @@ function MyRoute({navigation}) {
                 ref={droplocationRef}
                 onFail={error => console.error('Drop error:', error)}
                 placeholder="Enter destination"
-                keyboardShouldPersistTaps="always"
-                listViewDisplayed="auto"
+                keyboardShouldPersistTaps="handled"
+                listViewDisplayed={false}
                 textInputProps={{
                   placeholderTextColor: '#9CA3AF',
                   returnKeyType: 'search',
                 }}
                 styles={{
-                  container: {flex: 0, zIndex: 3000},
+                  container: {
+                    flex: 0,
+                    zIndex: 9000,
+                    elevation: 9000,
+                  },
                   textInput: {
                     backgroundColor: '#F3F4F6',
                     borderRadius: 10,
@@ -346,23 +400,30 @@ function MyRoute({navigation}) {
                     color: '#000',
                     fontSize: 14,
                     paddingHorizontal: 15,
+                    zIndex: 9000,
                   },
                   listView: {
                     position: 'absolute',
-                    top: 45,
+                    top: 47,
                     left: 0,
                     right: 0,
                     backgroundColor: 'white',
                     borderRadius: 10,
-                    elevation: 10,
+                    elevation: 9001,
                     shadowColor: '#000',
-                    shadowOffset: {width: 0, height: 2},
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    zIndex: 5000,
+                    shadowOffset: {width: 0, height: 4},
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    zIndex: 9001,
+                    maxHeight: 300,
                   },
                   description: {
                     color: '#000',
+                  },
+                  row: {
+                    backgroundColor: 'white',
+                    paddingVertical: 12,
+                    paddingHorizontal: 15,
                   },
                 }}
                 query={{key: GOOGLE_MAPS_APIKEY, language: 'en'}}
@@ -379,7 +440,9 @@ function MyRoute({navigation}) {
                       coords.latitude = json.results[0].geometry.location.lat;
                       coords.longitude = json.results[0].geometry.location.lng;
                     } catch (e) {
-                      console.error('Geocoding failed', e);
+                      if (__DEV__) {
+                        console.error('Geocoding failed', e);
+                      }
                     }
                   }
 
@@ -490,13 +553,15 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 10,
-    zIndex: 1000,
+    elevation: 10000,
+    zIndex: 10000,
     overflow: 'visible',
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    zIndex: 10000,
+    elevation: 10000,
   },
   visualColumn: {
     width: 20,
@@ -525,6 +590,7 @@ const styles = StyleSheet.create({
   inputColumn: {
     flex: 1,
     overflow: 'visible',
+    zIndex: 10000,
   },
   inputLabel: {
     fontSize: 10,

@@ -155,8 +155,7 @@ export default {
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 10,
-    zIndex: 1000,
+    elevation: 5,
   },
   routeHeader: {
     flexDirection: 'row',
@@ -171,7 +170,7 @@ export default {
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   visualColumn: {
     width: 20,

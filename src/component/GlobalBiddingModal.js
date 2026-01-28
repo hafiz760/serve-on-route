@@ -74,6 +74,7 @@ const GlobalBiddingModal = () => {
      * Fetch parcel details by ID
      * @param {string} parcelId - Parcel ID
      */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const fetchParcelById = async (parcelId) => {
         try {
             const userDataString = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
