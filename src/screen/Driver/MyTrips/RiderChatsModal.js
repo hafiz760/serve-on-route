@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -7,27 +7,27 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Text, Icon} from '../../../component/Basic';
-import {Button, TextInput} from '../../../component/Form';
+import { Text, Icon } from '../../../component/Basic';
+import { Button, TextInput } from '../../../component/Form';
 import Modal from 'react-native-modalbox';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import styles from './styles';
 import theme from '../../../theme/styles';
 // import { BASE_URL, URL_V } from "@env";
-import {BASE_URL, URL_V} from '../../../utilities/helper';
+import { BASE_URL, URL_V } from '../../../utilities/helper';
 import AppSpinner from '../../../component/AppSpinner';
-import {COLOR} from '../../../theme/typography';
+import { COLOR } from '../../../theme/typography';
 
-const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
+const RiderChatsModal = ({ setSelectedParcel, selectedParcel }) => {
   const [currentLoggedInUserDetails, setCurrentLoggedInUserDetails] =
     useState(null);
   const [text, setText] = useState('');
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const {socket} = useSelector(state => state.socket);
+  const { socket } = useSelector(state => state.socket);
   const listRef = useRef(null);
 
   const getConversationId = async userInfo => {
@@ -84,16 +84,16 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
     console.log('sendMessage called');
     const selectedMemberId =
       currentLoggedInUserDetails._id.toString() ===
-      selectedParcel.customer_id?._id.toString()
+        selectedParcel.customer_id?._id.toString()
         ? selectedParcel.rider_id
-        : selectedParcel.customer_id?._id;
+        : selectedParcel.customer_id
     console.log('selectedMemberId', selectedMemberId);
     let sendMsg = {
       to: selectedMemberId,
       message: text,
     };
 
-    if (messages?.length !== 0) {
+    if (conversationId) {
       sendMsg.conversationId = conversationId;
       console.log('conversation id', conversationId);
     }
@@ -181,7 +181,7 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
       style={styles.modalRating}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{flex: 1}}>
+        style={{ flex: 1 }}>
         <View style={styles.modalRatingContainer}>
           <Button
             onPress={() => setSelectedParcel(null)}
@@ -192,7 +192,7 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
               style={[theme.SIZE_20, theme.DARKVIOLET]}
             />
           </Button>
-          <View style={{flex: 1, width: '100%'}}>
+          <View style={{ flex: 1, width: '100%' }}>
             {isLoading ? (
               <View style={styles.loaderContainerStyles}>
                 <AppSpinner size="large" color={COLOR.PRIMARY} />
@@ -202,7 +202,7 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
                 data={messages}
                 keyExtractor={message => message._id.toString()}
                 showsVerticalScrollIndicator={false}
-                renderItem={({item}) => {
+                renderItem={({ item }) => {
                   const isSender =
                     item?.sender?.toString() ===
                     currentLoggedInUserDetails?._id?.toString();
@@ -211,14 +211,14 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
                     <View
                       style={[
                         styles.wrapimg,
-                        {justifyContent: isSender ? 'flex-end' : 'flex-start'},
+                        { justifyContent: isSender ? 'flex-end' : 'flex-start' },
                       ]}>
                       {!isSender && (
                         <View style={styles.reciverPic}>
                           <Image
                             source={
                               selectedParcel?.customer_id?.avatar
-                                ? {uri: selectedParcel?.customer_id?.avatar}
+                                ? { uri: selectedParcel?.customer_id?.avatar }
                                 : require('../../../assets/images/dummyProfile.jpg')
                             }
                             style={styles.profileImg}
@@ -240,7 +240,7 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
                           <Image
                             source={
                               selectedParcel?.rider_id?.avatar
-                                ? {uri: selectedParcel?.rider_id?.avatar}
+                                ? { uri: selectedParcel?.rider_id?.avatar }
                                 : require('../../../assets/images/dummyProfile.jpg')
                             }
                             style={styles.profileImg}
@@ -251,16 +251,16 @@ const RiderChatsModal = ({setSelectedParcel, selectedParcel}) => {
                   );
                 }}
                 ref={listRef}
-                onLayout={() => listRef?.current?.scrollToEnd({animated: true})}
+                onLayout={() => listRef?.current?.scrollToEnd({ animated: true })}
                 onContentSizeChange={() => {
                   if (messages.length) {
-                    listRef?.current?.scrollToEnd({animated: true});
+                    listRef?.current?.scrollToEnd({ animated: true });
                   }
                 }}
               />
             ) : (
-              <View style={{flex: 1, alignItems: 'center'}}>
-                <Text style={{color: '#999'}}>No Messages Found</Text>
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <Text style={{ color: '#999' }}>No Messages Found</Text>
               </View>
             )}
           </View>

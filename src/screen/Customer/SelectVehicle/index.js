@@ -89,18 +89,6 @@ function SelectVehicle(params) {
     { label: '20:00 - 00:00', value: '20:00 - 00:00', slot: 6 },
   ]);
   const [ageModels, setAgeModels] = useState(false);
-  const [openWeightModel, setOpenWeightModel] = useState(false);
-  const [selectedWeight, setSelectedWeight] = useState('0-5');
-  // const [weightRange, setWeightRange] = useState([
-  //   { label: "0-5", value: "0-5" },
-  //   { label: "5-10", value: "5-10" },
-  //   { label: "10-15", value: "10-15" },
-  //   { label: "15-20", value: "15-20" },
-  //   { label: "20-25", value: "20-25" },
-  //   { label: "25-30", value: "25-30" },
-  //   { label: "35-40", value: "35-40" },
-  //   { label: "40+", value: "40+" },
-  // ]);
   const [weightRange, setWeightRange] = useState({ title: '0-5' });
   const weightRangeValue = [
     { title: '0-5' },
@@ -249,7 +237,7 @@ function SelectVehicle(params) {
         Authorization: `Bearer ${datas.access_token}`,
         'Content-Type': 'multipart/form-data',
       },
-      body: formData, 
+      body: formData,
     };
     try {
       const res = await fetch(`${BASE_URL}${URL_V}parcel`, requestOptions);
@@ -426,7 +414,7 @@ function SelectVehicle(params) {
                   }}
                   setItems={setTimes}
                   listMode="SCROLLVIEW"
-                  dropDownMaxHeight={1000}
+                  maxHeight={1000}
                   style={{
                     paddingVertical: 19,
                     marginTop: 10,

@@ -74,18 +74,26 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
 
   const sendMessage = async () => {
     console.log("sendMessage called");
+
+    const getSafeId = (item) => (item && typeof item === 'object' && item._id) ? item._id : item;
+    const currentUserId = getSafeId(currentLoggedInUserDetails);
+    const customerId = getSafeId(selectedParcel?.customer_id);
+    // const riderId = getSafeId(selectedParcel?.rider_id);
+
     const selectedMemberId =
-      currentLoggedInUserDetails._id.toString() ===
-        selectedParcel.customer_id?._id.toString()
+      currentUserId.toString() === customerId?.toString()
         ? selectedParcel.rider_id
-        : selectedParcel.customer_id?._id;
-    console.log("selectedMemberId", selectedMemberId);
+        : selectedParcel.customer_id;
+
+    const targetMemberId = getSafeId(selectedMemberId);
+    console.log("selectedMemberId", targetMemberId);
+
     let sendMsg = {
-      to: selectedMemberId?._id,
+      to: targetMemberId,
       message: text,
     };
 
-    if (messages?.length !== 0) {
+    if (conversationId) {
       sendMsg.conversationId = conversationId;
     }
 
@@ -94,7 +102,7 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
       if (messages.length > 0 && !conversationId) {
         console.log("IN NESTED IF====>");
         const convoResp = await axios.get(
-          `${BASE_URL}${URL_V}chat/conversation?member=${selectedMemberId?._id}`,
+          `${BASE_URL}${URL_V}chat/conversation?member=${targetMemberId}`,
           {
             headers: {
               authorization: `Bearer ${currentLoggedInUserDetails?.token}`,
@@ -158,8 +166,14 @@ const ChatsModal = ({ setSelectedParcel, selectedParcel }) => {
   };
 
   useEffect(() => {
-    intializeChatFunctionality();
+    if (selectedParcel) {
+      setMessages([]);
+      setConversationId(null);
+      intializeChatFunctionality();
+    }
+  }, [selectedParcel]);
 
+  useEffect(() => {
     socket ? (socket.on("receive_message", (incomingMsg) => {
       console.log("NEW MESS for customer", incomingMsg);
       setMessages((prevMessages) => [...prevMessages, incomingMsg]);
