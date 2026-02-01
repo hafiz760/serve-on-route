@@ -414,7 +414,7 @@ function SelectVehicle(params) {
                   }}
                   setItems={setTimes}
                   listMode="SCROLLVIEW"
-                  maxHeight={1000}
+                  maxHeight={250}
                   style={{
                     paddingVertical: 19,
                     marginTop: 10,

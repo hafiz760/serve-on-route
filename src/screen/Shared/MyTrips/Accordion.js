@@ -63,24 +63,6 @@ const Accordion = ({
           {title}
         </Text>
         <View style={styles.accordionInfo}>
-          <View style={styles.accordionItem}>
-            {/* <Text
-              style={
-                opened
-                  ? styles.accordionActiveText
-                  : styles.accordionInactiveText
-              }
-            >
-              {text}
-            </Text> */}
-          </View>
-          <TouchableOpacity onPress={handleNavigation}>
-            <Icon
-              name="content-copy"
-              type="MaterialCommunityIcons"
-              style={[theme.SIZE_20, theme.DARKBLUE, { marginRight: 5 }]}
-            />
-          </TouchableOpacity>
           <Icon
             name={opened ? "keyboard-arrow-down" : "keyboard-arrow-right"}
             type="MaterialIcons"

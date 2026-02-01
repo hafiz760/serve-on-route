@@ -72,7 +72,7 @@ export default function MyTrips({ userRole = 'customer' }) {
   };
 
 
-   useEffect(() => {
+  useEffect(() => {
     if (isFocused) {
       fetchData();
     }
@@ -176,176 +176,176 @@ export default function MyTrips({ userRole = 'customer' }) {
             trip={val}
             renderContent={() => (
               <>
-            <View style={styles.accordionContent}>
-              {/* Details Card */}
-              <View style={{ paddingHorizontal: 15, paddingTop: 12 }}>
-                {/* Location and Time Section - Always Show */}
-                <View style={{ marginBottom: 8 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <View style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: COLOR.GREEN,
-                      marginRight: 8
-                    }} />
-                    <Text style={{
-                      fontFamily: FAMILY.REGULAR,
-                      fontSize: SIZE.SIZE_11,
-                      color: COLOR.GREYVIOLET,
-                      flex: 1
-                    }}>
-                      {pickupLoc}
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <View style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: COLOR.PRIMARY,
-                      marginRight: 8
-                    }} />
-                    <Text style={{
-                      fontFamily: FAMILY.REGULAR,
-                      fontSize: SIZE.SIZE_11,
-                      color: COLOR.GREYVIOLET,
-                      flex: 1
-                    }}>
-                      {dropLoc}
-                    </Text>
-                  </View>
-                  <View style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingTop: 8,
-                    paddingBottom: 8,
-                    borderTopWidth: 1,
-                    borderBottomWidth: 1,
-                    borderTopColor: COLOR.SMOKELIGHT,
-                    borderBottomColor: COLOR.SMOKELIGHT
-                  }}>
-                    <Icon
-                      name="clock"
-                      type="Feather"
-                      style={{ fontSize: 12, color: COLOR.GREYVIOLET, marginRight: 5 }}
-                    />
-                    <Text style={{
-                      fontFamily: FAMILY.REGULAR,
-                      fontSize: SIZE.SIZE_11,
-                      color: COLOR.GREYVIOLET
-                    }}>
-                      {tripTime}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.bookingInfo}>
-                  <Text style={styles.bookingTitle}>TRIP COST</Text>
-                  <Text style={[styles.bookingText, { fontFamily: FAMILY.BOLD, color: COLOR.PRIMARY, fontSize: SIZE.SIZE_14 }]}>
-                    {cost}
-                  </Text>
-                </View>
-
-                {val?.[otherUserField]?.first_name && (
-                  <View style={styles.bookingInfo}>
-                    <Text style={styles.bookingTitle}>{otherUserLabel}</Text>
-                    <Text style={[styles.bookingText, { fontFamily: FAMILY.BOLD }]}>
-                      {val[otherUserField]?.first_name}
-                    </Text>
-                  </View>
-                )}
-
-                {isCustomer && (
-                  <View style={styles.bookingInfo}>
-                    <Text style={styles.bookingTitle}>OTP</Text>
-                    <View style={{
-                      backgroundColor: COLOR.PRIMARY,
-                      paddingHorizontal: 12,
-                      paddingVertical: 4,
-                      borderRadius: 6
-                    }}>
-                      <Text style={{
-                        fontFamily: FAMILY.BOLD,
-                        fontSize: SIZE.SIZE_14,
-                        color: COLOR.LIGHT,
-                        letterSpacing: 2
+                <View style={styles.accordionContent}>
+                  {/* Details Card */}
+                  <View style={{ paddingHorizontal: 15, paddingTop: 12 }}>
+                    {/* Location and Time Section - Always Show */}
+                    <View style={{ marginBottom: 8 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                        <View style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 4,
+                          backgroundColor: COLOR.GREEN,
+                          marginRight: 8
+                        }} />
+                        <Text style={{
+                          fontFamily: FAMILY.REGULAR,
+                          fontSize: SIZE.SIZE_11,
+                          color: COLOR.GREYVIOLET,
+                          flex: 1
+                        }}>
+                          {pickupLoc}
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                        <View style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 4,
+                          backgroundColor: COLOR.PRIMARY,
+                          marginRight: 8
+                        }} />
+                        <Text style={{
+                          fontFamily: FAMILY.REGULAR,
+                          fontSize: SIZE.SIZE_11,
+                          color: COLOR.GREYVIOLET,
+                          flex: 1
+                        }}>
+                          {dropLoc}
+                        </Text>
+                      </View>
+                      <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingTop: 8,
+                        paddingBottom: 8,
+                        borderTopWidth: 1,
+                        borderBottomWidth: 1,
+                        borderTopColor: COLOR.SMOKELIGHT,
+                        borderBottomColor: COLOR.SMOKELIGHT
                       }}>
-                        {val?.receiving_otp}
+                        <Icon
+                          name="clock"
+                          type="Feather"
+                          style={{ fontSize: 12, color: COLOR.GREYVIOLET, marginRight: 5 }}
+                        />
+                        <Text style={{
+                          fontFamily: FAMILY.REGULAR,
+                          fontSize: SIZE.SIZE_11,
+                          color: COLOR.GREYVIOLET
+                        }}>
+                          {tripTime}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.bookingInfo}>
+                      <Text style={styles.bookingTitle}>TRIP COST</Text>
+                      <Text style={[styles.bookingText, { fontFamily: FAMILY.BOLD, color: COLOR.PRIMARY, fontSize: SIZE.SIZE_14 }]}>
+                        {cost}
                       </Text>
                     </View>
+
+                    {val?.[otherUserField]?.first_name && (
+                      <View style={styles.bookingInfo}>
+                        <Text style={styles.bookingTitle}>{otherUserLabel}</Text>
+                        <Text style={[styles.bookingText, { fontFamily: FAMILY.BOLD }]}>
+                          {val[otherUserField]?.first_name}
+                        </Text>
+                      </View>
+                    )}
+
+                    {isCustomer && (
+                      <View style={styles.bookingInfo}>
+                        <Text style={styles.bookingTitle}>OTP</Text>
+                        <View style={{
+                          backgroundColor: COLOR.PRIMARY,
+                          paddingHorizontal: 12,
+                          paddingVertical: 4,
+                          borderRadius: 6
+                        }}>
+                          <Text style={{
+                            fontFamily: FAMILY.BOLD,
+                            fontSize: SIZE.SIZE_14,
+                            color: COLOR.LIGHT,
+                            letterSpacing: 2
+                          }}>
+                            {val?.receiving_otp}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+
+                    <View style={[styles.bookingInfo, { borderBottomWidth: 0, paddingBottom: 8 }]}>
+                      <Text style={styles.bookingTitle}>STATUS</Text>
+                      <View style={{
+                        backgroundColor: getStatusColor(),
+                        paddingHorizontal: 12,
+                        paddingVertical: 5,
+                        borderRadius: 15
+                      }}>
+                        <Text style={{
+                          fontFamily: FAMILY.BOLD,
+                          fontSize: SIZE.SIZE_10,
+                          color: COLOR.LIGHT
+                        }}>
+                          {statusText}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                )}
 
-                <View style={[styles.bookingInfo, { borderBottomWidth: 0, paddingBottom: 8 }]}>
-                  <Text style={styles.bookingTitle}>STATUS</Text>
-                  <View style={{
-                    backgroundColor: getStatusColor(),
-                    paddingHorizontal: 12,
-                    paddingVertical: 5,
-                    borderRadius: 15
-                  }}>
-                    <Text style={{
-                      fontFamily: FAMILY.BOLD,
-                      fontSize: SIZE.SIZE_10,
-                      color: COLOR.LIGHT
-                    }}>
-                      {statusText}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              <View style={styles.btnInfo}>
-                <Button
-                  style={styles.detailBtn}
-                  onPress={() => {
-                    const screen = isCustomer
-                      ? 'CustomerBookingComplete'
-                      : 'DriverBookingComplete';
-                    navigate(screen, { data: val });
-                  }}>
-                  <Icon
-                    name="file-text"
-                    type="Feather"
-                    style={{ fontSize: 14, color: COLOR.GREYDARK }}
-                  />
-                  <Text style={styles.detailBtnText}>Details</Text>
-                </Button>
-
-                {val?.status !== 'completed' && (
-                  <>
+                  <View style={styles.btnInfo}>
                     <Button
-                      style={[styles.detailBtn, { backgroundColor: COLOR.BLUE }]}
+                      style={styles.detailBtn}
                       onPress={() => {
-                        setSelectedParcel(val);
+                        const screen = isCustomer
+                          ? 'CustomerBookingComplete'
+                          : 'DriverBookingComplete';
+                        navigate(screen, { data: val });
                       }}>
                       <Icon
-                        name="message-circle"
+                        name="file-text"
                         type="Feather"
-                        style={{ fontSize: 14, color: COLOR.LIGHT }}
+                        style={{ fontSize: 14, color: COLOR.GREYDARK }}
                       />
-                      <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>
-                        Chat
-                      </Text>
+                      <Text style={styles.detailBtnText}>Details</Text>
                     </Button>
 
-                    <Button
-                      style={[styles.detailBtn, { backgroundColor: COLOR.GREEN }]}
-                      onPress={() => handleNavigation(val)}>
-                      <Icon
-                        name="navigation"
-                        type="Feather"
-                        style={{ fontSize: 14, color: COLOR.LIGHT }}
-                      />
-                      <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>
-                        {isCustomer ? 'Track' : 'Start'}
-                      </Text>
-                    </Button>
-                  </>
-                )}
-              </View>
-            </View>
+                    {val?.status !== 'completed' && (
+                      <>
+                        <Button
+                          style={[styles.detailBtn, { backgroundColor: COLOR.BLUE }]}
+                          onPress={() => {
+                            setSelectedParcel(val);
+                          }}>
+                          <Icon
+                            name="message-circle"
+                            type="Feather"
+                            style={{ fontSize: 14, color: COLOR.LIGHT }}
+                          />
+                          <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>
+                            Chat
+                          </Text>
+                        </Button>
+
+                        <Button
+                          style={[styles.detailBtn, { backgroundColor: COLOR.GREEN }]}
+                          onPress={() => handleNavigation(val)}>
+                          <Icon
+                            name="navigation"
+                            type="Feather"
+                            style={{ fontSize: 14, color: COLOR.LIGHT }}
+                          />
+                          <Text style={[styles.detailBtnText, { color: COLOR.LIGHT }]}>
+                            {isCustomer ? 'Track' : 'Start'}
+                          </Text>
+                        </Button>
+                      </>
+                    )}
+                  </View>
+                </View>
               </>
             )}
           />
