@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Container, Content, Text, Icon } from '../../../component/Basic';
 import { TextInput, Button, ToggleSwitch } from '../../../component/Form';
 import { COLOR, FAMILY, SIZE } from '../../../theme/typography';
-import axios from 'axios';
 import styles from './styles';
 import theme from '../../../theme/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,10 +11,10 @@ import Modal from 'react-native-modalbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DocumentPicker from 'react-native-document-picker';
 import { useSelector } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CountDown from 'react-native-countdown-component';
 import { DarkStatusBar } from '../../../component/StatusBar';
 import { connect } from 'react-redux';
-import DatePicker from 'react-native-date-picker';
 import { showMessage } from '../../../helper/showAlert';
 import ImagePicker from 'react-native-image-crop-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -26,26 +25,15 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Toast from 'react-native-toast-message';
-import TimerModal from '../../../component/TimerModal';
-// import { BASE_URL, URL_V } from "@env";
 import { BASE_URL, URL_V } from '../../../utilities/helper';
 import { navigate } from '../../../navigations';
 import DropdownPicker from '../../../component/DropdownPicker';
 import AppSpinner from '../../../component/AppSpinner';
 
 function SelectVehicle(params) {
-  // console.log(params.route.params);
-  // console.log("CURRENT PARAMS ===>", params.route.params);
-
-  const from_location_cor = `${params.route.params.form.latitude}, ${params.route.params.form.longitude}`;
-
-  const to_location_cor = `${params.route.params.to.latitude}, ${params.route.params.to.longitude}`;
-
-  const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
   const [imageForShow, setImageForShow] = useState([]);
   const [date, setDate] = useState('');
-  const [date2, setDate2] = useState('');
   const [formatedDate, setFormatedDate] = useState('');
 
   const [images, setImages] = useState();
@@ -55,14 +43,12 @@ function SelectVehicle(params) {
   const [height, setHeight] = useState({ title: '0-1' });
   const [length, setLength] = useState({ title: '0-1' });
   const [weight, setWeight] = useState({ title: '0-5' });
-  const [mainModel, setMainModel] = useState(false);
   const [openModel, setOpenModel] = useState(false);
   const [openTimeModel, setOpenTimeModel] = useState(false);
 
   const [timerModel, setTimerModel] = useState(false);
   const [focus, setFocus] = useState(false);
   const [bottomModal, setBottomModal] = useState(false);
-  const [dateOneTimeSelect, setDateOneTimeSelect] = useState(false);
   const [selectSlot, setSelectSlot] = useState('');
   const [until, setUntil] = useState(0);
   const [slotTimings, setSlotTimings] = useState('');
@@ -113,7 +99,6 @@ function SelectVehicle(params) {
 
   const [pracelTimeType, setPracelTimeType] = useState('time');
   const [itemsType, setItemsType] = useState('solid');
-  const [time, setTime] = useState('Select Time');
   const { socket } = useSelector(state => state.socket);
   console.log(socket, 'socket');
 
@@ -124,6 +109,38 @@ function SelectVehicle(params) {
       width: 300,
       height: 400,
       cropping: true,
+      freeStyleCropEnabled: true,
+      cropperStatusBarColor: '#59499E',
+      cropperToolbarColor: '#59499E',
+      cropperToolbarWidgetColor: '#FFFFFF',
+      cropperActiveWidgetColor: '#59499E',
+    }).then(image => {
+      var format = {
+        fileCopyUri: null,
+        name: image.path.split('/')[image.path.split('/').length - 1],
+        height: image?.height,
+        width: image?.width,
+        size: image?.size,
+        type: image.mime,
+        uri: image?.path,
+      };
+      setImageForShow(pre => {
+        return [...pre, format];
+      });
+      setImages(format);
+    });
+  };
+
+  const getPhotoFromGalleryLibrary = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+      freeStyleCropEnabled: true,
+      cropperStatusBarColor: '#59499E',
+      cropperToolbarColor: '#59499E',
+      cropperToolbarWidgetColor: '#FFFFFF',
+      cropperActiveWidgetColor: '#59499E',
     }).then(image => {
       var format = {
         fileCopyUri: null,
@@ -146,11 +163,9 @@ function SelectVehicle(params) {
         allowMultiSelection: true,
         type: [DocumentPicker.types.allFiles],
       });
-      // console.log("Image frm galaery", res);
       setImages(res[0]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker, exit any dialogs or menus and move on
       } else {
         throw err;
       }
@@ -159,11 +174,10 @@ function SelectVehicle(params) {
 
 
   const getPhotoFromGallery = () => {
-    // setBottomModal(true);
     if (imageForShow.length >= 3) {
-      showMessage("You can't uploaded more than three images");
+      showMessage("You can't upload more than three images");
     } else {
-      getPhotoFromCamera();
+      setBottomModal(true);
     }
   };
 
@@ -221,7 +235,6 @@ function SelectVehicle(params) {
     formData.append('fare', fare);
     formData.append('width', width.title);
     formData.append('time', formatedDate);
-    // formData.append("time", "2023-10-25T18:37:33.582Z");
     formData.append('length', length.title);
     formData.append('weight', weight.title);
     formData.append('parcel_type', itemsType);
@@ -229,8 +242,6 @@ function SelectVehicle(params) {
     formData.append('biddingEndTime', '2026-12-12');
     formData.append('bidding_type', pracelTimeType);
 
-    // console.log("FormData", JSON.stringify(formData, null, 2));
-    // return
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -245,22 +256,18 @@ function SelectVehicle(params) {
       const result = await res.json();
       console.log("result>>>>>", result);
 
-      // Check if response is not OK (status code outside 200-299)
       if (!res.ok || result.statusCode === 400 || result.statusCode >= 400) {
         showMessage("error", result.message || "Failed to create parcel");
         setISLoading(false);
         return;
       }
 
-      // Success case
       setFocus(true);
       showMessage(
         'success',
         'Parcel Created Successfully!. Wait for drivers to bid',
       );
       navigate('PublicHome');
-      // setUntil(10)
-      // setTimerModel(true)
     } catch (err) {
       console.log('Error creating parcel:', err);
       showMessage('error', err.message || 'Something went wrong');
@@ -270,7 +277,6 @@ function SelectVehicle(params) {
   };
 
   const deleteShowImage = (value) => {
-    // console.log("press")
     setImageForShow((previous) =>
       previous.filter((val) => val?.uri != value?.uri)
     );
@@ -286,18 +292,12 @@ function SelectVehicle(params) {
   };
 
   const handleConfirm = date => {
-    // Format the date as "DD-MM-YYYY"
     const formattedDate1 = moment(date).format('DD-MM-YYYY');
-    // Set the first formatted date in state
     setDate(formattedDate1);
 
-    // Format the date as "YYYY-MM-DD HH:mm:ss"
     const formattedDate2 = moment(date).format('YYYY-MM-DD HH:mm:ss');
-    // Set the second formatted date in state
 
     setFormatedDate(formattedDate2);
-
-    // Hide the date picker or perform other actions as needed
     hideDatePicker();
   };
 
@@ -341,62 +341,6 @@ function SelectVehicle(params) {
                 Please choose a time slot, When a driving host can come to pick
                 up the parcel.
               </Text>
-              {/* <TimeSelection /> */}
-              {/* <View style={styles.slotContaainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectSlot(1), setSlotTimings("00:00 - 04:00");
-                  }}
-                  style={[selectSlot === 1 ? styles.slotBtnB : styles.slotBtn]}
-                >
-                  <Text style={styles.timeText}>00:00 - 04:00</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectSlot(2), setSlotTimings("04:00 - 08:00");
-                  }}
-                  style={[selectSlot === 2 ? styles.slotBtnB : styles.slotBtn]}
-                >
-                  <Text style={styles.timeText}>04:00 - 08:00</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.slotContaainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectSlot(3), setSlotTimings("08:00 - 12:00");
-                  }}
-                  style={[selectSlot === 3 ? styles.slotBtnB : styles.slotBtn]}
-                >
-                  <Text style={styles.timeText}>08:00 - 12:00</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectSlot(4), setSlotTimings("12:00 - 16:00");
-                  }}
-                  style={[selectSlot === 4 ? styles.slotBtnB : styles.slotBtn]}
-                >
-                  <Text style={styles.timeText}>12:00 - 16:00</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.slotContaainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectSlot(5), setSlotTimings("16:00 - 20:00");
-                  }}
-                  style={[selectSlot === 5 ? styles.slotBtnB : styles.slotBtn]}
-                >
-                  <Text style={styles.timeText}>16:00 - 20:00</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectSlot(6), setSlotTimings("20:00 - 24:00");
-                  }}
-                  style={[selectSlot === 6 ? styles.slotBtnB : styles.slotBtn]}
-                >
-                  <Text style={styles.timeText}>20:00 - 24:00</Text>
-                </TouchableOpacity>
-              </View> */}
-
               <View
                 style={{
                   zIndex: 2000,
@@ -453,185 +397,52 @@ function SelectVehicle(params) {
               </View>
 
               <View>
-                {/* <Text style={styles.timeTex2t}>Weight Range</Text> */}
-                <View
-                  style={
-                    {
-                      // height: 80,
-                    }
-                  }>
+                <View>
                   <DropdownPicker
                     data={weightRangeValue}
                     onSelect={(selectedItem, index) => {
                       setWeight(selectedItem);
                     }}
                     title={'Weight Range(kg)'}
-                    // touched={touched.job}
-                    // errorMessage={errors.job}
                     value={weightRange}
                     isPickerOpen={ageModels}
                     defaultButtonText={weightRange.title}
-                  //   onFocus={() => setOpenBrandPicker(true)}
-                  //   onBlur={() => setOpenBrandPicker(false)}
                   />
-                  {/* <DropDownPicker
-                  open={openWeightModel}
-                  items={weightRange}
-                  setOpen={setOpenWeightModel}
-                  value={selectedWeight}
-                  onSelectItem={(e) => {
-                    setSelectedWeight(e.value); 
-                  
-                  }}
-                  setItems={setItems}
-                  style={{
-                    // flex: 1,
-                    paddingVertical: 19,
-                    marginTop: 10,
-                    marginBottom: 0,
-                    borderWidth: 0,
-                    color: COLOR.PRIMARY,
-                    fontSize: SIZE.SIZE_14,
-                    fontFamily: FAMILY.REGULAR,
-
-                  }}
-                  labelStyle={{
-                    color:COLOR.DARKVIOLET, // Custom text color
-                    fontSize: 16,
-                  }}
-                  dropDownContainerStyle={{
-                    borderColor: "#4A90E2",
-                    backgroundColor: "#FFFFFF",
-                    zIndex: 999,
-                    elevation: 999,
-                    // Ensures dropdown stays above
-                  }}
-        
-          
-                  // ✅ Custom dropdown icon
-                  ArrowDownIconComponent={() => (
-                    <FontAwesome name="angle-down" size={22} color={COLOR.DARKVIOLET} />
-                  )}
-          
-                /> */}
                 </View>
-                {/* <View style={[styles.formRow]}>
-                  <View style={{ marginRight: 10 }}>
-                    <Icon
-                      name="box"
-                      type="Feather"
-                    />
-                  </View>
-                  <TextInput
-                    type="number"
-                    placeholder="Weight"
-                    placeholderTextColor="rgba(89, 73, 158, 0.5)"
-                    style={styles.formInput}
-                    value={weight}
-                    onChangeText={(text) => {
-                      setWeight(text);
-                    }}
-                    keyboardType="numeric"
-                    maxValue={100}
-                  />
-                </View> */}
               </View>
-              {/* <Text style={styles.timeText2}>Dimension</Text> */}
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                 }}>
-                {/* <View>
-                  <View>
-                    <View style={[styles.formRow2, { width: wp("25") }]}>
-                      <TextInput
-                        placeholder="Length"
-                        placeholderTextColor="rgba(89, 73, 158, 0.5)"
-                        keyboardType="numeric"
-                        value={length}
-                        onChangeText={(text) => {
-                          setLength(text);
-                        }}
-                        style={[styles.formInput,]}
-                      />
-                    </View>
-                  </View>
-                </View> */}
-
                 <DropdownPicker
                   data={WidthRangeValue}
                   onSelect={(selectedItem, index) => {
                     setLength(selectedItem);
                   }}
                   title={'Length(ft)'}
-                  // touched={touched.job}
-                  // errorMessage={errors.job}
                   isPickerOpen={ageModels}
                   defaultButtonText={length.title}
                   customButtonStyle={{ width: 100 }}
-                //   onFocus={() => setOpenBrandPicker(true)}
-                //   onBlur={() => setOpenBrandPicker(false)}
                 />
-                {/* <View>
-                  <View style={[styles.formRow2, { width: wp("25") }]}>
-                    <TextInput
-                      type="number"
-                      placeholder="Width"
-
-                      placeholderTextColor="rgba(89, 73, 158, 0.5)"
-                      style={styles.formInput}
-                      value={width}
-                      onChangeText={(text) => {
-                        setWidth(text);
-                      }}
-                      keyboardType="numeric"
-                      maxValue={100}
-                    />
-                  </View>
-                </View> */}
                 <DropdownPicker
                   data={WidthRangeValue}
                   onSelect={(selectedItem, index) => {
                     setHeight(selectedItem);
                   }}
                   title={'Height(ft)'}
-                  // touched={touched.job}
-                  // errorMessage={errors.job}
                   isPickerOpen={ageModels}
                   defaultButtonText={height.title}
                   customButtonStyle={{ width: 100 }}
-                //   onFocus={() => setOpenBrandPicker(true)}
-                //   onBlur={() => setOpenBrandPicker(false)}
                 />
-                {/* <View>
-                  <View>
-                    <View style={[styles.formRow2, { width: wp("25") }]}>
-                      <TextInput
-                        placeholder="Height"
-                        placeholderTextColor="rgba(89, 73, 158, 0.5)"
-                        keyboardType="numeric"
-                        value={height}
-                        onChangeText={(text) => {
-                          setHeight(text);
-                        }}
-                        style={[styles.formInput,]}
-                      />
-                    </View>
-                  </View>
-                </View> */}
                 <DropdownPicker
                   data={WidthRangeValue}
                   onSelect={(selectedItem, index) => {
                     setWidth(selectedItem);
                   }}
                   title={'Width(ft)'}
-                  // touched={touched.job}
-                  // errorMessage={errors.job}
                   isPickerOpen={ageModels}
                   defaultButtonText={width.title}
-                  //   onFocus={() => setOpenBrandPicker(true)}
-                  //   onBlur={() => setOpenBrandPicker(false)}
                   customButtonStyle={{ width: 100 }}
                 />
               </View>
@@ -658,10 +469,9 @@ function SelectVehicle(params) {
                     fontFamily: FAMILY.REGULAR,
                   }}
                   labelStyle={{
-                    color: COLOR.DARKVIOLET, // Custom text color
+                    color: COLOR.DARKVIOLET,
                     fontSize: 16,
                   }}
-                  // ✅ Custom dropdown icon
                   ArrowDownIconComponent={() => (
                     <FontAwesome
                       name="angle-down"
@@ -724,54 +534,55 @@ function SelectVehicle(params) {
           </View>
         </ScrollView>
       </Content>
-      <Button
-        style={styles.bookingBtn}
-        onPress={() => {
-          fetchData();
-        }}>
-        {isloading ? (
-          <View style={{ paddingVertical: 5 }}>
-            <AppSpinner color={COLOR.PRIMARY} size="large" />
-          </View>
-        ) : (
-          <Text style={styles.bookingBtnText}>BOOK NOW</Text>
-        )}
-      </Button>
+      <View style={{ paddingBottom: insets.bottom || 10, backgroundColor: COLOR.LIGHT }}>
+        <Button
+          style={styles.bookingBtn}
+          onPress={() => {
+            fetchData();
+          }}>
+          {isloading ? (
+            <View style={{ paddingVertical: 5 }}>
+              <AppSpinner color={COLOR.PRIMARY} size="large" />
+            </View>
+          ) : (
+            <Text style={styles.bookingBtnText}>BOOK NOW</Text>
+          )}
+        </Button>
+      </View>
 
       <Modal
         isOpen={bottomModal}
         entry={'bottom'}
         backdropOpacity={0.3}
-        swipeToClose={false}
+        onClosed={() => setBottomModal(false)}
+        swipeToClose={true}
         position="bottom"
         style={{
-          height: 200,
+          height: 250 + (insets.bottom || 0),
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
+          paddingBottom: insets.bottom || 20,
+          backgroundColor: '#FFF'
         }}>
-        <Button
-          style={[styles.bookingBtn, { backgroundColor: 'purple' }]}
-          onPress={() => {
-            getPhotoFromCamera();
-            setBottomModal(false);
-          }}>
-          <Text style={styles.bookingBtnText}>OPEN CAMERA</Text>
-        </Button>
-        <Button
-          style={styles.bookingBtn}
-          onPress={() => {
-            UploadData();
-            setBottomModal(false);
-          }}>
-          <Text style={styles.bookingBtnText}>SELECT FROM FILES</Text>
-        </Button>
-        <Button
-          style={[styles.bookingBtn, { backgroundColor: 'red' }]}
-          onPress={() => {
-            setBottomModal(false);
-          }}>
-          <Text style={styles.bookingBtnText}>CANCLE</Text>
-        </Button>
+        <View style={{ padding: 20 }}>
+          <Text style={[styles.label, { textAlign: 'center', fontSize: 18, marginBottom: 10 }]}>Select Photo Source</Text>
+          <Button
+            style={[styles.bookingBtn, { backgroundColor: COLOR.PRIMARY, marginHorizontal: 0 }]}
+            onPress={() => {
+              getPhotoFromCamera();
+              setBottomModal(false);
+            }}>
+            <Text style={styles.bookingBtnText}>OPEN CAMERA</Text>
+          </Button>
+          <Button
+            style={[styles.bookingBtn, { backgroundColor: COLOR.DARKBLUE, marginHorizontal: 0 }]}
+            onPress={() => {
+              getPhotoFromGalleryLibrary();
+              setBottomModal(false);
+            }}>
+            <Text style={styles.bookingBtnText}>SELECT FROM GALLERY</Text>
+          </Button>
+        </View>
       </Modal>
       <Modal
         isOpen={timerModel}

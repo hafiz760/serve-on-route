@@ -73,54 +73,59 @@ function MyRoute({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [temporaryPickUpCords, setTemporaryPickUpCords] = useState({});
   const [activeField, setActiveField] = useState(null);
+  const [mapRefreshKey, setMapRefreshKey] = useState(0);
 
   useEffect(() => {
-    if (pickupCords?.latitude && droplocationCords?.latitude) {
-      // Both locations selected - fit to show both markers
-      setTimeout(() => {
-        if (mapRef.current) {
-          mapRef.current.fitToCoordinates(
-            [
+    if (pickupCords?.latitude || droplocationCords?.latitude) {
+      setMapRefreshKey(prev => prev + 1);
+
+      if (pickupCords?.latitude && droplocationCords?.latitude) {
+        // Both locations selected - fit to show both markers
+        setTimeout(() => {
+          if (mapRef.current) {
+            mapRef.current.fitToCoordinates(
+              [
+                {
+                  latitude: Number(pickupCords.latitude),
+                  longitude: Number(pickupCords.longitude),
+                },
+                {
+                  latitude: Number(droplocationCords.latitude),
+                  longitude: Number(droplocationCords.longitude),
+                },
+              ],
               {
-                latitude: Number(pickupCords.latitude),
-                longitude: Number(pickupCords.longitude),
-              },
-              {
-                latitude: Number(droplocationCords.latitude),
-                longitude: Number(droplocationCords.longitude),
-              },
-            ],
-            {
-              edgePadding: { top: 200, right: 50, bottom: 200, left: 50 },
-              animated: true,
-            }
-          );
-        }
-      }, 100);
-    } else if (pickupCords?.latitude) {
-      // Only pickup selected - zoom to pickup
-      const newRegion = {
-        latitude: Number(pickupCords.latitude),
-        longitude: Number(pickupCords.longitude),
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      };
-      setRegion(newRegion);
-      setTimeout(() => {
-        mapRef.current?.animateToRegion(newRegion, 1000);
-      }, 100);
-    } else if (droplocationCords?.latitude) {
-      // Only destination selected - zoom to destination
-      const newRegion = {
-        latitude: Number(droplocationCords.latitude),
-        longitude: Number(droplocationCords.longitude),
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      };
-      setRegion(newRegion);
-      setTimeout(() => {
-        mapRef.current?.animateToRegion(newRegion, 1000);
-      }, 100);
+                edgePadding: { top: 200, right: 50, bottom: 200, left: 50 },
+                animated: true,
+              }
+            );
+          }
+        }, 100);
+      } else if (pickupCords?.latitude) {
+        // Only pickup selected - zoom to pickup
+        const newRegion = {
+          latitude: Number(pickupCords.latitude),
+          longitude: Number(pickupCords.longitude),
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        };
+        setRegion(newRegion);
+        setTimeout(() => {
+          mapRef.current?.animateToRegion(newRegion, 1000);
+        }, 100);
+      } else if (droplocationCords?.latitude) {
+        // Only destination selected - zoom to destination
+        const newRegion = {
+          latitude: Number(droplocationCords.latitude),
+          longitude: Number(droplocationCords.longitude),
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        };
+        setRegion(newRegion);
+        setTimeout(() => {
+          mapRef.current?.animateToRegion(newRegion, 1000);
+        }, 100);
+      }
     }
   }, [pickupCords?.latitude, pickupCords?.longitude, droplocationCords?.latitude, droplocationCords?.longitude]);
 
@@ -366,6 +371,7 @@ function MyRoute({ navigation }) {
       <View style={{ flex: 1 }}>
         <MapView
           ref={mapRef}
+          key={`map-${mapRefreshKey}`}
           style={StyleSheet.absoluteFill}
           provider="google"
           region={region}
