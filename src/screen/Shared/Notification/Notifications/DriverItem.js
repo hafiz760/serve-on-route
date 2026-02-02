@@ -170,7 +170,8 @@ export default function Item({ value }) {
               style={{
                 backgroundColor: "#fff",
                 borderRadius: 20,
-                padding: 24,
+                paddingVertical: 24,
+                paddingLeft: 16,
                 width: wp("85"),
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 10 },
@@ -189,7 +190,7 @@ export default function Item({ value }) {
                     Customer
                   </Text>
                 </View>
-                <View style={{ backgroundColor: COLOR.SMOKEBLUE, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 12 }}>
+                <View style={{ backgroundColor: COLOR.SMOKEBLUE, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 12, marginRight: 16 }}>
                   <Text style={{ fontFamily: FAMILY.BOLD, fontSize: SIZE.SIZE_18, color: COLOR.PRIMARY }}>
                     ${data?.fare}
                   </Text>
@@ -197,7 +198,7 @@ export default function Item({ value }) {
               </View>
 
               {/* Route Info */}
-              <View style={{ marginBottom: 25 }}>
+              <View style={{ marginBottom: 25, marginRight: 16 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 15 }}>
                   <View style={{ alignItems: 'center', marginRight: 12, marginTop: 4 }}>
                     <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: COLOR.BLUE }} />
@@ -267,7 +268,8 @@ export default function Item({ value }) {
                       backgroundColor: COLOR.PRIMARY,
                       paddingVertical: 14,
                       borderRadius: 12,
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      marginRight: 16,
                     }}
                   >
                     <Text style={{ color: '#FFF', fontWeight: 'bold' }}>Make Own Offer</Text>

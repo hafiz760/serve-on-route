@@ -163,7 +163,7 @@ export default function Item({ value }) {
               }}
             >
               {/* Header */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'start', alignItems: 'center', marginBottom: 20 }}>
                 <View>
                   <Text style={{ fontFamily: FAMILY.BOLD, fontSize: SIZE.SIZE_18, color: COLOR.DARK }}>
                     {data?.customer_id?.first_name} {data?.customer_id?.last_name}
@@ -172,7 +172,7 @@ export default function Item({ value }) {
                     Customer
                   </Text>
                 </View>
-                <View style={{ backgroundColor: COLOR.SMOKEBLUE, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 12 }}>
+                <View style={{ backgroundColor: COLOR.SMOKEBLUE, paddingVertical: 8, borderRadius: 12 }}>
                   <Text style={{ fontFamily: FAMILY.BOLD, fontSize: SIZE.SIZE_18, color: COLOR.PRIMARY }}>
                     ${data?.fare}
                   </Text>
